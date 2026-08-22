@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
+<meta name="theme-color" content="#f59e0b">
+
+<title>Learn • Nanhi Pathshala</title>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap"
+    rel="stylesheet"
+>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Nunito", sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 10% 5%,
+            #ccfbf1 0,
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 90% 10%,
+            #fef3c7 0,
+            transparent 25%
+        ),
+        #f8fafc;
+
+    color: #134e4a;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.page {
+    min-height: 100vh;
+    padding-bottom: 30px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    padding: 17px 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #14b8a6,
+            #0d9488
+        );
+
+    color: white;
+
+    border-radius:
+        0 0 30px 30px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(13,148,136,.18);
+}
+
+.back-button {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,.18);
+
+    color: white;
+
+    font-size: 21px;
+}
+
+.header-title {
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 23px;
+
+    font-weight: 900;
+}
+
+
+/* =========================
+   CONTENT
+========================= */
+
+.container {
+    width: 100%;
+    max-width: 700px;
+
+    margin: 0 auto;
+
+    padding: 22px 16px;
+}
+
+.page-heading {
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 22px;
+
+    font-weight: 900;
+
+    color: #134e4a;
+
+    margin-bottom: 5px;
+}
+
+.page-description {
+    color: #64748b;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    line-height: 1.5;
+
+    margin-bottom: 20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="header">
+
+        <button
+            type="button"
+            class="back-button"
+            id="backButton"
+        >
+            ←
+        </button>
+
+        <h1 class="header-title">
+            Learn
+        </h1>
+
+    </header>
+
+
+    <main class="container">
+
+        <h2 class="page-heading">
+            What would you like to learn?
+        </h2>
+
+        <p class="page-description">
+            Choose a subject and start learning today.
+        </p>
+        <div class="subject-grid">
+
+
+            <button
+                type="button"
+                class="subject-card"
+                id="mathButton"
+            >
+
+                <div class="subject-icon">
+                    🔢
+                </div>
+
+                <div class="subject-info">
+
+                    <h3>
+                        Mathematics
+                    </h3>
+
+                    <p>
+                        Numbers, formulas & problem solving
+                    </p>
+
+                </div>
+
+                <span class="subject-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="subject-card"
+                id="scienceButton"
+            >
+
+                <div class="subject-icon">
+                    🔬
+                </div>
+
+                <div class="subject-info">
+
+                    <h3>
+                        Science
+                    </h3>
+
+                    <p>
+                        Discover the world around you
+                    </p>
+
+                </div>
+
+                <span class="subject-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="subject-card"
+                id="englishButton"
+            >
+
+                <div class="subject-icon">
+                    📘
+                </div>
+
+                <div class="subject-info">
+
+                    <h3>
+                        English
+                    </h3>
+
+                    <p>
+                        Reading, writing & communication
+                    </p>
+
+                </div>
+
+                <span class="subject-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="subject-card"
+                id="hindiButton"
+            >
+
+                <div class="subject-icon">
+                    🪔
+                </div>
+
+                <div class="subject-info">
+
+                    <h3>
+                        Hindi
+                    </h3>
+
+                    <p>
+                        Language, stories & literature
+                    </p>
+
+                </div>
+
+                <span class="subject-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="subject-card"
+                id="computerButton"
+            >
+
+                <div class="subject-icon">
+                    💻
+                </div>
+
+                <div class="subject-info">
+
+                    <h3>
+                        Computer
+                    </h3>
+
+                    <p>
+                        Technology & digital skills
+                    </p>
+
+                </div>
+
+                <span class="subject-arrow">
+                    →
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="subject-card"
+                id="generalButton"
+            >
+
+                <div class="subject-icon">
+                    🌍
+                </div>
+
+                <div class="subject-info">
+
+                    <h3>
+                        General Knowledge
+                    </h3>
+
+                    <p>
+                        Explore facts about our world
+                    </p>
+
+                </div>
+
+                <span class="subject-arrow">
+                    →
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <div class="coming-card">
+
+            <div class="coming-icon">
+                ✨
+            </div>
+
+            <div>
+
+                <h3>
+                    More subjects coming soon
+                </h3>
+
+                <p>
+                    New learning content will be added regularly.
+                </p>
+
+            </div>
+
+        </div>
+        <div class="continue-card">
+
+            <div class="continue-icon">
+                🚀
+            </div>
+
+            <div class="continue-content">
+
+                <h3>
+                    Keep Learning
+                </h3>
+
+                <p>
+                    Your lessons and learning materials
+                    will appear here.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="loading-box"
+            id="loadingBox"
+        >
+
+            <div class="loading-spinner"></div>
+
+            <p>
+                Loading learning content...
+            </p>
+
+        </div>
+
+
+        <div
+            class="empty-box"
+            id="emptyBox"
+        >
+
+            <div class="empty-icon">
+                📚
+            </div>
+
+            <h3>
+                No Content Available
+            </h3>
+
+            <p>
+                Learning content will appear here
+                when it is added.
+            </p>
+
+        </div>
+
+    </main>
+
+</div>
+<style>
+
+    /* =========================
+       SUBJECT GRID
+    ========================== */
+
+    .subject-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+        gap: 12px;
+
+        margin-bottom: 20px;
+    }
+
+    .subject-card {
+        position: relative;
+
+        min-height: 145px;
+
+        padding: 17px;
+
+        display: flex;
+        flex-direction: column;
+
+        align-items: flex-start;
+        justify-content: space-between;
+
+        text-align: left;
+
+        border-radius: 21px;
+
+        background: #ffffff;
+
+        border: 1px solid #e2e8f0;
+
+        box-shadow:
+            0 8px 22px
+            rgba(15,23,42,.06);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease;
+    }
+
+    .subject-card:active {
+        transform: scale(.97);
+    }
+
+    .subject-icon {
+        width: 48px;
+        height: 48px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 15px;
+
+        background: #f0fdfa;
+
+        font-size: 25px;
+    }
+
+    .subject-info {
+        margin-top: 12px;
+
+        min-width: 0;
+    }
+
+    .subject-info h3 {
+        color: #134e4a;
+
+        font-family: "Quicksand", sans-serif;
+
+        font-size: 15px;
+
+        font-weight: 900;
+    }
+
+    .subject-info p {
+        margin-top: 4px;
+
+        color: #94a3b8;
+
+        font-size: 10px;
+
+        line-height: 1.45;
+
+        font-weight: 700;
+    }
+
+    .subject-arrow {
+        position: absolute;
+
+        right: 14px;
+        top: 14px;
+
+        width: 28px;
+        height: 28px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 9px;
+
+        background: #f8fafc;
+
+        color: #0d9488;
+
+        font-size: 15px;
+
+        font-weight: 900;
+    }
+
+
+    /* =========================
+       COMING SOON
+    ========================== */
+
+    .coming-card,
+    .continue-card {
+        display: flex;
+
+        align-items: center;
+
+        gap: 13px;
+
+        padding: 16px;
+
+        margin-bottom: 14px;
+
+        border-radius: 19px;
+    }
+
+    .coming-card {
+        background:
+            linear-gradient(
+                135deg,
+                #fffbeb,
+                #fef3c7
+            );
+
+        border: 1px solid #fde68a;
+    }
+
+    .continue-card {
+        background:
+            linear-gradient(
+                135deg,
+                #f0fdfa,
+                #ccfbf1
+            );
+
+        border: 1px solid #99f6e4;
+    }
+
+    .coming-icon,
+    .continue-icon {
+        width: 46px;
+        height: 46px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 14px;
+
+        background: #ffffff;
+
+        font-size: 23px;
+    }
+
+    .coming-card h3,
+    .continue-card h3 {
+        font-size: 14px;
+
+        font-weight: 900;
+    }
+
+    .coming-card h3 {
+        color: #92400e;
+    }
+
+    .continue-card h3 {
+        color: #0f766e;
+    }
+
+    .coming-card p,
+    .continue-card p {
+        margin-top: 3px;
+
+        font-size: 11px;
+
+        line-height: 1.45;
+
+        font-weight: 700;
+    }
+
+    .coming-card p {
+        color: #a16207;
+    }
+
+    .continue-card p {
+        color: #0f766e;
+    }
+
+
+    /* =========================
+       LOADING
+    ========================== */
+
+    .loading-box {
+        display: none;
+
+        padding: 28px 15px;
+
+        text-align: center;
+
+        color: #64748b;
+
+        font-size: 12px;
+
+        font-weight: 800;
+    }
+
+    .loading-spinner {
+        width: 30px;
+        height: 30px;
+
+        margin: 0 auto 10px;
+
+        border: 3px solid #ccfbf1;
+
+        border-top-color: #0d9488;
+
+        border-radius: 50%;
+
+        animation:
+            spin .8s linear infinite;
+    }
+
+    @keyframes spin {
+
+        to {
+            transform: rotate(360deg);
+        }
+
+    }
+
+
+    /* =========================
+       EMPTY
+    ========================== */
+
+    .empty-box {
+        display: none;
+
+        padding: 30px 18px;
+
+        text-align: center;
+
+        border-radius: 20px;
+
+        background: #ffffff;
+
+        border: 1px solid #e2e8f0;
+    }
+
+    .empty-icon {
+        font-size: 35px;
+
+        margin-bottom: 8px;
+    }
+
+    .empty-box h3 {
+        color: #134e4a;
+
+        font-family: "Quicksand", sans-serif;
+
+        font-size: 17px;
+
+        font-weight: 900;
+    }
+
+    .empty-box p {
+        max-width: 300px;
+
+        margin: 5px auto 0;
+
+        color: #94a3b8;
+
+        font-size: 11px;
+
+        line-height: 1.5;
+
+        font-weight: 700;
+    }
+
+
+    /* =========================
+       RESPONSIVE
+    ========================== */
+
+    @media (min-width: 600px) {
+
+        .subject-grid {
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+        }
+
+    }
+
+
+    @media (max-width: 350px) {
+
+        .subject-grid {
+            gap: 9px;
+        }
+
+        .subject-card {
+            padding: 13px;
+
+            min-height: 135px;
+        }
+
+        .subject-info h3 {
+            font-size: 14px;
+        }
+
+    }
+
+</style>
+<script type="module">
+
+    import {
+        auth,
+        db
+    } from "./firebase.js";
+
+    import {
+        onAuthStateChanged
+    } from
+    "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+    const loadingBox =
+        document.getElementById("loadingBox");
+
+    const emptyBox =
+        document.getElementById("emptyBox");
+
+
+    /*
+    ============================================================
+       FIREBASE LOGIN CHECK
+    ============================================================
+    */
+
+    onAuthStateChanged(
+        auth,
+        (user) => {
+
+            if (!user) {
+
+                window.location.replace(
+                    "login.html"
+                );
+
+                return;
+            }
+
+
+            /*
+            User is authenticated.
+            The learning content can now
+            be loaded from Firebase.
+            */
+
+            loadingBox.style.display =
+                "none";
+
+        }
+    );
+
+
+    /*
+    ============================================================
+       BACK BUTTON
+    ============================================================
+    */
+
+    document
+        .getElementById("backButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "home.html";
+
+            }
+        );
+
+
+    /*
+    ============================================================
+       SUBJECT NAVIGATION
+    ============================================================
+    */
+
+    document
+        .getElementById("mathButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "subject.html?subject=mathematics";
+
+            }
+        );
+
+
+    document
+        .getElementById("scienceButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "subject.html?subject=science";
+
+            }
+        );
+
+
+    document
+        .getElementById("englishButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "subject.html?subject=english";
+
+            }
+        );
+
+
+    document
+        .getElementById("hindiButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "subject.html?subject=hindi";
+
+            }
+        );
+
+
+    document
+        .getElementById("computerButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "subject.html?subject=computer";
+
+            }
+        );
+
+
+    document
+        .getElementById("generalButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "subject.html?subject=general-knowledge";
+
+            }
+        );
+
+
+    /*
+    ============================================================
+       PAGE SECURITY
+    ============================================================
+    */
+
+    window.addEventListener(
+        "pageshow",
+        () => {
+
+            if (!auth.currentUser) {
+
+                window.location.replace(
+                    "login.html"
+                );
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+
+</html>
+
+
+        
