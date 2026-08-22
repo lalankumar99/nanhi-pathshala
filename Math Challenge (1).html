@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Master Challenge</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Fun, Bright, and Kid-Friendly Theme */
+        body { 
+            background: linear-gradient(135deg, #A7F3D0 0%, #FDE68A 100%);
+            font-family: 'Nunito', sans-serif;
+            -webkit-tap-highlight-color: transparent; 
+            color: #1E293B;
+            overflow: hidden; 
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Animated Background Pattern */
+        .bg-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(#14B8A6 10%, transparent 10%), radial-gradient(#14B8A6 10%, transparent 10%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            opacity: 0.1;
+            z-index: -1;
+            animation: moveBg 20s linear infinite;
+        }
+
+        @keyframes moveBg {
+            0% { background-position: 0 0, 20px 20px; }
+            100% { background-position: 400px 400px, 420px 420px; }
+        }
+
+        /* White Glassy Card */
+        .game-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 0 0 8px rgba(255, 255, 255, 0.4);
+        }
+
+        /* Juicy 3D Buttons */
+        .juicy-btn {
+            background: #FFFFFF;
+            border: 3px solid #E2E8F0;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 0 #CBD5E1;
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #334155;
+            position: relative;
+            top: 0;
+        }
+        
+        .juicy-btn:active {
+            top: 8px;
+            box-shadow: 0 0px 0 #CBD5E1;
+            background: #F8FAFC;
+        }
+
+        /* State Colors for Buttons */
+        .btn-correct {
+            background: #22C55E !important;
+            border-color: #16A34A !important;
+            box-shadow: 0 8px 0 #15803D !important;
+            color: white !important;
+            animation: bounce 0.5s;
+        }
+        
+        .btn-wrong {
+            background: #EF4444 !important;
+            border-color: #DC2626 !important;
+            box-shadow: 0 8px 0 #B91C1C !important;
+            color: white !important;
+            animation: shake 0.4s;
+        }
+
+        /* Timer Bar */
+        .timer-track {
+            background: #E2E8F0;
+            border-radius: 999px;
+            box-shadow: inset 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .timer-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.1s linear, background-color 0.3s;
+            box-shadow: inset 0 -4px 0 rgba(0,0,0,0.15);
+        }
+
+        /* Animations */
+        @keyframes slideInUp {
+            0% { transform: translateY(50px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-enter { animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop { animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-8px); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Fullscreen Modal */
+        #gameOverModal { backdrop-filter: blur(8px); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative w-full h-full text-slate-800">
+
+    <div class="bg-pattern"></div>
+
+    <!-- Header (Timer & Stats) -->
+    <header class="p-4 sm:p-6 w-full max-w-3xl mx-auto z-10 flex flex-col gap-4">
+        <div class="flex items-center justify-between w-full bg-white/60 backdrop-blur-md rounded-2xl p-3 shadow-sm border border-white">
+            <!-- Question Counter -->
+            <div class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl font-black text-sm sm:text-base flex items-center gap-2 shadow-inner">
+                🎯 <span id="questionCounter">Q: 1/20</span>
+            </div>
+            
+            <!-- Score -->
+            <div class="bg-yellow-100 text-yellow-700 px-5 py-2 rounded-xl font-black text-xl flex items-center gap-2 shadow-inner">
+                ⭐ <span id="scoreDisplay">0</span>
+            </div>
+        </div>
+
+        <!-- 30s Timer Bar -->
+        <div class="w-full timer-track h-6 sm:h-8 p-1 relative border-2 border-white">
+            <div id="timerBar" class="timer-fill bg-green-400 w-full relative">
+                <!-- Highlight for 3D effect on timer -->
+                <div class="absolute top-0 left-0 right-0 h-1/3 bg-white/30 rounded-full"></div>
+            </div>
+            <div id="timerText" class="absolute inset-0 flex items-center justify-center text-xs sm:text-sm font-black text-slate-700 drop-shadow-sm">
+                30s
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Area -->
+    <main class="flex-1 flex flex-col items-center justify-center px-4 z-10 w-full max-w-3xl mx-auto pb-10">
+        
+        <div id="gameBox" class="w-full animate-enter">
+            <!-- Question Card -->
+            <div class="w-full game-card p-8 sm:p-12 text-center relative mb-8 flex flex-col items-center justify-center min-h-[220px]">
+                
+                <div id="timeoutWarning" class="absolute -top-4 bg-red-500 text-white px-4 py-1 rounded-full font-black text-sm shadow-lg hidden animate-pop border-2 border-white">
+                    ⏰ Time's Up!
+                </div>
+                
+                <h2 id="questionText" class="text-6xl sm:text-7xl md:text-8xl font-black tracking-tight text-slate-700 drop-shadow-sm font-sans flex items-center justify-center gap-2 flex-wrap">
+                    <!-- Question will be injected here -->
+                </h2>
+            </div>
+
+            <!-- Options Grid (2x2) -->
+            <div class="w-full grid grid-cols-2 gap-4 sm:gap-6" id="optionsGrid">
+                <!-- Buttons will be injected here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="fixed inset-0 z-50 bg-slate-900/90 hidden flex-col items-center justify-center p-6" id="gameOverModal">
+        <div class="text-8xl mb-4 animate-pop" id="resultEmoji">🏆</div>
+        <h1 class="text-4xl sm:text-5xl font-black text-white mb-2 text-center drop-shadow-md">Challenge Complete!</h1>
+        <p class="text-yellow-400 text-xl mb-8 font-black tracking-wide" id="resultMessage">You are a Math Genius.</p>
+        
+        <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm mb-10 text-center shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-4 bg-indigo-500"></div>
+            <p class="text-sm text-slate-400 uppercase tracking-widest font-bold mb-1 mt-2">Total Score</p>
+            <div class="text-7xl font-black text-indigo-600 mb-6 drop-shadow-sm" id="finalScoreText">0</div>
+            
+            <div class="flex justify-between items-center text-lg font-black border-t-2 border-slate-100 pt-4">
+                <div class="flex flex-col items-center text-green-500">
+                    <span class="text-2xl" id="correctCountText">0</span>
+                    <span class="text-xs uppercase text-slate-400">Correct</span>
+                </div>
+                <div class="h-10 w-0.5 bg-slate-100"></div>
+                <div class="flex flex-col items-center text-red-500">
+                    <span class="text-2xl" id="wrongCountText">0</span>
+                    <span class="text-xs uppercase text-slate-400">Wrong</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 w-full max-w-sm">
+            <button onclick="startGame()" class="flex-1 bg-yellow-400 hover:bg-yellow-300 text-yellow-900 font-black py-4 px-6 rounded-2xl transition-transform active:scale-95 text-xl shadow-[0_6px_0_#ca8a04]">
+                Play Again 🔄
+            </button>
+            <button onclick="exitGame()" class="flex-1 bg-slate-200 hover:bg-white text-slate-700 font-black py-4 px-6 rounded-2xl transition-transform active:scale-95 text-xl shadow-[0_6px_0_#94a3b8]">
+                Exit 🚪
+            </button>
+        </div>
+    </div>
+
+    <!-- Big Feedback Emoji Overlay -->
+    <div id="feedbackOverlay" class="fixed inset-0 pointer-events-none flex items-center justify-center z-40 opacity-0 transition-opacity duration-200">
+        <div id="feedbackEmoji" class="text-[150px] sm:text-[200px] filter drop-shadow-2xl scale-50 transition-transform duration-300">🎉</div>
+    </div>
+
+    <script>
+        /**
+         * 1. AUDIO SYSTEM (साउंड इफ़ेक्ट्स के लिए Web Audio API)
+         * इसके लिए किसी फाइल की ज़रूरत नहीं, ब्राउज़र खुद आवाज़ बनाएगा!
+         */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const Sounds = {
+            click: () => playTone(600, 'sine', 0.1, 0.05),
+            correct: () => {
+                playTone(523.25, 'sine', 0.1, 0.1); // C5
+                setTimeout(() => playTone(659.25, 'sine', 0.2, 0.1), 100); // E5
+                setTimeout(() => playTone(783.99, 'sine', 0.3, 0.1), 200); // G5
+            },
+            wrong: () => {
+                playTone(300, 'sawtooth', 0.2, 0.1);
+                setTimeout(() => playTone(250, 'sawtooth', 0.3, 0.1), 150);
+            },
+            timeout: () => playTone(200, 'square', 0.5, 0.1)
+        };
+
+        /**
+         * 2. GAME SETTINGS & STATE
+         */
+        const TOTAL_QUESTIONS = 20; // 20 प्रश्न कर दिए गए हैं
+        const TIME_PER_QUESTION = 30; // 30 सेकंड का टाइमर
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let currentAnswer = 0;
+        let isProcessing = false;
+        
+        let timeLeft = TIME_PER_QUESTION;
+        let timerInterval;
+
+        // DOM Elements
+        const questionCounter = document.getElementById('questionCounter');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const timerBar = document.getElementById('timerBar');
+        const timerText = document.getElementById('timerText');
+        const questionText = document.getElementById('questionText');
+        const optionsGrid = document.getElementById('optionsGrid');
+        const gameBox = document.getElementById('gameBox');
+        const timeoutWarning = document.getElementById('timeoutWarning');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const feedbackOverlay = document.getElementById('feedbackOverlay');
+        const feedbackEmoji = document.getElementById('feedbackEmoji');
+
+        /**
+         * 3. GAME LOGIC
+         */
+        function startGame() {
+            // ऑडियो कॉन्टेक्स्ट को इनेबल करने के लिए पहला क्लिक
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            correctCount = 0;
+            wrongCount = 0;
+            scoreDisplay.innerText = score;
+            gameOverScreen.classList.add('hidden');
+            gameOverScreen.classList.remove('flex');
+            
+            loadNextQuestion();
+        }
+
+        function loadNextQuestion() {
+            if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+                showGameOver();
+                return;
+            }
+
+            currentQuestionIndex++;
+            questionCounter.innerText = `Q: ${currentQuestionIndex}/${TOTAL_QUESTIONS}`;
+            timeoutWarning.classList.add('hidden');
+            
+            generateMathProblem();
+
+            // Re-trigger animation
+            gameBox.classList.remove('animate-enter');
+            void gameBox.offsetWidth; // trigger reflow
+            gameBox.classList.add('animate-enter');
+
+            isProcessing = false;
+            resetTimer();
+        }
+
+        /**
+         * 100+ से ज़्यादा (अनंत) प्रश्न बनाने का लॉजिक
+         * यहाँ Math.random का उपयोग किया गया है जिससे हर बार नए सवाल आएँगे।
+         */
+        function generateMathProblem() {
+            const operations = ['+', '-', '×', '÷'];
+            const op = operations[Math.floor(Math.random() * operations.length)];
+            
+            let num1, num2;
+            let formattedQuestion = "";
+
+            // ऑपरेशन्स को थोड़ा हार्ड किया गया है
+            switch(op) {
+                case '+':
+                    // बड़े जोड़ (e.g., 245 + 387)
+                    num1 = Math.floor(Math.random() * 500) + 50;
+                    num2 = Math.floor(Math.random() * 500) + 50;
+                    currentAnswer = num1 + num2;
+                    formattedQuestion = `<span class="text-indigo-600">${num1}</span> <span class="text-slate-300 mx-2">+</span> <span class="text-purple-600">${num2}</span>`;
+                    break;
+                case '-':
+                    // बड़े घटाव (नेगेटिव उत्तर से बचने के लिए num1 हमेशा बड़ा होगा)
+                    num1 = Math.floor(Math.random() * 800) + 200;
+                    num2 = Math.floor(Math.random() * (num1 - 50)) + 20; 
+                    currentAnswer = num1 - num2;
+                    formattedQuestion = `<span class="text-blue-600">${num1}</span> <span class="text-slate-300 mx-2">−</span> <span class="text-cyan-600">${num2}</span>`;
+                    break;
+                case '×':
+                    // गुणा थोड़ा ट्रिकी (e.g., 45 x 6  या 12 x 15)
+                    let randType = Math.random();
+                    if (randType > 0.4) {
+                        num1 = Math.floor(Math.random() * 90) + 10; // 10-99
+                        num2 = Math.floor(Math.random() * 8) + 2;   // 2-9
+                    } else {
+                        num1 = Math.floor(Math.random() * 15) + 11; // 11-25
+                        num2 = Math.floor(Math.random() * 15) + 11; // 11-25
+                    }
+                    currentAnswer = num1 * num2;
+                    formattedQuestion = `<span class="text-orange-500">${num1}</span> <span class="text-slate-300 mx-2">×</span> <span class="text-amber-500">${num2}</span>`;
+                    break;
+                case '÷':
+                    // भाग (बिना शेषफल के)
+                    let divisor = Math.floor(Math.random() * 15) + 2; // 2 से 16
+                    let answer = Math.floor(Math.random() * 30) + 5;  // 5 से 34
+                    let dividend = divisor * answer;
+                    num1 = dividend;
+                    num2 = divisor;
+                    currentAnswer = answer;
+                    formattedQuestion = `<span class="text-emerald-500">${num1}</span> <span class="text-slate-300 mx-2">÷</span> <span class="text-teal-500">${num2}</span>`;
+                    break;
+            }
+
+            questionText.innerHTML = formattedQuestion;
+            generateOptions(currentAnswer);
+        }
+
+        function generateOptions(correct) {
+            let options = [correct];
+            
+            while (options.length < 4) {
+                // भटकाने वाले जवाब
+                let offset = Math.floor(Math.random() * 30) - 15;
+                if (offset === 0) offset = 10; 
+                let wrong = correct + offset;
+                
+                if (wrong < 0) wrong = Math.abs(wrong) + 5; 
+                
+                if (!options.includes(wrong)) {
+                    options.push(wrong);
+                }
+            }
+
+            // Shuffle
+            options.sort(() => Math.random() - 0.5);
+
+            optionsGrid.innerHTML = options.map(opt => `
+                <button onclick="checkAnswer(${opt}, this)" class="juicy-btn font-black text-4xl sm:text-5xl py-6 sm:py-8 focus:outline-none select-none">
+                    ${opt}
+                </button>
+            `).join('');
+        }
+
+        /**
+         * 4. TIMER CONTROL (30 सेकंड)
+         */
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = TIME_PER_QUESTION;
+            updateTimerUI();
+            
+            timerInterval = setInterval(() => {
+                timeLeft -= 0.1;
+                updateTimerUI();
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+            }, 100);
+        }
+
+        function updateTimerUI() {
+            let percentage = (timeLeft / TIME_PER_QUESTION) * 100;
+            if (percentage < 0) percentage = 0;
+            
+            timerBar.style.width = `${percentage}%`;
+            timerText.innerText = `${Math.ceil(timeLeft)}s`;
+
+            // रंग बदलें 30s के अनुसार
+            if (percentage > 50) {
+                timerBar.style.backgroundColor = '#4ADE80'; // Green
+            } else if (percentage > 25) {
+                timerBar.style.backgroundColor = '#FACC15'; // Yellow
+            } else {
+                timerBar.style.backgroundColor = '#F87171'; // Red
+            }
+        }
+
+        function handleTimeOut() {
+            if (isProcessing) return;
+            isProcessing = true;
+            Sounds.timeout();
+
+            timeoutWarning.classList.remove('hidden');
+            wrongCount++;
+            
+            const buttons = document.querySelectorAll('.juicy-btn');
+            buttons.forEach(b => {
+                b.disabled = true;
+                if (parseInt(b.innerText) === currentAnswer) {
+                    b.classList.add('btn-correct');
+                } else {
+                    b.style.opacity = '0.5';
+                }
+            });
+
+            if (navigator.vibrate) navigator.vibrate(300);
+            setTimeout(loadNextQuestion, 1500);
+        }
+
+        /**
+         * 5. ANSWER CHECKING & FEEDBACK
+         */
+        function checkAnswer(selected, btnElement) {
+            if (isProcessing) return;
+            
+            Sounds.click(); // बटन क्लिक की आवाज़
+            
+            isProcessing = true;
+            clearInterval(timerInterval); 
+
+            const buttons = document.querySelectorAll('.juicy-btn');
+            buttons.forEach(b => b.disabled = true); 
+            
+            if (selected === currentAnswer) {
+                Sounds.correct(); // सही होने की आवाज़
+                btnElement.classList.add('btn-correct');
+                
+                // Active status animation fix for juicy-btn
+                btnElement.style.top = '8px';
+                btnElement.style.boxShadow = '0 0px 0 #CBD5E1';
+
+                correctCount++;
+                
+                // बोनस: जल्दी उत्तर देने पर ज़्यादा अंक
+                let timeBonus = Math.floor(timeLeft);
+                score += (20 + timeBonus); 
+                scoreDisplay.innerText = score;
+                
+                showFeedback('🎉', true);
+            } else {
+                Sounds.wrong(); // गलत होने की आवाज़
+                btnElement.classList.add('btn-wrong');
+                wrongCount++;
+                
+                buttons.forEach(b => {
+                    if (parseInt(b.innerText) === currentAnswer) {
+                        b.classList.add('btn-correct');
+                    }
+                });
+                
+                showFeedback('💥', false);
+            }
+
+            setTimeout(() => {
+                hideFeedback();
+                loadNextQuestion();
+            }, 1200);
+        }
+
+        function showFeedback(emoji, success) {
+            feedbackEmoji.innerText = emoji;
+            feedbackOverlay.classList.remove('opacity-0');
+            
+            // Random popup animation
+            feedbackEmoji.style.transform = `scale(1) rotate(${Math.random()*40 - 20}deg) translateY(-20px)`;
+            
+            if (navigator.vibrate) {
+                navigator.vibrate(success ? [30, 50, 30] : [200]);
+            }
+        }
+
+        function hideFeedback() {
+            feedbackOverlay.classList.add('opacity-0');
+            feedbackEmoji.style.transform = 'scale(0.5) translateY(0)';
+        }
+
+        /**
+         * 6. GAME OVER & SAVE
+         */
+        function showGameOver() {
+            clearInterval(timerInterval);
+            document.getElementById('finalScoreText').innerText = score;
+            document.getElementById('correctCountText').innerText = correctCount;
+            document.getElementById('wrongCountText').innerText = wrongCount;
+
+            let message, emoji;
+            if (correctCount === TOTAL_QUESTIONS) {
+                message = "PERFECT GENIUS! 🧠"; emoji = "👑"; Sounds.correct();
+            } else if (correctCount >= 15) {
+                message = "AWESOME JOB! 🚀"; emoji = "🌟"; Sounds.correct();
+            } else if (correctCount >= 10) {
+                message = "GOOD EFFORT! 👍"; emoji = "👏";
+            } else {
+                message = "KEEP PRACTICING! 💪"; emoji = "📚";
+            }
+            
+            document.getElementById('resultMessage').innerText = message;
+            document.getElementById('resultEmoji').innerText = emoji;
+
+            gameOverScreen.classList.remove('hidden');
+            gameOverScreen.classList.add('flex');
+            
+            saveScore();
+        }
+
+        function saveScore() {
+            try {
+                const STORAGE_KEY = 'nanhiPathshalaGamesData';
+                let data = JSON.parse(localStorage.getItem(STORAGE_KEY)) || { scores: {} };
+                const currentHigh = data.scores['math-challenge'] || 0;
+                if (score > currentHigh) {
+                    data.scores['math-challenge'] = score;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                }
+            } catch (e) { console.error("Storage error"); }
+        }
+
+        function exitGame() {
+            Sounds.click();
+            setTimeout(() => {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage('closeGame', '*');
+                } else {
+                    window.location.href = 'game.html';
+                }
+            }, 200);
+        }
+
+        // Start on load
+        window.addEventListener('DOMContentLoaded', startGame);
+    </script>
+</body>
+</html>

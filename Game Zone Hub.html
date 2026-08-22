@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Game Zone | Nanhi Pathshala</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Nunito', 'sans-serif'] },
+                    colors: {
+                        np: {
+                            teal: '#14B8A6',
+                            tealDark: '#0D9488',
+                            yellow: '#FBBF24',
+                            blueDark: '#1E293B',
+                            bg: '#F8FAFC'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(20, 184, 166, 0.15)',
+                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide Scrollbar */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        /* Game Fullscreen Overlay Transition */
+        #gamePlayerOverlay {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            transform: translateY(100%) scale(0.9);
+            opacity: 0;
+            visibility: hidden;
+        }
+        #gamePlayerOverlay.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Background shapes */
+        .blob {
+            position: fixed; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.4;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: #CCFBF1; }
+        .blob-2 { bottom: -10%; right: -10%; width: 250px; height: 250px; background: #FEF3C7; }
+
+        dialog::backdrop { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
+    </style>
+</head>
+<body class="text-np-blueDark pb-20">
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 shadow-sm flex items-center justify-between">
+        <button onclick="history.back()" class="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-gray-50 transition active:scale-95">
+            <svg class="w-6 h-6 text-np-tealDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <div class="text-center flex-1">
+            <h1 class="text-xl font-bold text-np-blueDark flex items-center justify-center gap-2">
+                🎮 Game Zone
+            </h1>
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Learn • Play • Explore</p>
+        </div>
+        <div class="w-10 h-10"></div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="px-4 mt-6">
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-np-blueDark to-gray-800 p-6 text-white shadow-soft flex items-center justify-between">
+            <div class="z-10 w-2/3">
+                <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-bold mb-3 backdrop-blur-sm">
+                    🔥 Action & Logic
+                </span>
+                <h2 class="text-2xl font-black mb-1 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-np-teal to-np-yellow">
+                    Play & Learn
+                </h2>
+                <p class="text-sm text-gray-300 opacity-90">Test your brain or just have fun!</p>
+            </div>
+            <div class="w-1/3 flex justify-end animate-float relative z-10">
+                <div class="text-6xl drop-shadow-lg">🕹️</div>
+            </div>
+            <div class="absolute top-0 right-0 w-32 h-32 bg-np-teal/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="px-4 mt-6">
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search math, racing, physics..." 
+                class="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl shadow-card text-sm font-semibold placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-np-teal transition-all">
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="mt-6">
+        <nav class="flex px-4 gap-3 overflow-x-auto hide-scrollbar pb-2" id="categoryContainer">
+            <!-- Categories injected via JS -->
+        </nav>
+    </section>
+
+    <!-- Main Game List -->
+    <main class="px-4 mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-black text-np-blueDark" id="gameListTitle">All Challenges 🎯</h3>
+        </div>
+        
+        <div id="gameGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <!-- Game cards injected via JS -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-10">
+            <div class="text-5xl mb-3">🕵️‍♂️</div>
+            <h4 class="text-lg font-bold text-gray-700">No games found</h4>
+            <p class="text-gray-500 text-sm">Try a different search term.</p>
+        </div>
+    </main>
+
+    <!-- FULLSCREEN GAME PLAYER OVERLAY -->
+    <div id="gamePlayerOverlay" class="fixed inset-0 z-50 bg-black flex flex-col">
+        <!-- Overlay Header (Auto-hides in true fullscreen) -->
+        <div id="gamePlayerHeader" class="bg-gray-900 px-4 py-3 flex items-center justify-between text-white shadow-md z-10">
+            <div class="flex items-center gap-3">
+                <button onclick="closeGame()" class="p-2 bg-gray-800 rounded-full hover:bg-red-500 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <span id="playingGameTitle" class="font-bold text-sm tracking-wide">Game Title</span>
+            </div>
+            <button onclick="requestBrowserFullscreen()" class="p-2 bg-gray-800 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-gray-700 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                Fullscreen
+            </button>
+        </div>
+        <!-- Iframe to load actual game file safely -->
+        <iframe id="gameIframe" src="" class="w-full flex-1 border-none bg-black" allowfullscreen></iframe>
+    </div>
+
+    <!-- Coming Soon Modal -->
+    <dialog id="comingSoonModal" class="rounded-3xl shadow-2xl border-0 p-0 w-11/12 max-w-sm bg-transparent">
+        <div class="bg-white rounded-3xl overflow-hidden text-center pb-6">
+            <div class="bg-gradient-to-r from-np-yellow to-orange-400 py-8 px-4 text-white relative">
+                <div class="text-5xl animate-float mb-2">🚧</div>
+                <h3 class="text-2xl font-black">Coming Soon!</h3>
+            </div>
+            <div class="px-6 pt-6 pb-2">
+                <p class="text-gray-600 font-medium mb-6">This game is currently in development. It will be available soon! 🎮</p>
+                <button onclick="document.getElementById('comingSoonModal').close()" 
+                    class="w-full py-3 bg-gray-900 text-white font-bold rounded-xl shadow-lg hover:bg-black active:scale-95 transition-all">
+                    Got it!
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <script>
+        /** ==========================================
+         * 1. GAME DATABASE (Mix of Study & Fun)
+         * ========================================== */
+        const gamesDB = [
+            // Educational / Heavy Subjects
+            { id: "math-challenge", name: "Math Master", description: "Test your speed in addition and subtraction.", category: "Math", difficulty: "Medium", icon: "🧮", bgGradient: "from-blue-500 to-blue-700", gameUrl: "math-challenge.html" },
+            { id: "advanced-calc", name: "Calculus Pro", description: "Heavy math: Integrals, derivatives & limits.", category: "Math", difficulty: "Hard", icon: "➗", bgGradient: "from-slate-700 to-slate-900", gameUrl: "coming-soon" },
+            { id: "physics-engine", name: "Physics Lab", description: "Experiment with gravity and friction.", category: "Science", difficulty: "Hard", icon: "🍎", bgGradient: "from-emerald-500 to-teal-700", gameUrl: "coming-soon" },
+            { id: "code-breaker", name: "Code Breaker", description: "Learn Python and JS logic algorithms.", category: "Coding", difficulty: "Hard", icon: "💻", bgGradient: "from-gray-800 to-black", gameUrl: "coming-soon" },
+            { id: "chem-bonds", name: "Chemical Bonds", description: "Connect atoms to form molecules.", category: "Science", difficulty: "Medium", icon: "🧪", bgGradient: "from-purple-500 to-fuchsia-700", gameUrl: "coming-soon" },
+            
+            // Pure Entertainment / Fun Games
+            { id: "space-shooter", name: "Space Shooter", description: "Blast asteroids and save the galaxy!", category: "Arcade", difficulty: "Easy", icon: "🚀", bgGradient: "from-indigo-600 to-purple-800", gameUrl: "coming-soon" },
+            { id: "turbo-racing", name: "Turbo Racing", description: "High-speed 3D car racing action.", category: "Action", difficulty: "Medium", icon: "🏎️", bgGradient: "from-red-500 to-orange-600", gameUrl: "coming-soon" },
+            { id: "ninja-jump", name: "Ninja Jump", description: "Jump high and avoid deadly traps.", category: "Action", difficulty: "Easy", icon: "🥷", bgGradient: "from-stone-600 to-stone-800", gameUrl: "coming-soon" },
+            { id: "candy-match", name: "Sweet Match", description: "Match 3 candies to clear the board.", category: "Puzzle", difficulty: "Easy", icon: "🍬", bgGradient: "from-pink-400 to-rose-500", gameUrl: "coming-soon" },
+            { id: "brain-puzzle", name: "Logic Escape", description: "Solve the riddle to open the door.", category: "Puzzle", difficulty: "Medium", icon: "🔐", bgGradient: "from-amber-500 to-orange-600", gameUrl: "coming-soon" }
+        ];
+
+        const categories = ["All", "Action", "Arcade", "Science", "Math", "Coding", "Puzzle"];
+        let currentCategory = "All";
+        let searchQuery = "";
+
+        /** ==========================================
+         * 2. GAME PLAYER LOGIC (Fullscreen Mode)
+         * ========================================== */
+        const playerOverlay = document.getElementById('gamePlayerOverlay');
+        const gameIframe = document.getElementById('gameIframe');
+        const playingGameTitle = document.getElementById('playingGameTitle');
+
+        function playGame(gameId) {
+            const game = gamesDB.find(g => g.id === gameId);
+            if (!game) return;
+
+            if (game.gameUrl === "coming-soon" || game.gameUrl === "#") {
+                document.getElementById('comingSoonModal').showModal();
+            } else {
+                // Open Fullscreen Game Mode
+                playingGameTitle.innerText = game.name;
+                gameIframe.src = game.gameUrl;
+                playerOverlay.classList.add('active');
+                
+                // Attempt to auto-fullscreen on mobile (might require user interaction)
+                setTimeout(() => requestBrowserFullscreen(), 100);
+            }
+        }
+
+        function closeGame() {
+            // Exit fullscreen if active
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
+            playerOverlay.classList.remove('active');
+            
+            // Clear iframe to stop game audio/processing
+            setTimeout(() => { gameIframe.src = ''; }, 400);
+        }
+
+        function requestBrowserFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.log("Fullscreen error:", err));
+            } else if (elem.webkitRequestFullscreen) { /* Safari */
+                elem.webkitRequestFullscreen();
+            }
+        }
+
+        // Handle physical escape key
+        document.addEventListener('fullscreenchange', () => {
+            const header = document.getElementById('gamePlayerHeader');
+            if (document.fullscreenElement) {
+                header.classList.add('hidden'); // Hide header for true immersive experience
+            } else {
+                header.classList.remove('hidden');
+            }
+        });
+
+        /** ==========================================
+         * 3. RENDERING UI
+         * ========================================== */
+        function getDifficultyColor(diff) {
+            if (diff === 'Easy') return 'text-green-600 bg-green-100';
+            if (diff === 'Medium') return 'text-yellow-600 bg-yellow-100';
+            return 'text-red-600 bg-red-100';
+        }
+
+        function createGameCard(game) {
+            return `
+                <div class="bg-white rounded-3xl shadow-card overflow-hidden border border-gray-100 hover:shadow-lg transition-all flex flex-col cursor-pointer animate-pop-in relative group" onclick="playGame('${game.id}')">
+                    
+                    <!-- Icon Area -->
+                    <div class="h-36 bg-gradient-to-br ${game.bgGradient} flex items-center justify-center relative overflow-hidden">
+                        <div class="text-7xl group-hover:scale-110 transition-transform duration-300 z-10 drop-shadow-md">${game.icon}</div>
+                        <!-- Glass effect overlay -->
+                        <div class="absolute -bottom-4 -right-4 w-28 h-28 bg-white/20 rounded-full blur-xl"></div>
+                        <div class="absolute top-2 right-2 bg-black/30 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider">
+                            ${game.category}
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-black text-lg text-gray-900 mb-1 leading-tight">${game.name}</h4>
+                        <p class="text-xs text-gray-500 mb-4 line-clamp-2 leading-relaxed">${game.description}</p>
+                        
+                        <div class="mt-auto flex items-center justify-between">
+                            <span class="px-2.5 py-1 ${getDifficultyColor(game.difficulty)} rounded-lg text-[10px] font-bold uppercase tracking-wide">${game.difficulty} Mode</span>
+                            
+                            <button class="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center group-hover:bg-np-teal transition-colors shadow-md">
+                                <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryContainer');
+            container.innerHTML = categories.map(cat => {
+                const isActive = currentCategory === cat;
+                const baseClass = "px-5 py-2 rounded-xl text-sm font-bold cursor-pointer transition-all border shrink-0";
+                const activeClass = "bg-gray-900 text-white border-gray-900 shadow-md";
+                const inactiveClass = "bg-white text-gray-600 border-gray-200 hover:bg-gray-50";
+                
+                return `<button onclick="setCategory('${cat}')" class="${baseClass} ${isActive ? activeClass : inactiveClass}">${cat}</button>`;
+            }).join('');
+        }
+
+        function renderGameGrid() {
+            const container = document.getElementById('gameGrid');
+            const emptyState = document.getElementById('emptyState');
+            const title = document.getElementById('gameListTitle');
+
+            let filtered = gamesDB.filter(game => {
+                const matchesCat = currentCategory === "All" || game.category === currentCategory;
+                const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      game.description.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCat && matchesSearch;
+            });
+
+            if (searchQuery) title.innerText = `Search Results 🔍`;
+            else if (currentCategory !== "All") title.innerText = `${currentCategory} Games 🎲`;
+            else title.innerText = `All Challenges 🎯`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                container.innerHTML = filtered.map(g => createGameCard(g)).join('');
+            }
+        }
+
+        function renderAll() {
+            renderCategories();
+            renderGameGrid();
+        }
+
+        /** ==========================================
+         * 4. EVENT LISTENERS
+         * ========================================== */
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            renderAll();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim();
+            renderAll();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAll();
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.4s ease';
+                document.body.style.opacity = '1';
+            }, 50);
+        });
+
+    </script>
+</body>
+</html>
