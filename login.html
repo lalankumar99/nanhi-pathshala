@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <!-- Browser / PWA Brand Theme -->
+    <meta name="theme-color" content="#f59e0b">
+    <meta name="msapplication-TileColor" content="#f59e0b">
+
+    <title>Login • Nanhi Pathshala</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+            width: 100%;
+        }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            color: #134e4a;
+            background:
+                radial-gradient(circle at 10% 10%, #ccfbf1 0, transparent 28%),
+                radial-gradient(circle at 90% 15%, #fef3c7 0, transparent 28%),
+                linear-gradient(135deg, #f0fdfa, #ffffff, #fffbeb);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button,
+        input {
+            font-family: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        /* =========================
+           BACKGROUND
+        ========================== */
+
+        .page {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .blob-one {
+            width: 220px;
+            height: 220px;
+            top: -100px;
+            left: -80px;
+            background: #99f6e4;
+            opacity: .45;
+            filter: blur(8px);
+        }
+
+        .blob-two {
+            width: 190px;
+            height: 190px;
+            right: -70px;
+            top: 100px;
+            background: #fde68a;
+            opacity: .5;
+            filter: blur(10px);
+        }
+
+        .blob-three {
+            width: 250px;
+            height: 250px;
+            bottom: -150px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #bfdbfe;
+            opacity: .3;
+            filter: blur(15px);
+        }
+
+        /* =========================
+           LANGUAGE
+        ========================== */
+
+        .top-bar {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            z-index: 20;
+        }
+
+        .language-button {
+            border: 1px solid rgba(255,255,255,.8);
+            background: rgba(255,255,255,.75);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 9px 14px;
+            border-radius: 999px;
+            color: #0f766e;
+            font-size: 13px;
+            font-weight: 800;
+            box-shadow: 0 6px 20px rgba(15,118,110,.08);
+        }
+
+        /* =========================
+           CONTAINER
+        ========================== */
+
+        .container {
+            position: relative;
+            z-index: 5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 70px 18px 35px;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 430px;
+            animation: entrance .65s ease-out both;
+        }
+
+        @keyframes entrance {
+            from {
+                opacity: 0;
+                transform: translateY(25px) scale(.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* =========================
+           BRAND
+        ========================== */
+
+        .brand {
+            text-align: center;
+            margin-bottom: 22px;
+        }
+
+        .brand-icon {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 12px;
+            border-radius: 24px;
+            background: linear-gradient(145deg, #2dd4bf, #0d9488);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 14px 30px rgba(13,148,136,.22),
+                inset 0 2px 4px rgba(255,255,255,.35);
+        }
+
+        .book {
+            width: 43px;
+            height: 34px;
+            position: relative;
+        }
+
+        .book-left,
+        .book-right {
+            position: absolute;
+            top: 3px;
+            width: 22px;
+            height: 28px;
+            background: white;
+        }
+
+        .book-left {
+            left: 0;
+            border-radius: 4px 2px 2px 4px;
+        }
+
+        .book-right {
+            right: 0;
+            border-radius: 2px 4px 4px 2px;
+        }
+
+        .book-line {
+            position: absolute;
+            z-index: 3;
+            width: 14px;
+            height: 2.5px;
+            border-radius: 5px;
+            background: #5eead4;
+        }
+
+        .line1 {
+            top: 11px;
+            left: 4px;
+        }
+
+        .line2 {
+            top: 11px;
+            left: 26px;
+        }
+
+        .line3 {
+            top: 18px;
+            left: 4px;
+        }
+
+        .line4 {
+            top: 18px;
+            left: 26px;
+        }
+
+        .brand h1 {
+            font-family: "Quicksand", sans-serif;
+            font-size: 30px;
+            font-weight: 900;
+            color: #134e4a;
+        }
+
+        .brand p {
+            margin-top: 3px;
+            color: #0d9488;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        /* =========================
+           CARD
+        ========================== */
+
+        .card {
+            background: rgba(255,255,255,.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255,255,255,.9);
+            border-radius: 30px;
+            box-shadow:
+                0 24px 60px rgba(15,23,42,.10);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 25px 24px;
+            text-align: center;
+            color: white;
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+        }
+
+        .card-header h2 {
+            font-family: "Quicksand", sans-serif;
+            font-size: 25px;
+            font-weight: 900;
+        }
+
+        .card-header p {
+            margin-top: 5px;
+            color: #ccfbf1;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .form {
+            padding: 26px 24px 25px;
+        }
+
+        /* =========================
+           INPUTS
+        ========================== */
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 7px;
+            font-size: 13px;
+            font-weight: 900;
+            color: #475569;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 18px;
+        }
+
+        input {
+            width: 100%;
+            height: 52px;
+            padding: 0 45px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            background: #f8fafc;
+            color: #1e293b;
+            font-size: 15px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #14b8a6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(20,184,166,.10);
+        }
+
+        input::placeholder {
+            color: #94a3b8;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 34px;
+            border: none;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 17px;
+        }
+
+        /* =========================
+           OPTIONS
+        ========================== */
+
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 4px 0 21px;
+            font-size: 12px;
+        }
+
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .remember input {
+            width: 16px;
+            height: 16px;
+            padding: 0;
+            accent-color: #14b8a6;
+        }
+
+        .forgot {
+            border: none;
+            background: transparent;
+            color: #0d9488;
+            font-weight: 900;
+        }
+
+        /* =========================
+           LOGIN BUTTON
+        ========================== */
+
+        .login-button {
+            width: 100%;
+            height: 54px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(
+                135deg,
+                #fbbf24,
+                #f59e0b
+            );
+            color: #172554;
+            font-size: 16px;
+            font-weight: 900;
+            box-shadow: 0 10px 22px rgba(245,158,11,.22);
+            transition: .2s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .login-button:active {
+            transform: scale(.98);
+        }
+
+        .login-button:disabled {
+            opacity: .65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* =========================
+           REGISTER
+        ========================== */
+
+        .register-box {
+            margin-top: 22px;
+            text-align: center;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .register-button {
+            margin-top: 4px;
+            border: none;
+            background: transparent;
+            color: #0d9488;
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        /* =========================
+           SECURITY
+        ========================== */
+
+        .secure {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-top: 20px;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           MESSAGE
+        ========================== */
+
+        .message {
+            display: none;
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            border-radius: 13px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .message.error {
+            display: block;
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .message.success {
+            display: block;
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #94a3b8;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 380px) {
+
+            .container {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .brand h1 {
+                font-size: 27px;
+            }
+
+            .card {
+                border-radius: 25px;
+            }
+
+            .form {
+                padding: 22px 18px;
+            }
+
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+<div class="page">
+
+    <div class="blob blob-one"></div>
+    <div class="blob blob-two"></div>
+    <div class="blob blob-three"></div>
+
+
+    <!-- Language -->
+    <div class="top-bar">
+
+        <button
+            type="button"
+            class="language-button"
+            id="languageButton"
+        >
+            🌐 English
+        </button>
+
+    </div>
+
+
+    <main class="container">
+
+        <div class="login-wrapper">
+
+
+            <!-- Brand -->
+
+            <div class="brand">
+
+                <div class="brand-icon">
+
+                    <div class="book">
+
+                        <div class="book-left"></div>
+                        <div class="book-right"></div>
+
+                        <div class="book-line line1"></div>
+                        <div class="book-line line2"></div>
+                        <div class="book-line line3"></div>
+                        <div class="book-line line4"></div>
+
+                    </div>
+
+                </div>
+
+                <h1>Nanhi Pathshala</h1>
+
+                <p>Learn • Play • Grow</p>
+
+            </div>
+
+
+            <!-- Login Card -->
+
+            <section class="card">
+
+                <header class="card-header">
+
+                    <h2>Welcome Back</h2>
+
+                    <p>
+                        Continue your learning journey
+                    </p>
+
+                </header>
+
+
+                <form
+                    class="form"
+                    id="loginForm"
+                >
+
+                    <div
+                        class="message"
+                        id="message"
+                    ></div>
+
+
+                    <!-- Email -->
+
+                    <div class="field">
+
+                        <label
+                            class="label"
+                            for="email"
+                        >
+                            Email Address
+                        </label>
+
+                        <div class="input-wrap">
+
+                            <span class="input-icon">
+                                ✉️
+                            </span>
+
+                            <input
+                                id="email"
+                                type="email"
+                                autocomplete="email"
+                                placeholder="Enter your email"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Password -->
+
+                    <div class="field">
+
+                        <label
+                            class="label"
+                            for="password"
+                        >
+                            Password
+                        </label>
+
+                        <div class="input-wrap">
+
+                            <span class="input-icon">
+                                🔒
+                            </span>
+
+                            <input
+                                id="password"
+                                type="password"
+                                autocomplete="current-password"
+                                placeholder="Enter your password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="passwordToggle"
+                                aria-label="Show password"
+                            >
+                                👁️
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Options -->
+
+                    <div class="options">
+
+                        <label class="remember">
+
+                            <input
+                                type="checkbox"
+                                id="remember"
+                            >
+
+                            <span>
+                                Remember me
+                            </span>
+
+                        </label>
+
+
+                        <button
+                            type="button"
+                            class="forgot"
+                            id="forgotButton"
+                        >
+                            Forgot password?
+                        </button>
+
+                    </div>
+
+
+                    <!-- Login -->
+
+                    <button
+                        type="submit"
+                        class="login-button"
+                        id="loginButton"
+                    >
+                        Login Securely →
+                    </button>
+
+
+                    <!-- Register -->
+
+                    <div class="register-box">
+
+                        <div>
+                            New to Nanhi Pathshala?
+                        </div>
+
+                        <button
+                            type="button"
+                            class="register-button"
+                            id="registerButton"
+                        >
+                            Create New Account
+                        </button>
+
+                    </div>
+
+
+                    <!-- Security -->
+
+                    <div class="secure">
+
+                        <span>🔐</span>
+
+                        <span>
+                            Secure login powered by Firebase
+                        </span>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <div class="footer">
+                Nanhi Pathshala • Learn • Play • Grow
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     FIREBASE
+     =========================================================
+
+     Firebase configuration will be connected through the
+     common Firebase system.
+
+     Student login:
+        Firebase Authentication
+             ↓
+        Check user role
+             ↓
+        Student → home.html
+
+     Admin login is NOT linked anywhere on this page.
+
+     Admin URL will be:
+        /admin-login.html
+
+     ========================================================= -->
+
+
+<script type="module">
+
+    /*
+    ============================================================
+    NANHI PATHSHALA — STUDENT LOGIN
+    ============================================================
+
+    Firebase Authentication will be connected here.
+
+    IMPORTANT:
+    Admin login is intentionally NOT visible on this page.
+
+    Admin will use a separate:
+        admin-login.html
+
+    ============================================================
+    */
+
+
+    const form =
+        document.getElementById("loginForm");
+
+    const emailInput =
+        document.getElementById("email");
+
+    const passwordInput =
+        document.getElementById("password");
+
+    const loginButton =
+        document.getElementById("loginButton");
+
+    const message =
+        document.getElementById("message");
+
+
+    function showMessage(text, type = "error") {
+
+        message.textContent = text;
+
+        message.className =
+            "message " + type;
+
+    }
+
+
+    /* Password visibility */
+
+    document
+        .getElementById("passwordToggle")
+        .addEventListener("click", () => {
+
+            const visible =
+                passwordInput.type === "text";
+
+            passwordInput.type =
+                visible
+                    ? "password"
+                    : "text";
+
+            document.getElementById(
+                "passwordToggle"
+            ).textContent =
+                visible ? "👁️" : "🙈";
+
+        });
+
+
+    /* Login */
+
+    form.addEventListener("submit", async (event) => {
+
+        event.preventDefault();
+
+        const email =
+            emailInput.value.trim();
+
+        const password =
+            passwordInput.value;
+
+
+        if (!email || !password) {
+            showMessage(
+                "Please enter your email and password."
+            );
+            return;
+        }
+
+
+        loginButton.disabled = true;
+        loginButton.textContent = "Signing in...";
+
+
+        try {
+
+            /*
+            ========================================================
+            FIREBASE AUTHENTICATION — CONNECT HERE
+
+            import {
+                signInWithEmailAndPassword
+            } from "firebase/auth";
+
+            import {
+                auth
+            } from "./firebase.js";
+
+            const result =
+                await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+            Then check the user's role from Firestore.
+
+            Student → home.html
+            ========================================================
+            */
+
+
+            /*
+             * Temporary placeholder.
+             * Actual Firebase connection will be added when
+             * firebase.js is created.
+             */
+
+            await new Promise(
+                resolve => setTimeout(resolve, 700)
+            );
+
+
+            showMessage(
+                "Firebase authentication is ready to be connected.",
+                "success"
+            );
+
+
+        } catch (error) {
+
+            showMessage(
+                "Login failed. Please check your details."
+            );
+
+        } finally {
+
+            loginButton.disabled = false;
+            loginButton.textContent =
+                "Login Securely →";
+
+        }
+
+    });
+
+
+    /* Register */
+
+    document
+        .getElementById("registerButton")
+        .addEventListener("click", () => {
+
+            window.location.href =
+                "register.html";
+
+        });
+
+
+    /* Forgot password */
+
+    document
+        .getElementById("forgotButton")
+        .addEventListener("click", () => {
+
+            showMessage(
+                "Password reset will be available through Firebase."
+            );
+
+        });
+
+
+    /*
+    ============================================================
+    IMPORTANT SECURITY DESIGN
+    ============================================================
+
+    There is NO admin button here.
+
+    Admin URL:
+        /admin-login.html
+
+    Admin authentication will be handled separately.
+
+    ============================================================
+    */
+
+</script>
+
+</body>
+</html>
