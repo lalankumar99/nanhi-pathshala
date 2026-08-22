@@ -1264,9 +1264,12 @@ button {
     );
 
 
+
 /*
 ============================================================
    PROFILE PHOTO UPLOAD
+   Firebase Storage NOT USED
+   Firestore + LocalStorage
 ============================================================
 */
 
@@ -1278,10 +1281,19 @@ photoInput.addEventListener(
             photoInput.files[0];
 
 
-        if (
-            !file ||
-            !currentUser
-        ) {
+        if (!file) {
+            return;
+        }
+
+
+        if (!currentUser) {
+
+            showMessage(
+                "Please wait. Your account is still loading."
+            );
+
+            photoInput.value = "";
+
             return;
         }
 
@@ -1299,6 +1311,11 @@ photoInput.addEventListener(
             return;
         }
 
+
+        /*
+        Maximum original file size:
+        5 MB
+        */
 
         if (
             file.size >
@@ -1318,47 +1335,32 @@ photoInput.addEventListener(
         try {
 
             showMessage(
-                "Uploading profile photo...",
+                "Preparing profile photo...",
                 "success"
             );
 
 
-            const extension =
-                file.name
-                    .split(".")
-                    .pop()
-                    .toLowerCase();
+            /*
+            ====================================================
+               IMAGE COMPRESS
+            ====================================================
+            */
 
-
-            const photoRef =
-                ref(
-                    storage,
-                    `profilePhotos/${currentUser.uid}/profile.${extension}`
+            const photoData =
+                await compressProfilePhoto(
+                    file
                 );
 
 
-            await uploadBytes(
-                photoRef,
-                file,
-                {
-                    contentType:
-                        file.type
-                }
-            );
+            /*
+            ====================================================
+               SAVE TO FIRESTORE
+            ====================================================
+            */
 
-
-            const photoURL =
-                await getDownloadURL(
-                    photoRef
-                );
-
-
-            await updateProfile(
-                currentUser,
-                {
-                    photoURL:
-                        photoURL
-                }
+            showMessage(
+                "Saving profile photo...",
+                "success"
             );
 
 
@@ -1369,11 +1371,13 @@ photoInput.addEventListener(
                     currentUser.uid
                 ),
                 {
-                    photoURL:
-                        photoURL,
+
+                    photoData:
+                        photoData,
 
                     updatedAt:
                         serverTimestamp()
+
                 },
                 {
                     merge: true
@@ -1381,20 +1385,80 @@ photoInput.addEventListener(
             );
 
 
-            profilePhoto.src =
-                photoURL;
+            /*
+            ====================================================
+               SAVE LOCAL COPY
+            ====================================================
+            */
 
+            try {
+
+                localStorage.setItem(
+                    "nanhiPathshalaProfilePhoto_" +
+                    currentUser.uid,
+                    photoData
+                );
+
+            } catch (localError) {
+
+                console.warn(
+                    "Local photo cache unavailable:",
+                    localError
+                );
+
+            }
+
+
+            /*
+            ====================================================
+               UPDATE PROFILE PREVIEW
+            ====================================================
+            */
+
+            profilePhoto.src =
+                photoData;
 
             profilePhoto.style.display =
                 "block";
-
 
             profilePlaceholder.style.display =
                 "none";
 
 
+            /*
+            ====================================================
+               OPTIONAL FIREBASE AUTH PHOTO
+               This uses the same Base64 data.
+            ====================================================
+            */
+
+            try {
+
+                await updateProfile(
+                    currentUser,
+                    {
+                        photoURL:
+                            photoData
+                    }
+                );
+
+            } catch (authPhotoError) {
+
+                /*
+                Firestore photo is already saved.
+                So don't treat this as a complete failure.
+                */
+
+                console.warn(
+                    "Firebase Auth photo update skipped:",
+                    authPhotoError
+                );
+
+            }
+
+
             showMessage(
-                "Profile photo updated successfully.",
+                "Profile photo saved successfully.",
                 "success"
             );
 
@@ -1402,13 +1466,13 @@ photoInput.addEventListener(
         } catch (error) {
 
             console.error(
-                "Photo upload error:",
+                "Profile photo save error:",
                 error
             );
 
 
             showMessage(
-                "Unable to upload profile photo. Please try again."
+                "Unable to save profile photo. Please try again."
             );
 
         }
@@ -1417,7 +1481,251 @@ photoInput.addEventListener(
 );
 
 
- /* ============================================================
+/*
+============================================================
+   IMAGE COMPRESS FUNCTION
+============================================================
+*/
+
+async function compressProfilePhoto(
+    file
+) {
+
+    return new Promise(
+        (resolve, reject) => {
+
+            const reader =
+                new FileReader();
+
+
+            reader.onload = (
+                event
+            ) => {
+
+                const image =
+                    new Image();
+
+
+                image.onload = () => {
+
+                    /*
+                    Maximum image dimension.
+                    */
+
+                    const maxSize =
+                        600;
+
+
+                    let width =
+                        image.width;
+
+                    let height =
+                        image.height;
+
+
+                    /*
+                    Keep original aspect ratio.
+                    */
+
+                    if (
+                        width >
+                        height
+                    ) {
+
+                        if (
+                            width >
+                            maxSize
+                        ) {
+
+                            height =
+                                Math.round(
+                                    height *
+                                    maxSize /
+                                    width
+                                );
+
+                            width =
+                                maxSize;
+
+                        }
+
+                    } else {
+
+                        if (
+                            height >
+                            maxSize
+                        ) {
+
+                            width =
+                                Math.round(
+                                    width *
+                                    maxSize /
+                                    height
+                                );
+
+                            height =
+                                maxSize;
+
+                        }
+
+                    }
+
+
+                    /*
+                    Create compressed canvas.
+                    */
+
+                    const canvas =
+                        document.createElement(
+                            "canvas"
+                        );
+
+
+                    canvas.width =
+                        width;
+
+                    canvas.height =
+                        height;
+
+
+                    const context =
+                        canvas.getContext(
+                            "2d"
+                        );
+
+
+                    context.drawImage(
+                        image,
+                        0,
+                        0,
+                        width,
+                        height
+                    );
+
+
+                    /*
+                    JPEG compression.
+                    */
+
+                    const compressed =
+                        canvas.toDataURL(
+                            "image/jpeg",
+                            0.70
+                        );
+
+
+                    /*
+                    Check approximate
+                    Base64 size.
+                    */
+
+                    const approximateBytes =
+                        Math.ceil(
+                            compressed.length *
+                            0.75
+                        );
+
+
+                    /*
+                    Firestore document limit
+                    is roughly 1 MiB.
+
+                    Keep photo comfortably
+                    below that limit.
+                    */
+
+                    if (
+                        approximateBytes >
+                        700000
+                    ) {
+
+                        const smaller =
+                            canvas.toDataURL(
+                                "image/jpeg",
+                                0.50
+                            );
+
+
+                        const smallerBytes =
+                            Math.ceil(
+                                smaller.length *
+                                0.75
+                            );
+
+
+                        if (
+                            smallerBytes >
+                            700000
+                        ) {
+
+                            reject(
+                                new Error(
+                                    "Profile photo is too large after compression."
+                                )
+                            );
+
+                            return;
+
+                        }
+
+
+                        resolve(
+                            smaller
+                        );
+
+                        return;
+
+                    }
+
+
+                    resolve(
+                        compressed
+                    );
+
+                };
+
+
+                image.onerror = () => {
+
+                    reject(
+                        new Error(
+                            "Unable to read the selected image."
+                        )
+                    );
+
+                };
+
+
+                image.src =
+                    event.target.result;
+
+            };
+
+
+            reader.onerror = () => {
+
+                reject(
+                    new Error(
+                        "Unable to read image file."
+                    )
+                );
+
+            };
+
+
+            reader.readAsDataURL(
+                file
+            );
+
+        }
+    );
+
+}
+
+
+
+/*
+============================================================
        SAVE PROFILE
     ============================================================
     */
