@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
+
+<meta name="theme-color" content="#f59e0b">
+
+<title>My Profile • Nanhi Pathshala</title>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap"
+    rel="stylesheet"
+>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    font-family: "Nunito", sans-serif;
+
+    background:
+        radial-gradient(
+            circle at 10% 5%,
+            #ccfbf1 0,
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 90% 10%,
+            #fef3c7 0,
+            transparent 25%
+        ),
+        #f8fafc;
+
+    color: #134e4a;
+
+    -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input,
+select {
+    font-family: inherit;
+}
+
+button {
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.page {
+    min-height: 100vh;
+    padding-bottom: 35px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    padding: 17px 16px;
+
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #14b8a6,
+            #0d9488
+        );
+
+    color: white;
+
+    border-radius:
+        0 0 30px 30px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(13,148,136,.18);
+}
+
+.back-button {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    border-radius: 14px;
+
+    background:
+        rgba(255,255,255,.18);
+
+    color: white;
+
+    font-size: 21px;
+}
+
+.header-title {
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 23px;
+
+    font-weight: 900;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.container {
+    width: 100%;
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    padding: 22px 16px;
+}
+
+/* =========================
+   PROFILE PHOTO
+========================= */
+
+.profile-card {
+    padding: 24px 18px;
+
+    margin-bottom: 18px;
+
+    text-align: center;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(15,23,42,.07);
+}
+
+.photo-wrapper {
+    position: relative;
+
+    width: 104px;
+    height: 104px;
+
+    margin: 0 auto 14px;
+}
+
+.profile-photo,
+.profile-placeholder {
+    width: 104px;
+    height: 104px;
+
+    border-radius: 50%;
+}
+
+.profile-photo {
+    display: none;
+
+    object-fit: cover;
+
+    border: 4px solid #ccfbf1;
+}
+
+.profile-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ccfbf1,
+            #99f6e4
+        );
+
+    border: 4px solid #f0fdfa;
+
+    font-size: 40px;
+}
+
+.photo-upload {
+    position: absolute;
+
+    right: -2px;
+    bottom: -2px;
+
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fbbf24,
+            #f59e0b
+        );
+
+    color: #172554;
+
+    font-size: 17px;
+
+    border: 3px solid white;
+
+    box-shadow:
+        0 5px 14px
+        rgba(245,158,11,.25);
+}
+
+#photoInput {
+    display: none;
+}
+
+.profile-name {
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 22px;
+
+    font-weight: 900;
+
+    color: #134e4a;
+}
+
+.profile-email {
+    margin-top: 3px;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    font-weight: 700;
+}
+
+/* =========================
+   FORM CARD
+========================= */
+
+.form-card {
+    padding: 22px 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 25px;
+
+    box-shadow:
+        0 10px 28px
+        rgba(15,23,42,.06);
+}
+
+.section-heading {
+    margin-bottom: 18px;
+
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 19px;
+
+    font-weight: 900;
+
+    color: #134e4a;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <header class="header">
+
+        <button
+            type="button"
+            class="back-button"
+            id="backButton"
+        >
+            ←
+        </button>
+
+        <h1 class="header-title">
+            My Profile
+        </h1>
+
+    </header>
+
+
+    <main class="container">
+
+        <section class="profile-card">
+
+            <div class="photo-wrapper">
+
+                <div
+                    class="profile-placeholder"
+                    id="profilePlaceholder"
+                >
+                    👤
+                </div>
+
+                <img
+                    class="profile-photo"
+                    id="profilePhoto"
+                    alt="Profile photo"
+                >
+
+                <label
+                    class="photo-upload"
+                    for="photoInput"
+                    title="Upload profile photo"
+                >
+                    📷
+                </label>
+
+                <input
+                    type="file"
+                    id="photoInput"
+                    accept="image/*"
+                >
+
+            </div>
+
+
+            <h2
+                class="profile-name"
+                id="profileName"
+            >
+                Loading...
+            </h2>
+
+            <p
+                class="profile-email"
+                id="profileEmail"
+            >
+                Loading...
+            </p>
+
+        </section>
+
+
+        <section class="form-card">
+
+            <h2 class="section-heading">
+                Personal Information
+            </h2>
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="fullName"
+                >
+                    Full Name
+                </label>
+
+                <input
+                    class="input"
+                    id="fullName"
+                    type="text"
+                    autocomplete="name"
+                    placeholder="Enter your full name"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="rollNumber"
+                >
+                    Roll Number
+                </label>
+
+                <input
+                    class="input"
+                    id="rollNumber"
+                    type="text"
+                    placeholder="Enter your roll number"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="className"
+                >
+                    Class / Grade
+                </label>
+
+                <select
+                    class="input"
+                    id="className"
+                >
+
+                    <option
+                        value=""
+                    >
+                        Select your class
+                    </option>
+
+                    <option value="Nursery">
+                        Nursery
+                    </option>
+
+                    <option value="LKG">
+                        LKG
+                    </option>
+
+                    <option value="UKG">
+                        UKG
+                    </option>
+
+                    <option value="1">
+                        Class 1
+                    </option>
+
+                    <option value="2">
+                        Class 2
+                    </option>
+
+                    <option value="3">
+                        Class 3
+                    </option>
+
+                    <option value="4">
+                        Class 4
+                    </option>
+
+                    <option value="5">
+                        Class 5
+                    </option>
+
+                    <option value="6">
+                        Class 6
+                    </option>
+
+                    <option value="7">
+                        Class 7
+                    </option>
+
+                    <option value="8">
+                        Class 8
+                    </option>
+
+                    <option value="9">
+                        Class 9
+                    </option>
+
+                    <option value="10">
+                        Class 10
+                    </option>
+
+                    <option value="11">
+                        Class 11
+                    </option>
+
+                    <option value="12">
+                        Class 12
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="schoolName"
+                >
+                    School Name
+                </label>
+
+                <input
+                    class="input"
+                    id="schoolName"
+                    type="text"
+                    autocomplete="organization"
+                    placeholder="Enter your school name"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="schoolType"
+                >
+                    School Type
+                </label>
+
+                <select
+                    class="input"
+                    id="schoolType"
+                >
+
+                    <option value="">
+                        Select school type
+                    </option>
+
+                    <option value="Primary School">
+                        Primary School
+                    </option>
+
+                    <option value="Middle School">
+                        Middle School
+                    </option>
+
+                    <option value="Secondary School">
+                        Secondary School
+                    </option>
+
+                    <option value="Senior Secondary School">
+                        Senior Secondary School
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="medium"
+                >
+                    Medium of Study
+                </label>
+
+                <select
+                    class="input"
+                    id="medium"
+                >
+
+                    <option value="">
+                        Select medium
+                    </option>
+
+                    <option value="Hindi">
+                        Hindi
+                    </option>
+
+                    <option value="English">
+                        English
+                    </option>
+
+                    <option value="Hindi & English">
+                        Hindi & English
+                    </option>
+
+                </select>
+
+            </div>
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="mobile"
+                >
+                    Mobile Number
+                </label>
+
+                <input
+                    class="input"
+                    id="mobile"
+                    type="tel"
+                    inputmode="numeric"
+                    autocomplete="tel"
+                    placeholder="Enter your mobile number"
+                    maxlength="10"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="state"
+                >
+                    State
+                </label>
+
+                <input
+                    class="input"
+                    id="state"
+                    type="text"
+                    autocomplete="address-level1"
+                    placeholder="Enter your state"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="district"
+                >
+                    District
+                </label>
+
+                <input
+                    class="input"
+                    id="district"
+                    type="text"
+                    autocomplete="address-level2"
+                    placeholder="Enter your district"
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="schoolAddress"
+                >
+                    School Address
+                </label>
+
+                <textarea
+                    class="input textarea"
+                    id="schoolAddress"
+                    rows="3"
+                    placeholder="Enter your school address"
+                ></textarea>
+
+            </div>
+
+
+            <div class="field">
+
+                <label
+                    class="label"
+                    for="bio"
+                >
+                    About Me
+                </label>
+
+                <textarea
+                    class="input textarea"
+                    id="bio"
+                    rows="3"
+                    maxlength="250"
+                    placeholder="Tell us something about yourself"
+                ></textarea>
+
+            </div>
+
+
+            <div class="account-info">
+
+                <div class="account-info-icon">
+                    🔐
+                </div>
+
+                <div>
+
+                    <h3>
+                        Account Email
+                    </h3>
+
+                    <p id="accountEmail">
+                        Loading...
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                class="save-button"
+                id="saveProfileButton"
+            >
+                Save Profile
+                <span>✓</span>
+            </button>
+
+
+            <button
+                type="button"
+                class="logout-button"
+                id="logoutButton"
+            >
+                Sign Out
+            </button>
+
+
+            <div
+                class="message"
+                id="message"
+                aria-live="polite"
+            ></div>
+
+        </section>
+
+    </main>
+
+</div>
+<style>
+
+    /* =========================
+       PROFILE FORM STYLES
+    ========================== */
+
+    .field {
+        margin-bottom: 17px;
+    }
+
+    .label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #475569;
+
+        font-size: 13px;
+
+        font-weight: 900;
+    }
+
+    .input {
+        width: 100%;
+
+        min-height: 52px;
+
+        padding: 13px 15px;
+
+        border:
+            2px solid #e2e8f0;
+
+        border-radius: 15px;
+
+        background: #f8fafc;
+
+        color: #1e293b;
+
+        font-size: 14px;
+
+        font-weight: 700;
+
+        transition: .2s;
+    }
+
+    .input:focus {
+        outline: none;
+
+        border-color: #14b8a6;
+
+        background: #ffffff;
+
+        box-shadow:
+            0 0 0 4px
+            rgba(20,184,166,.10);
+    }
+
+    .input::placeholder {
+        color: #94a3b8;
+    }
+
+    select.input {
+        cursor: pointer;
+
+        appearance: auto;
+    }
+
+    .textarea {
+        resize: vertical;
+
+        min-height: 90px;
+
+        line-height: 1.5;
+    }
+
+
+    /* =========================
+       ACCOUNT INFO
+    ========================== */
+
+    .account-info {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        padding: 14px;
+
+        margin:
+            4px 0 18px;
+
+        border-radius: 16px;
+
+        background: #f0fdfa;
+
+        border: 1px solid #ccfbf1;
+    }
+
+    .account-info-icon {
+        width: 42px;
+        height: 42px;
+
+        flex-shrink: 0;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 13px;
+
+        background: #ffffff;
+
+        font-size: 19px;
+    }
+
+    .account-info h3 {
+        color: #0f766e;
+
+        font-size: 12px;
+
+        font-weight: 900;
+    }
+
+    .account-info p {
+        margin-top: 2px;
+
+        color: #64748b;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        word-break: break-word;
+    }
+
+
+    /* =========================
+       SAVE BUTTON
+    ========================== */
+
+    .save-button {
+        width: 100%;
+        height: 54px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 8px;
+
+        border-radius: 16px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #fbbf24,
+                #f59e0b
+            );
+
+        color: #172554;
+
+        font-size: 16px;
+
+        font-weight: 900;
+
+        box-shadow:
+            0 10px 22px
+            rgba(245,158,11,.22);
+
+        transition: .2s;
+    }
+
+    .save-button:hover {
+        transform: translateY(-2px);
+    }
+
+    .save-button:active {
+        transform: scale(.98);
+    }
+
+    .save-button:disabled {
+        opacity: .65;
+
+        cursor: not-allowed;
+
+        transform: none;
+    }
+
+
+    /* =========================
+       LOGOUT
+    ========================== */
+
+    .logout-button {
+        width: 100%;
+
+        height: 48px;
+
+        margin-top: 11px;
+
+        border-radius: 15px;
+
+        background: #fff1f2;
+
+        color: #be123c;
+
+        border:
+            1px solid #fecdd3;
+
+        font-size: 14px;
+
+        font-weight: 900;
+    }
+
+
+    /* =========================
+       MESSAGE
+    ========================== */
+
+    .message {
+        display: none;
+
+        margin-top: 15px;
+
+        padding: 12px 14px;
+
+        border-radius: 13px;
+
+        font-size: 12px;
+
+        font-weight: 800;
+
+        line-height: 1.4;
+    }
+
+    .message.show {
+        display: block;
+    }
+
+    .message.success {
+        background: #dcfce7;
+
+        color: #15803d;
+    }
+
+    .message.error {
+        background: #fee2e2;
+
+        color: #b91c1c;
+    }
+
+
+    /* =========================
+       LOADING
+    ========================== */
+
+    .loading {
+        opacity: .6;
+
+        pointer-events: none;
+    }
+
+
+    @media (max-width: 380px) {
+
+        .container {
+            padding-left: 13px;
+            padding-right: 13px;
+        }
+
+        .form-card,
+        .profile-card {
+            border-radius: 22px;
+        }
+
+        .form-card {
+            padding: 20px 15px;
+        }
+
+    }
+
+</style>
+
+
+<script type="module">
+
+    import {
+        auth,
+        db,
+        storage
+    } from "./firebase.js";
+
+    import {
+        onAuthStateChanged,
+        signOut,
+        updateProfile
+    } from
+    "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+    import {
+        doc,
+        getDoc,
+        setDoc,
+        serverTimestamp
+    } from
+    "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+    import {
+        ref,
+        uploadBytes,
+        getDownloadURL
+    } from
+    "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+
+
+    const profileName =
+        document.getElementById("profileName");
+
+    const profileEmail =
+        document.getElementById("profileEmail");
+
+    const accountEmail =
+        document.getElementById("accountEmail");
+
+    const profilePhoto =
+        document.getElementById("profilePhoto");
+
+    const profilePlaceholder =
+        document.getElementById("profilePlaceholder");
+
+    const photoInput =
+        document.getElementById("photoInput");
+
+    const fullName =
+        document.getElementById("fullName");
+
+    const rollNumber =
+        document.getElementById("rollNumber");
+
+    const className =
+        document.getElementById("className");
+
+    const schoolName =
+        document.getElementById("schoolName");
+
+    const schoolType =
+        document.getElementById("schoolType");
+
+    const medium =
+        document.getElementById("medium");
+
+    const mobile =
+        document.getElementById("mobile");
+
+    const state =
+        document.getElementById("state");
+
+    const district =
+        document.getElementById("district");
+
+    const schoolAddress =
+        document.getElementById("schoolAddress");
+
+    const bio =
+        document.getElementById("bio");
+
+    const saveButton =
+        document.getElementById("saveProfileButton");
+
+    const logoutButton =
+        document.getElementById("logoutButton");
+
+    const message =
+        document.getElementById("message");
+
+
+    let currentUser = null;
+
+
+    function showMessage(
+        text,
+        type = "error"
+    ) {
+
+        message.textContent = text;
+
+        message.className =
+            "message show " + type;
+
+    }
+
+
+    function fillProfile(data, user) {
+
+        fullName.value =
+            data?.name ||
+            user.displayName ||
+            "";
+
+        rollNumber.value =
+            data?.rollNumber || "";
+
+        className.value =
+            data?.className || "";
+
+        schoolName.value =
+            data?.schoolName || "";
+
+        schoolType.value =
+            data?.schoolType || "";
+
+        medium.value =
+            data?.medium || "";
+
+        mobile.value =
+            data?.phone || "";
+
+        state.value =
+            data?.state || "";
+
+        district.value =
+            data?.district || "";
+
+        schoolAddress.value =
+            data?.schoolAddress || "";
+
+        bio.value =
+            data?.bio || "";
+
+
+        profileName.textContent =
+            data?.name ||
+            user.displayName ||
+            "Student";
+
+        profileEmail.textContent =
+            user.email || "";
+
+        accountEmail.textContent =
+            user.email || "";
+
+
+        if (data?.photoURL) {
+
+            profilePhoto.src =
+                data.photoURL;
+
+            profilePhoto.style.display =
+                "block";
+
+            profilePlaceholder.style.display =
+                "none";
+
+        }
+
+    }
+
+
+    /*
+    =========================
+       AUTH CHECK
+    =========================
+    */
+
+    onAuthStateChanged(
+        auth,
+        async (user) => {
+
+            if (!user) {
+
+                window.location.replace(
+                    "login.html"
+                );
+
+                return;
+            }
+
+
+            currentUser = user;
+
+
+            try {
+
+                const userRef =
+                    doc(
+                        db,
+                        "users",
+                        user.uid
+                    );
+
+                const snapshot =
+                    await getDoc(userRef);
+
+
+                const data =
+                    snapshot.exists()
+                        ? snapshot.data()
+                        : {};
+
+
+                fillProfile(
+                    data,
+                    user
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Profile load error:",
+                    error
+                );
+
+                fillProfile(
+                    {},
+                    user
+                );
+
+            }
+
+        }
+    );
+
+</script>
+/*
+    ============================================================
+       PROFILE PHOTO UPLOAD
+    ============================================================
+    */
+
+    photoInput.addEventListener(
+        "change",
+        async () => {
+
+            const file =
+                photoInput.files[0];
+
+            if (!file || !currentUser) {
+                return;
+            }
+
+
+            if (!file.type.startsWith("image/")) {
+
+                showMessage(
+                    "Please select an image file."
+                );
+
+                photoInput.value = "";
+
+                return;
+            }
+
+
+            if (file.size > 5 * 1024 * 1024) {
+
+                showMessage(
+                    "Profile photo must be smaller than 5 MB."
+                );
+
+                photoInput.value = "";
+
+                return;
+            }
+
+
+            try {
+
+                showMessage(
+                    "Uploading profile photo...",
+                    "success"
+                );
+
+
+                const extension =
+                    file.name
+                        .split(".")
+                        .pop()
+                        .toLowerCase();
+
+
+                const photoRef =
+                    ref(
+                        storage,
+                        `profilePhotos/${currentUser.uid}/profile.${extension}`
+                    );
+
+
+                await uploadBytes(
+                    photoRef,
+                    file,
+                    {
+                        contentType:
+                            file.type
+                    }
+                );
+
+
+                const photoURL =
+                    await getDownloadURL(
+                        photoRef
+                    );
+
+
+                await updateProfile(
+                    currentUser,
+                    {
+                        photoURL:
+                            photoURL
+                    }
+                );
+
+
+                await setDoc(
+                    doc(
+                        db,
+                        "users",
+                        currentUser.uid
+                    ),
+                    {
+                        photoURL:
+                            photoURL,
+
+                        updatedAt:
+                            serverTimestamp()
+                    },
+                    {
+                        merge: true
+                    }
+                );
+
+
+                profilePhoto.src =
+                    photoURL;
+
+                profilePhoto.style.display =
+                    "block";
+
+                profilePlaceholder.style.display =
+                    "none";
+
+
+                showMessage(
+                    "Profile photo updated successfully.",
+                    "success"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Photo upload error:",
+                    error
+                );
+
+
+                showMessage(
+                    "Unable to upload profile photo. Please try again."
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+    ============================================================
+       SAVE PROFILE
+    ============================================================
+    */
+
+    saveButton.addEventListener(
+        "click",
+        async () => {
+
+            if (!currentUser) {
+                return;
+            }
+
+
+            const name =
+                fullName.value.trim();
+
+            const roll =
+                rollNumber.value.trim();
+
+            const selectedClass =
+                className.value;
+
+            const school =
+                schoolName.value.trim();
+
+            const type =
+                schoolType.value;
+
+            const studyMedium =
+                medium.value;
+
+            const phone =
+                mobile.value.trim();
+
+            const userState =
+                state.value.trim();
+
+            const userDistrict =
+                district.value.trim();
+
+            const address =
+                schoolAddress.value.trim();
+
+            const about =
+                bio.value.trim();
+
+
+            if (!name) {
+
+                showMessage(
+                    "Please enter your full name."
+                );
+
+                fullName.focus();
+
+                return;
+            }
+
+
+            if (
+                phone &&
+                !/^[0-9]{10}$/.test(phone)
+            ) {
+
+                showMessage(
+                    "Please enter a valid 10-digit mobile number."
+                );
+
+                mobile.focus();
+
+                return;
+            }
+
+
+            saveButton.disabled = true;
+
+            saveButton.innerHTML =
+                "Saving Profile...";
+
+
+            try {
+
+                /*
+                Update Firebase Authentication
+                display name.
+                */
+
+                await updateProfile(
+                    currentUser,
+                    {
+                        displayName:
+                            name
+                    }
+                );
+
+
+                /*
+                Update user's own Firestore
+                document.
+                */
+
+                await setDoc(
+                    doc(
+                        db,
+                        "users",
+                        currentUser.uid
+                    ),
+                    {
+
+                        uid:
+                            currentUser.uid,
+
+                        name:
+                            name,
+
+                        email:
+                            currentUser.email || "",
+
+                        rollNumber:
+                            roll,
+
+                        className:
+                            selectedClass,
+
+                        schoolName:
+                            school,
+
+                        schoolType:
+                            type,
+
+                        medium:
+                            studyMedium,
+
+                        phone:
+                            phone,
+
+                        state:
+                            userState,
+
+                        district:
+                            userDistrict,
+
+                        schoolAddress:
+                            address,
+
+                        bio:
+                            about,
+
+                        updatedAt:
+                            serverTimestamp()
+
+                    },
+                    {
+                        merge: true
+                    }
+                );
+
+
+                profileName.textContent =
+                    name;
+
+
+                showMessage(
+                    "Your profile has been saved successfully.",
+                    "success"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Profile save error:",
+                    error
+                );
+
+
+                showMessage(
+                    "Unable to save your profile. Please try again."
+                );
+
+
+            } finally {
+
+                saveButton.disabled = false;
+
+                saveButton.innerHTML =
+                    "Save Profile <span>✓</span>";
+
+            }
+
+        }
+    );
+/*
+    ============================================================
+       LOGOUT
+    ============================================================
+    */
+
+    logoutButton.addEventListener(
+        "click",
+        async () => {
+
+            const confirmed =
+                confirm(
+                    "Are you sure you want to sign out?"
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            try {
+
+                await signOut(auth);
+
+                window.location.replace(
+                    "login.html"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "Logout error:",
+                    error
+                );
+
+                showMessage(
+                    "Unable to sign out. Please try again."
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+    ============================================================
+       BACK TO HOME
+    ============================================================
+    */
+
+    document
+        .getElementById("backButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "home.html";
+
+            }
+        );
+
+
+    /*
+    ============================================================
+       MOBILE NUMBER INPUT
+    ============================================================
+    */
+
+    mobile.addEventListener(
+        "input",
+        () => {
+
+            mobile.value =
+                mobile.value
+                    .replace(/\D/g, "")
+                    .slice(0, 10);
+
+        }
+    );
+
+
+    /*
+    ============================================================
+       PROFILE PHOTO PREVIEW
+    ============================================================
+    */
+
+    profilePhoto.addEventListener(
+        "error",
+        () => {
+
+            profilePhoto.style.display =
+                "none";
+
+            profilePlaceholder.style.display =
+                "flex";
+
+        }
+    );
+
+
+    /*
+    ============================================================
+       PAGE VISIBILITY SECURITY
+    ============================================================
+    */
+
+    window.addEventListener(
+        "pageshow",
+        () => {
+
+            if (!auth.currentUser) {
+
+                window.location.replace(
+                    "login.html"
+                );
+
+            }
+
+        }
+    );
+
+
+</script>
+
+</body>
+
+</html>
