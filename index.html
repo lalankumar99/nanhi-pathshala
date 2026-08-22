@@ -585,33 +585,25 @@
 </div>
 
 
-<script>
+<script type="module">
 
-    /*
-    ============================================================
-    NANHI PATHSHALA — INTRO
-    ============================================================
+import { auth } from "./firebase.js";
 
-    This page is intentionally only the welcome screen.
-
-    Firebase authentication and the next application screen
-    will be connected later.
-
-    ============================================================
-    */
-    import { auth } from "./firebase.js";
-
-import { onAuthStateChanged } from
-    "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-    const startButton =
-        document.getElementById("startButton");
-
-    const welcomeScreen =
-        document.getElementById("welcomeScreen");
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
-    startButton.addEventListener("click", () => {
+const startButton =
+    document.getElementById("startButton");
+
+const welcomeScreen =
+    document.getElementById("welcomeScreen");
+
+
+startButton.addEventListener("click", () => {
+
+    startButton.disabled = true;
 
     welcomeScreen.classList.add("exit");
 
@@ -634,24 +626,6 @@ import { onAuthStateChanged } from
     }, 650);
 
 });
-
-        /*
-         * Next page will be connected here.
-         *
-         * Example later:
-         *
-         * window.location.href = "login.html";
-         *
-         * For now the intro animation is kept local.
-         */
-
-        setTimeout(() => {
-
-            // Next page connection will be added later.
-
-        }, 650);
-
-    });
 
 </script>
 
