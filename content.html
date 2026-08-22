@@ -10,15 +10,33 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 >
 
-<meta name="theme-color" content="#f59e0b">
+<meta
+    name="theme-color"
+    content="#f59e0b"
+>
+
+<meta
+    name="description"
+    content="Nanhi Pathshala Learning Content"
+>
 
 <title>Learn • Nanhi Pathshala</title>
+
+<link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+>
+
+<link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+    crossorigin
+>
 
 <link
     href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap"
     rel="stylesheet"
 >
-
 <style>
 
 * {
@@ -38,12 +56,12 @@ body {
 
     background:
         radial-gradient(
-            circle at 10% 5%,
+            circle at 8% 4%,
             #ccfbf1 0,
             transparent 25%
         ),
         radial-gradient(
-            circle at 90% 10%,
+            circle at 92% 8%,
             #fef3c7 0,
             transparent 25%
         ),
@@ -56,32 +74,36 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
     font-family: inherit;
 }
 
 button {
-    border: none;
-    outline: none;
+    border: 0;
+    outline: 0;
     cursor: pointer;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
 }
 
 .page {
     min-height: 100vh;
-    padding-bottom: 30px;
+    padding-bottom: 35px;
 }
 
-
-/* =========================
-   HEADER
-========================= */
-
 .header {
-    padding: 17px 16px;
+    padding: 17px 16px 20px;
 
     display: flex;
     align-items: center;
+
     gap: 13px;
+
+    color: #ffffff;
 
     background:
         linear-gradient(
@@ -89,8 +111,6 @@ button {
             #14b8a6,
             #0d9488
         );
-
-    color: white;
 
     border-radius:
         0 0 30px 30px;
@@ -106,14 +126,22 @@ button {
 
     flex-shrink: 0;
 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     border-radius: 14px;
 
     background:
         rgba(255,255,255,.18);
 
-    color: white;
+    color: #ffffff;
 
-    font-size: 21px;
+    font-size: 22px;
+}
+
+.header-content {
+    min-width: 0;
 }
 
 .header-title {
@@ -122,20 +150,33 @@ button {
     font-size: 23px;
 
     font-weight: 900;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
 }
 
+.header-subtitle {
+    margin-top: 2px;
 
-/* =========================
-   CONTENT
-========================= */
+    color: #ccfbf1;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
 
 .container {
     width: 100%;
-    max-width: 700px;
+
+    max-width: 760px;
 
     margin: 0 auto;
 
-    padding: 22px 16px;
+    padding:
+        22px 16px 40px;
 }
 
 .page-heading {
@@ -146,28 +187,25 @@ button {
     font-weight: 900;
 
     color: #134e4a;
-
-    margin-bottom: 5px;
 }
 
 .page-description {
+    margin-top: 5px;
+
     color: #64748b;
 
     font-size: 12px;
 
-    font-weight: 700;
-
     line-height: 1.5;
 
-    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.content-area {
+    margin-top: 20px;
 }
 
 </style>
-
-</head>
-
-<body>
-
 <div class="page">
 
     <header class="header">
@@ -176,13 +214,22 @@ button {
             type="button"
             class="back-button"
             id="backButton"
+            aria-label="Go back"
         >
             ←
         </button>
 
-        <h1 class="header-title">
-            Learn
-        </h1>
+        <div class="header-content">
+
+            <h1 class="header-title">
+                Learn
+            </h1>
+
+            <p class="header-subtitle">
+                Explore your learning content
+            </p>
+
+        </div>
 
     </header>
 
@@ -190,789 +237,2640 @@ button {
     <main class="container">
 
         <h2 class="page-heading">
-            What would you like to learn?
+            Learning Space 📚
         </h2>
 
         <p class="page-description">
-            Choose a subject and start learning today.
+            Explore folders, lessons, notes, videos
+            and other learning materials.
         </p>
-        <div class="subject-grid">
 
-
-            <button
-                type="button"
-                class="subject-card"
-                id="mathButton"
-            >
-
-                <div class="subject-icon">
-                    🔢
-                </div>
-
-                <div class="subject-info">
-
-                    <h3>
-                        Mathematics
-                    </h3>
-
-                    <p>
-                        Numbers, formulas & problem solving
-                    </p>
-
-                </div>
-
-                <span class="subject-arrow">
-                    →
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="subject-card"
-                id="scienceButton"
-            >
-
-                <div class="subject-icon">
-                    🔬
-                </div>
-
-                <div class="subject-info">
-
-                    <h3>
-                        Science
-                    </h3>
-
-                    <p>
-                        Discover the world around you
-                    </p>
-
-                </div>
-
-                <span class="subject-arrow">
-                    →
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="subject-card"
-                id="englishButton"
-            >
-
-                <div class="subject-icon">
-                    📘
-                </div>
-
-                <div class="subject-info">
-
-                    <h3>
-                        English
-                    </h3>
-
-                    <p>
-                        Reading, writing & communication
-                    </p>
-
-                </div>
-
-                <span class="subject-arrow">
-                    →
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="subject-card"
-                id="hindiButton"
-            >
-
-                <div class="subject-icon">
-                    🪔
-                </div>
-
-                <div class="subject-info">
-
-                    <h3>
-                        Hindi
-                    </h3>
-
-                    <p>
-                        Language, stories & literature
-                    </p>
-
-                </div>
-
-                <span class="subject-arrow">
-                    →
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="subject-card"
-                id="computerButton"
-            >
-
-                <div class="subject-icon">
-                    💻
-                </div>
-
-                <div class="subject-info">
-
-                    <h3>
-                        Computer
-                    </h3>
-
-                    <p>
-                        Technology & digital skills
-                    </p>
-
-                </div>
-
-                <span class="subject-arrow">
-                    →
-                </span>
-
-            </button>
-
-
-            <button
-                type="button"
-                class="subject-card"
-                id="generalButton"
-            >
-
-                <div class="subject-icon">
-                    🌍
-                </div>
-
-                <div class="subject-info">
-
-                    <h3>
-                        General Knowledge
-                    </h3>
-
-                    <p>
-                        Explore facts about our world
-                    </p>
-
-                </div>
-
-                <span class="subject-arrow">
-                    →
-                </span>
-
-            </button>
-
-        </div>
-
-
-        <div class="coming-card">
-
-            <div class="coming-icon">
-                ✨
-            </div>
-
-            <div>
-
-                <h3>
-                    More subjects coming soon
-                </h3>
-
-                <p>
-                    New learning content will be added regularly.
-                </p>
-
-            </div>
-
-        </div>
-        <div class="continue-card">
-
-            <div class="continue-icon">
-                🚀
-            </div>
-
-            <div class="continue-content">
-
-                <h3>
-                    Keep Learning
-                </h3>
-
-                <p>
-                    Your lessons and learning materials
-                    will appear here.
-                </p>
-
-            </div>
-
-        </div>
-
-
+        <div class="content-area">
         <div
-            class="loading-box"
-            id="loadingBox"
+            class="firebase-status"
+            id="firebaseStatus"
         >
 
-            <div class="loading-spinner"></div>
+            <span
+                class="status-dot"
+            ></span>
 
-            <p>
+            <span
+                id="firebaseStatusText"
+            >
                 Loading learning content...
-            </p>
+            </span>
 
         </div>
 
 
         <div
-            class="empty-box"
-            id="emptyBox"
+            id="contentRoot"
         >
-
-            <div class="empty-icon">
-                📚
-            </div>
-
-            <h3>
-                No Content Available
-            </h3>
-
-            <p>
-                Learning content will appear here
-                when it is added.
-            </p>
-
         </div>
 
-    </main>
+    </div>
+
+</main>
 
 </div>
+
+
 <style>
 
-    /* =========================
-       SUBJECT GRID
-    ========================== */
+.firebase-status {
+    display: flex;
 
-    .subject-grid {
-        display: grid;
+    align-items: center;
 
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
+    gap: 8px;
 
-        gap: 12px;
+    margin-bottom: 15px;
 
-        margin-bottom: 20px;
-    }
+    padding: 10px 13px;
 
-    .subject-card {
-        position: relative;
+    border-radius: 14px;
 
-        min-height: 145px;
+    background: #ffffff;
 
-        padding: 17px;
+    border: 1px solid #e2e8f0;
 
-        display: flex;
-        flex-direction: column;
+    color: #64748b;
 
-        align-items: flex-start;
-        justify-content: space-between;
+    font-size: 11px;
 
-        text-align: left;
+    font-weight: 800;
+}
 
-        border-radius: 21px;
+.status-dot {
+    width: 8px;
+    height: 8px;
 
-        background: #ffffff;
+    flex-shrink: 0;
 
-        border: 1px solid #e2e8f0;
+    border-radius: 50%;
 
-        box-shadow:
-            0 8px 22px
-            rgba(15,23,42,.06);
+    background: #f59e0b;
+}
 
-        transition:
-            transform .2s ease,
-            box-shadow .2s ease;
-    }
+.firebase-status.connected
+.status-dot {
+    background: #10b981;
+}
 
-    .subject-card:active {
-        transform: scale(.97);
-    }
-
-    .subject-icon {
-        width: 48px;
-        height: 48px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 15px;
-
-        background: #f0fdfa;
-
-        font-size: 25px;
-    }
-
-    .subject-info {
-        margin-top: 12px;
-
-        min-width: 0;
-    }
-
-    .subject-info h3 {
-        color: #134e4a;
-
-        font-family: "Quicksand", sans-serif;
-
-        font-size: 15px;
-
-        font-weight: 900;
-    }
-
-    .subject-info p {
-        margin-top: 4px;
-
-        color: #94a3b8;
-
-        font-size: 10px;
-
-        line-height: 1.45;
-
-        font-weight: 700;
-    }
-
-    .subject-arrow {
-        position: absolute;
-
-        right: 14px;
-        top: 14px;
-
-        width: 28px;
-        height: 28px;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 9px;
-
-        background: #f8fafc;
-
-        color: #0d9488;
-
-        font-size: 15px;
-
-        font-weight: 900;
-    }
-
-
-    /* =========================
-       COMING SOON
-    ========================== */
-
-    .coming-card,
-    .continue-card {
-        display: flex;
-
-        align-items: center;
-
-        gap: 13px;
-
-        padding: 16px;
-
-        margin-bottom: 14px;
-
-        border-radius: 19px;
-    }
-
-    .coming-card {
-        background:
-            linear-gradient(
-                135deg,
-                #fffbeb,
-                #fef3c7
-            );
-
-        border: 1px solid #fde68a;
-    }
-
-    .continue-card {
-        background:
-            linear-gradient(
-                135deg,
-                #f0fdfa,
-                #ccfbf1
-            );
-
-        border: 1px solid #99f6e4;
-    }
-
-    .coming-icon,
-    .continue-icon {
-        width: 46px;
-        height: 46px;
-
-        flex-shrink: 0;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        border-radius: 14px;
-
-        background: #ffffff;
-
-        font-size: 23px;
-    }
-
-    .coming-card h3,
-    .continue-card h3 {
-        font-size: 14px;
-
-        font-weight: 900;
-    }
-
-    .coming-card h3 {
-        color: #92400e;
-    }
-
-    .continue-card h3 {
-        color: #0f766e;
-    }
-
-    .coming-card p,
-    .continue-card p {
-        margin-top: 3px;
-
-        font-size: 11px;
-
-        line-height: 1.45;
-
-        font-weight: 700;
-    }
-
-    .coming-card p {
-        color: #a16207;
-    }
-
-    .continue-card p {
-        color: #0f766e;
-    }
-
-
-    /* =========================
-       LOADING
-    ========================== */
-
-    .loading-box {
-        display: none;
-
-        padding: 28px 15px;
-
-        text-align: center;
-
-        color: #64748b;
-
-        font-size: 12px;
-
-        font-weight: 800;
-    }
-
-    .loading-spinner {
-        width: 30px;
-        height: 30px;
-
-        margin: 0 auto 10px;
-
-        border: 3px solid #ccfbf1;
-
-        border-top-color: #0d9488;
-
-        border-radius: 50%;
-
-        animation:
-            spin .8s linear infinite;
-    }
-
-    @keyframes spin {
-
-        to {
-            transform: rotate(360deg);
-        }
-
-    }
-
-
-    /* =========================
-       EMPTY
-    ========================== */
-
-    .empty-box {
-        display: none;
-
-        padding: 30px 18px;
-
-        text-align: center;
-
-        border-radius: 20px;
-
-        background: #ffffff;
-
-        border: 1px solid #e2e8f0;
-    }
-
-    .empty-icon {
-        font-size: 35px;
-
-        margin-bottom: 8px;
-    }
-
-    .empty-box h3 {
-        color: #134e4a;
-
-        font-family: "Quicksand", sans-serif;
-
-        font-size: 17px;
-
-        font-weight: 900;
-    }
-
-    .empty-box p {
-        max-width: 300px;
-
-        margin: 5px auto 0;
-
-        color: #94a3b8;
-
-        font-size: 11px;
-
-        line-height: 1.5;
-
-        font-weight: 700;
-    }
-
-
-    /* =========================
-       RESPONSIVE
-    ========================== */
-
-    @media (min-width: 600px) {
-
-        .subject-grid {
-            grid-template-columns:
-                repeat(3, minmax(0, 1fr));
-        }
-
-    }
-
-
-    @media (max-width: 350px) {
-
-        .subject-grid {
-            gap: 9px;
-        }
-
-        .subject-card {
-            padding: 13px;
-
-            min-height: 135px;
-        }
-
-        .subject-info h3 {
-            font-size: 14px;
-        }
-
-    }
+.firebase-status.error
+.status-dot {
+    background: #ef4444;
+}
 
 </style>
+<style>
+
+.folder-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+}
+
+
+.folder-card {
+    position: relative;
+
+    min-height: 145px;
+
+    padding: 17px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    justify-content: space-between;
+
+    text-align: left;
+
+    border-radius: 21px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 8px 22px
+        rgba(15,23,42,.06);
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.folder-card:active {
+    transform: scale(.97);
+}
+
+
+.folder-icon {
+    width: 54px;
+    height: 54px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fef3c7,
+            #fde68a
+        );
+
+    font-size: 28px;
+}
+
+
+.folder-name {
+    margin-top: 12px;
+
+    color: #134e4a;
+
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 15px;
+
+    font-weight: 900;
+}
+
+
+.folder-description {
+    margin-top: 3px;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+
+    line-height: 1.4;
+
+    font-weight: 700;
+}
+
+
+.folder-count {
+    position: absolute;
+
+    top: 13px;
+    right: 13px;
+
+    min-width: 27px;
+
+    padding: 5px 7px;
+
+    text-align: center;
+
+    border-radius: 999px;
+
+    background: #f0fdfa;
+
+    color: #0f766e;
+
+    font-size: 9px;
+
+    font-weight: 900;
+}
+
+
+.file-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    margin-bottom: 20px;
+}
+
+
+.file-card {
+    width: 100%;
+
+    padding: 14px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    text-align: left;
+
+    border-radius: 18px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 7px 18px
+        rgba(15,23,42,.05);
+
+    transition:
+        transform .2s ease;
+}
+
+
+.file-card:active {
+    transform: scale(.98);
+}
+
+
+.file-icon {
+    width: 46px;
+    height: 46px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #f0fdfa;
+
+    font-size: 22px;
+}
+
+
+.file-info {
+    min-width: 0;
+
+    flex: 1;
+}
+
+
+.file-name {
+    color: #134e4a;
+
+    font-size: 14px;
+
+    font-weight: 900;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+}
+
+
+.file-description {
+    margin-top: 3px;
+
+    color: #94a3b8;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    line-height: 1.4;
+}
+
+
+.file-type {
+    flex-shrink: 0;
+
+    padding: 5px 7px;
+
+    border-radius: 8px;
+
+    background: #f8fafc;
+
+    color: #64748b;
+
+    font-size: 8px;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+}
+
+
+.video-card {
+    width: 100%;
+
+    overflow: hidden;
+
+    margin-bottom: 12px;
+
+    text-align: left;
+
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    box-shadow:
+        0 8px 22px
+        rgba(15,23,42,.06);
+}
+
+
+.video-thumbnail {
+    width: 100%;
+
+    aspect-ratio: 16 / 9;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            135deg,
+            #134e4a,
+            #0f766e
+        );
+
+    color: #ffffff;
+
+    font-size: 40px;
+}
+
+
+.video-info {
+    padding: 14px;
+}
+
+
+.video-title {
+    color: #134e4a;
+
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 15px;
+
+    font-weight: 900;
+}
+
+
+.video-description {
+    margin-top: 4px;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+    font-weight: 700;
+}
+
+
+@media (min-width: 600px) {
+
+    .folder-grid {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 350px) {
+
+    .folder-grid {
+        gap: 9px;
+    }
+
+    .folder-card {
+        min-height: 135px;
+
+        padding: 14px;
+    }
+
+}
+
+</style>
+<style>
+
+.demo-badge {
+    display: inline-flex;
+
+    align-items: center;
+
+    margin-bottom: 12px;
+
+    padding: 6px 10px;
+
+    border-radius: 999px;
+
+    background: #fffbeb;
+
+    color: #b45309;
+
+    font-size: 9px;
+
+    font-weight: 900;
+
+    text-transform: uppercase;
+}
+
+
+.empty-state {
+    padding: 32px 18px;
+
+    text-align: center;
+
+    border-radius: 21px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+}
+
+
+.empty-state-icon {
+    font-size: 38px;
+
+    margin-bottom: 9px;
+}
+
+
+.empty-state-title {
+    color: #134e4a;
+
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 17px;
+
+    font-weight: 900;
+}
+
+
+.empty-state-text {
+    max-width: 330px;
+
+    margin: 5px auto 0;
+
+    color: #94a3b8;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    font-weight: 700;
+}
+
+
+.loading-state {
+    padding: 30px 15px;
+
+    text-align: center;
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    font-weight: 800;
+}
+
+
+.loading-spinner {
+    width: 30px;
+    height: 30px;
+
+    margin: 0 auto 10px;
+
+    border: 3px solid #ccfbf1;
+
+    border-top-color: #0d9488;
+
+    border-radius: 50%;
+
+    animation:
+        contentSpin .8s linear infinite;
+}
+
+
+@keyframes contentSpin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+.section-label {
+    margin:
+        18px 0 10px;
+
+    color: #134e4a;
+
+    font-family: "Quicksand", sans-serif;
+
+    font-size: 17px;
+
+    font-weight: 900;
+}
+
+
+.breadcrumb {
+    display: none;
+
+    align-items: center;
+
+    gap: 6px;
+
+    margin-bottom: 14px;
+
+    padding: 10px 12px;
+
+    border-radius: 13px;
+
+    background: #f0fdfa;
+
+    color: #0f766e;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    overflow-x: auto;
+
+    white-space: nowrap;
+}
+
+
+.breadcrumb.visible {
+    display: flex;
+}
+
+
+.breadcrumb button {
+    background: transparent;
+
+    color: #0f766e;
+
+    font-weight: 900;
+}
+
+
+.breadcrumb-separator {
+    color: #94a3b8;
+}
+
+
+@media (max-width: 350px) {
+
+    .file-card {
+        padding: 12px;
+    }
+
+    .file-type {
+        display: none;
+    }
+
+}
+
+</style>
+
+
+<script>
+
+/* ============================================================
+   DEMO LEARNING CONTENT
+============================================================ */
+
+const demoLearningContent = [
+
+    {
+        id: "demo-mathematics",
+        parentId: null,
+        type: "folder",
+        name: "Mathematics",
+        description: "Numbers, formulas and practice",
+        icon: "📐",
+        order: 1
+    },
+
+    {
+        id: "demo-science",
+        parentId: null,
+        type: "folder",
+        name: "Science",
+        description: "Discover science and experiments",
+        icon: "🔬",
+        order: 2
+    },
+
+    {
+        id: "demo-english",
+        parentId: null,
+        type: "folder",
+        name: "English",
+        description: "Grammar, stories and vocabulary",
+        icon: "📘",
+        order: 3
+    },
+
+    {
+        id: "demo-math-basics",
+        parentId: "demo-mathematics",
+        type: "file",
+        name: "Basic Mathematics",
+        description: "Numbers and basic calculations",
+        fileType: "HTML",
+        url: "#",
+        order: 1
+    },
+
+    {
+        id: "demo-science-video",
+        parentId: "demo-science",
+        type: "video",
+        name: "Science Introduction",
+        description: "Introduction to the world of science",
+        videoUrl: "https://www.youtube.com/",
+        order: 1
+    },
+
+    {
+        id: "demo-english-grammar",
+        parentId: "demo-english",
+        type: "file",
+        name: "English Grammar",
+        description: "Learn basic English grammar",
+        fileType: "HTML",
+        url: "#",
+        order: 1
+    }
+
+];
+
+
+/* ============================================================
+   CURRENT FOLDER
+============================================================ */
+
+let currentFolderId = null;
+
+
+/* ============================================================
+   GET CHILDREN
+============================================================ */
+
+function getChildren(
+    items,
+    parentId
+) {
+
+    return items
+        .filter(
+            item =>
+                (item.parentId || null) ===
+                parentId
+        )
+        .sort(
+            (a, b) =>
+                (a.order || 0) -
+                (b.order || 0)
+        );
+
+}
+
+
+/* ============================================================
+   SAFE TEXT
+============================================================ */
+
+function escapeHTML(value) {
+
+    return String(value || "")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* ============================================================
+   RENDER CONTENT
+============================================================ */
+
+function renderLearningContent(
+    items,
+    parentId = null,
+    showDemo = false
+) {
+
+    if (!contentRoot) {
+        return;
+    }
+
+
+    currentFolderId =
+        parentId;
+
+
+    contentRoot.innerHTML =
+        "";
+
+
+    const children =
+        getChildren(
+            items,
+            parentId
+        );
+
+
+    if (
+        children.length === 0
+    ) {
+
+        contentRoot.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-state-icon">
+                    📚
+                </div>
+
+                <h3 class="empty-state-title">
+                    No Content Yet
+                </h3>
+
+                <p class="empty-state-text">
+                    Learning materials will appear here
+                    when the admin adds them.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+    }
+
+
+    if (showDemo) {
+
+        const badge =
+            document.createElement("div");
+
+        badge.className =
+            "demo-badge";
+
+        badge.textContent =
+            "Demo Content";
+
+        contentRoot.appendChild(
+            badge
+        );
+
+    }
+
+
+    const folders =
+        children.filter(
+            item =>
+                item.type === "folder"
+        );
+
+
+    const files =
+        children.filter(
+            item =>
+                item.type === "file"
+        );
+
+
+    const videos =
+        children.filter(
+            item =>
+                item.type === "video"
+        );
+
+
+    /* ========================================================
+       FOLDERS
+    ======================================================== */
+
+    if (folders.length > 0) {
+
+        const grid =
+            document.createElement(
+                "div"
+            );
+
+        grid.className =
+            "folder-grid";
+
+
+        folders.forEach(
+            folder => {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.type =
+                    "button";
+
+                button.className =
+                    "folder-card";
+
+
+                button.innerHTML = `
+
+                    <div class="folder-icon">
+                        ${escapeHTML(
+                            folder.icon || "📁"
+                        )}
+                    </div>
+
+                    <div>
+
+                        <div class="folder-name">
+                            ${escapeHTML(
+                                folder.name ||
+                                "Folder"
+                            )}
+                        </div>
+
+                        <div class="folder-description">
+                            ${escapeHTML(
+                                folder.description ||
+                                "Open folder"
+                            )}
+                        </div>
+
+                    </div>
+
+                    <span class="folder-count">
+                        →
+                    </span>
+
+                `;
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        openFolder(
+                            folder,
+                            items
+                        );
+
+                    }
+                );
+
+
+                grid.appendChild(
+                    button
+                );
+
+            }
+        );
+
+
+        contentRoot.appendChild(
+            grid
+        );
+
+    }
+
+
+    /* ========================================================
+       FILES
+    ======================================================== */
+
+    if (files.length > 0) {
+
+        const title =
+            document.createElement(
+                "h3"
+            );
+
+        title.className =
+            "section-label";
+
+        title.textContent =
+            "Files & Notes";
+
+
+        contentRoot.appendChild(
+            title
+        );
+
+
+        const list =
+            document.createElement(
+                "div"
+            );
+
+        list.className =
+            "file-list";
+
+
+        files.forEach(
+            file => {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.type =
+                    "button";
+
+                button.className =
+                    "file-card";
+
+
+                button.innerHTML = `
+
+                    <div class="file-icon">
+                        ${getFileIcon(
+                            file.fileType
+                        )}
+                    </div>
+
+                    <div class="file-info">
+
+                        <div class="file-name">
+                            ${escapeHTML(
+                                file.name ||
+                                "File"
+                            )}
+                        </div>
+
+                        <div class="file-description">
+                            ${escapeHTML(
+                                file.description ||
+                                "Learning material"
+                            )}
+                        </div>
+
+                    </div>
+
+                    <span class="file-type">
+                        ${escapeHTML(
+                            file.fileType ||
+                            "FILE"
+                        )}
+                    </span>
+
+                `;
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        openFile(
+                            file
+                        );
+
+                    }
+                );
+
+
+                list.appendChild(
+                    button
+                );
+
+            }
+        );
+
+
+        contentRoot.appendChild(
+            list
+        );
+
+    }
+
+
+    /* ========================================================
+       VIDEOS
+    ======================================================== */
+
+    if (videos.length > 0) {
+
+        const title =
+            document.createElement(
+                "h3"
+            );
+
+        title.className =
+            "section-label";
+
+        title.textContent =
+            "Videos";
+
+
+        contentRoot.appendChild(
+            title
+        );
+
+
+        videos.forEach(
+            video => {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.type =
+                    "button";
+
+                button.className =
+                    "video-card";
+
+
+                button.innerHTML = `
+
+                    <div class="video-thumbnail">
+                        ▶
+                    </div>
+
+                    <div class="video-info">
+
+                        <div class="video-title">
+                            ${escapeHTML(
+                                video.name ||
+                                "Learning Video"
+                            )}
+                        </div>
+
+                        <div class="video-description">
+                            ${escapeHTML(
+                                video.description ||
+                                "Watch and learn"
+                            )}
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                button.addEventListener(
+                    "click",
+                    () => {
+
+                        openVideo(
+                            video
+                        );
+
+                    }
+                );
+
+
+                contentRoot.appendChild(
+                    button
+                );
+
+            }
+        );
+
+    }
+
+}
+
+<script>
+
+/* ============================================================
+   FILE ICON
+============================================================ */
+
+function getFileIcon(fileType) {
+
+    const type =
+        String(
+            fileType || ""
+        ).toLowerCase();
+
+
+    if (
+        type === "pdf"
+    ) {
+
+        return "📕";
+
+    }
+
+
+    if (
+        type === "video"
+    ) {
+
+        return "🎬";
+
+    }
+
+
+    if (
+        type === "html" ||
+        type === "web"
+    ) {
+
+        return "🌐";
+
+    }
+
+
+    if (
+        type === "image" ||
+        type === "jpg" ||
+        type === "png"
+    ) {
+
+        return "🖼️";
+
+    }
+
+
+    if (
+        type === "document" ||
+        type === "doc"
+    ) {
+
+        return "📄";
+
+    }
+
+
+    return "📁";
+
+}
+
+
+/* ============================================================
+   FOLDER OPEN
+============================================================ */
+
+function openFolder(
+    folder,
+    items
+) {
+
+    const folderId =
+        folder.id;
+
+
+    const children =
+        getChildren(
+            items,
+            folderId
+        );
+
+
+    if (
+        children.length === 0
+    ) {
+
+        contentRoot.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-state-icon">
+                    📂
+                </div>
+
+                <h3 class="empty-state-title">
+                    Folder is Empty
+                </h3>
+
+                <p class="empty-state-text">
+                    New files and learning materials
+                    will appear here when the admin
+                    adds them.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    renderLearningContent(
+        items,
+        folderId,
+        false
+    );
+
+}
+
+
+/* ============================================================
+   FILE OPEN
+============================================================ */
+
+function openFile(file) {
+
+    const url =
+        file.url ||
+        file.fileUrl;
+
+
+    if (!url) {
+
+        alert(
+            "This file is not available yet."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        url === "#"
+    ) {
+
+        alert(
+            "This is a demo learning file."
+        );
+
+        return;
+
+    }
+
+
+    window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+    );
+
+}
+
+
+/* ============================================================
+   YOUTUBE VIDEO
+============================================================ */
+
+function openVideo(video) {
+
+    const url =
+        video.videoUrl ||
+        video.url;
+
+
+    if (!url) {
+
+        alert(
+            "Video is not available yet."
+        );
+
+        return;
+
+    }
+
+
+    window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+    );
+
+}
+
+</script>
 <script type="module">
 
-    import {
-        auth,
-        db
-    } from "./firebase.js";
+import {
+    db
+} from "./firebase.js";
 
-    import {
-        onAuthStateChanged
-    } from
-    "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-
-    const loadingBox =
-        document.getElementById("loadingBox");
-
-    const emptyBox =
-        document.getElementById("emptyBox");
+import {
+    collection,
+    query,
+    orderBy,
+    onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-    /*
-    ============================================================
-       FIREBASE LOGIN CHECK
-    ============================================================
-    */
+/* ============================================================
+   FIREBASE CONTENT LOADING
+============================================================ */
 
-    onAuthStateChanged(
-        auth,
-        (user) => {
-
-            if (!user) {
-
-                window.location.replace(
-                    "login.html"
-                );
-
-                return;
-            }
-
-
-            /*
-            User is authenticated.
-            The learning content can now
-            be loaded from Firebase.
-            */
-
-            loadingBox.style.display =
-                "none";
-
-        }
+const contentQuery =
+    query(
+        collection(
+            db,
+            "learningContent"
+        ),
+        orderBy(
+            "order",
+            "asc"
+        )
     );
 
 
-    /*
-    ============================================================
-       BACK BUTTON
-    ============================================================
-    */
+onSnapshot(
+    contentQuery,
+    (snapshot) => {
 
-    document
-        .getElementById("backButton")
-        .addEventListener(
-            "click",
-            () => {
-
-                window.location.href =
-                    "home.html";
-
-            }
-        );
+        const firebaseItems = [];
 
 
-    /*
-    ============================================================
-       SUBJECT NAVIGATION
-    ============================================================
-    */
+        snapshot.forEach(
+            (itemSnapshot) => {
 
-    document
-        .getElementById("mathButton")
-        .addEventListener(
-            "click",
-            () => {
+                firebaseItems.push({
 
-                window.location.href =
-                    "subject.html?subject=mathematics";
+                    id:
+                        itemSnapshot.id,
+
+                    ...itemSnapshot.data()
+
+                });
 
             }
         );
 
 
-    document
-        .getElementById("scienceButton")
-        .addEventListener(
-            "click",
-            () => {
+        /*
+        If Firebase contains content,
+        use Firebase content.
 
-                window.location.href =
-                    "subject.html?subject=science";
+        Otherwise show demo content.
+        */
 
-            }
+        if (
+            firebaseItems.length > 0
+        ) {
+
+            renderLearningContent(
+                firebaseItems,
+                null,
+                false
+            );
+
+        } else {
+
+            renderLearningContent(
+                demoLearningContent,
+                null,
+                true
+            );
+
+        }
+
+
+        const status =
+            document.getElementById(
+                "firebaseStatus"
+            );
+
+        const statusText =
+            document.getElementById(
+                "firebaseStatusText"
+            );
+
+
+        status.classList.add(
+            "connected"
+        );
+
+        status.classList.remove(
+            "error"
+        );
+
+        statusText.textContent =
+            firebaseItems.length > 0
+                ? "Live learning content"
+                : "Demo content • Ready for learning";
+
+    },
+
+
+    (error) => {
+
+        console.error(
+            "Firebase content loading error:",
+            error
         );
 
 
-    document
-        .getElementById("englishButton")
-        .addEventListener(
-            "click",
-            () => {
+        /*
+        Firebase unavailable:
+        keep the page useful with demo content.
+        */
 
-                window.location.href =
-                    "subject.html?subject=english";
-
-            }
+        renderLearningContent(
+            demoLearningContent,
+            null,
+            true
         );
 
 
-    document
-        .getElementById("hindiButton")
-        .addEventListener(
-            "click",
-            () => {
+        const status =
+            document.getElementById(
+                "firebaseStatus"
+            );
 
-                window.location.href =
-                    "subject.html?subject=hindi";
+        const statusText =
+            document.getElementById(
+                "firebaseStatusText"
+            );
 
-            }
+
+        status.classList.remove(
+            "connected"
         );
 
-
-    document
-        .getElementById("computerButton")
-        .addEventListener(
-            "click",
-            () => {
-
-                window.location.href =
-                    "subject.html?subject=computer";
-
-            }
+        status.classList.add(
+            "error"
         );
 
+        statusText.textContent =
+            "Demo content • Firebase unavailable";
 
-    document
-        .getElementById("generalButton")
-        .addEventListener(
-            "click",
-            () => {
+    }
 
-                window.location.href =
-                    "subject.html?subject=general-knowledge";
-
-            }
-        );
+);
 
 
-    /*
-    ============================================================
-       PAGE SECURITY
-    ============================================================
-    */
+/* ============================================================
+   BACK BUTTON
+============================================================ */
 
-    window.addEventListener(
-        "pageshow",
+document
+    .getElementById("backButton")
+    .addEventListener(
+        "click",
         () => {
 
-            if (!auth.currentUser) {
-
-                window.location.replace(
-                    "login.html"
-                );
-
-            }
+            window.location.href =
+                "home.html";
 
         }
     );
+
+
+</script>
+<script>
+
+/* ============================================================
+   BREADCRUMB
+============================================================ */
+
+let breadcrumbPath = [];
+
+
+function createBreadcrumb(
+    folderId,
+    items
+) {
+
+    const existing =
+        document.getElementById(
+            "breadcrumb"
+        );
+
+
+    if (existing) {
+
+        existing.remove();
+
+    }
+
+
+    if (!folderId) {
+
+        return;
+
+    }
+
+
+    const path = [];
+
+    let currentId =
+        folderId;
+
+
+    while (currentId) {
+
+        const folder =
+            items.find(
+                item =>
+                    item.id === currentId
+            );
+
+
+        if (!folder) {
+            break;
+        }
+
+
+        path.unshift(
+            folder
+        );
+
+
+        currentId =
+            folder.parentId || null;
+
+    }
+
+
+    breadcrumbPath =
+        path;
+
+
+    const breadcrumb =
+        document.createElement(
+            "div"
+        );
+
+    breadcrumb.id =
+        "breadcrumb";
+
+    breadcrumb.className =
+        "breadcrumb visible";
+
+
+    const homeButton =
+        document.createElement(
+            "button"
+        );
+
+    homeButton.type =
+        "button";
+
+    homeButton.textContent =
+        "Home";
+
+
+    homeButton.addEventListener(
+        "click",
+        () => {
+
+            renderLearningContent(
+                window.nanhiLearningContent ||
+                demoLearningContent,
+                null,
+                false
+            );
+
+        }
+    );
+
+
+    breadcrumb.appendChild(
+        homeButton
+    );
+
+
+    path.forEach(
+        (folder, index) => {
+
+            const separator =
+                document.createElement(
+                    "span"
+                );
+
+            separator.className =
+                "breadcrumb-separator";
+
+            separator.textContent =
+                "›";
+
+
+            breadcrumb.appendChild(
+                separator
+            );
+
+
+            const folderButton =
+                document.createElement(
+                    "button"
+                );
+
+            folderButton.type =
+                "button";
+
+            folderButton.textContent =
+                folder.name;
+
+
+            folderButton.addEventListener(
+                "click",
+                () => {
+
+                    renderLearningContent(
+                        window.nanhiLearningContent ||
+                        demoLearningContent,
+                        folder.id,
+                        false
+                    );
+
+                }
+            );
+
+
+            breadcrumb.appendChild(
+                folderButton
+            );
+
+        }
+    );
+
+
+    contentRoot.prepend(
+        breadcrumb
+    );
+
+}
+
+
+/* ============================================================
+   UPDATE FOLDER VIEW
+============================================================ */
+
+const originalOpenFolder =
+    openFolder;
+
+
+openFolder = function (
+    folder,
+    items
+) {
+
+    createBreadcrumb(
+        folder.id,
+        items
+    );
+
+
+    originalOpenFolder(
+        folder,
+        items
+    );
+
+};
+
+
+</script>
+<script>
+
+/* ============================================================
+   DEMO FILE OPENING
+============================================================ */
+
+function openDemoFile(file) {
+
+    if (!file) {
+        return;
+    }
+
+
+    const title =
+        file.name || "Learning File";
+
+
+    const demoWindow =
+        window.open(
+            "",
+            "_blank"
+        );
+
+
+    if (!demoWindow) {
+
+        alert(
+            "Please allow pop-ups to open this learning file."
+        );
+
+        return;
+
+    }
+
+
+    demoWindow.document.write(`
+
+        <!DOCTYPE html>
+
+        <html lang="en">
+
+        <head>
+
+            <meta charset="UTF-8">
+
+            <meta
+                name="viewport"
+                content="width=device-width, initial-scale=1.0"
+            >
+
+            <meta
+                name="theme-color"
+                content="#f59e0b"
+            >
+
+            <title>
+                ${escapeHTML(title)}
+                • Nanhi Pathshala
+            </title>
+
+        </head>
+
+        <body
+            style="
+                margin:0;
+                padding:24px;
+                font-family:Arial,sans-serif;
+                background:#f8fafc;
+                color:#134e4a;
+            "
+        >
+
+            <div
+                style="
+                    max-width:700px;
+                    margin:auto;
+                    background:white;
+                    padding:24px;
+                    border-radius:22px;
+                    box-shadow:0 10px 30px rgba(0,0,0,.08);
+                "
+            >
+
+                <div
+                    style="
+                        font-size:42px;
+                        margin-bottom:12px;
+                    "
+                >
+                    📚
+                </div>
+
+                <h1>
+                    ${escapeHTML(title)}
+                </h1>
+
+                <p
+                    style="
+                        color:#64748b;
+                        line-height:1.6;
+                    "
+                >
+                    This is a demo learning page
+                    of Nanhi Pathshala.
+                </p>
+
+                <hr>
+
+                <h2>
+                    Welcome to your lesson! 🌟
+                </h2>
+
+                <p
+                    style="
+                        color:#475569;
+                        line-height:1.7;
+                    "
+                >
+                    Real learning content added by
+                    the administrator will appear
+                    here.
+                </p>
+
+            </div>
+
+        </body>
+
+        </html>
+
+    `);
+
+
+    demoWindow.document.close();
+
+}
+
+
+/* ============================================================
+   OVERRIDE FILE OPEN
+============================================================ */
+
+const previousOpenFile =
+    openFile;
+
+
+openFile = function(file) {
+
+    const url =
+        file?.url ||
+        file?.fileUrl;
+
+
+    if (
+        !url ||
+        url === "#"
+    ) {
+
+        openDemoFile(
+            file
+        );
+
+        return;
+
+    }
+
+
+    window.open(
+        url,
+        "_blank",
+        "noopener,noreferrer"
+    );
+
+};
+
+</script>
+<script>
+
+/* ============================================================
+   CONTENT SEARCH
+============================================================ */
+
+function searchLearningContent(
+    searchText,
+    items
+) {
+
+    const text =
+        String(
+            searchText || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if (!text) {
+
+        renderLearningContent(
+            items,
+            null,
+            items === demoLearningContent
+        );
+
+        return;
+
+    }
+
+
+    const results =
+        items.filter(
+            item => {
+
+                const name =
+                    String(
+                        item.name || ""
+                    ).toLowerCase();
+
+                const description =
+                    String(
+                        item.description || ""
+                    ).toLowerCase();
+
+                return (
+                    name.includes(text) ||
+                    description.includes(text)
+                );
+
+            }
+        );
+
+
+    if (
+        results.length === 0
+    ) {
+
+        contentRoot.innerHTML = `
+
+            <div class="empty-state">
+
+                <div class="empty-state-icon">
+                    🔎
+                </div>
+
+                <h3 class="empty-state-title">
+                    No Results Found
+                </h3>
+
+                <p class="empty-state-text">
+                    Try searching for another
+                    lesson, folder or file.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    contentRoot.innerHTML = "";
+
+
+    const list =
+        document.createElement(
+            "div"
+        );
+
+    list.className =
+        "file-list";
+
+
+    results.forEach(
+        item => {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+            button.type =
+                "button";
+
+            button.className =
+                "file-card";
+
+
+            button.innerHTML = `
+
+                <div class="file-icon">
+                    ${
+                        item.type === "folder"
+                            ? "📁"
+                            : item.type === "video"
+                                ? "🎬"
+                                : "📄"
+                    }
+                </div>
+
+                <div class="file-info">
+
+                    <div class="file-name">
+                        ${escapeHTML(
+                            item.name ||
+                            "Content"
+                        )}
+                    </div>
+
+                    <div class="file-description">
+                        ${escapeHTML(
+                            item.description ||
+                            "Learning content"
+                        )}
+                    </div>
+
+                </div>
+
+                <span class="file-type">
+                    ${escapeHTML(
+                        item.type ||
+                        "FILE"
+                    )}
+                </span>
+
+            `;
+
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    if (
+                        item.type === "folder"
+                    ) {
+
+                        openFolder(
+                            item,
+                            items
+                        );
+
+                    }
+
+                    else if (
+                        item.type === "video"
+                    ) {
+
+                        openVideo(
+                            item
+                        );
+
+                    }
+
+                    else {
+
+                        openFile(
+                            item
+                        );
+
+                    }
+
+                }
+            );
+
+
+            list.appendChild(
+                button
+            );
+
+        }
+    );
+
+
+    contentRoot.appendChild(
+        list
+    );
+
+}
+
+
+/* ============================================================
+   GLOBAL CONTENT ACCESS
+============================================================ */
+
+window.nanhiSearchContent =
+    function(searchText) {
+
+        const items =
+            window.nanhiLearningContent &&
+            window.nanhiLearningContent.length > 0
+                ? window.nanhiLearningContent
+                : demoLearningContent;
+
+
+        searchLearningContent(
+            searchText,
+            items
+        );
+
+    };
+
+</script>
+<script>
+
+/* ============================================================
+   CONTENT SEARCH UI
+============================================================ */
+
+const searchWrapper =
+    document.createElement("div");
+
+searchWrapper.style.cssText = `
+    display:flex;
+    gap:8px;
+    margin-bottom:16px;
+`;
+
+
+const searchInput =
+    document.createElement("input");
+
+searchInput.type =
+    "search";
+
+searchInput.placeholder =
+    "Search lessons, folders or files...";
+
+searchInput.autocomplete =
+    "off";
+
+searchInput.style.cssText = `
+    flex:1;
+    min-width:0;
+    height:48px;
+    padding:0 15px;
+    border:1px solid #e2e8f0;
+    border-radius:15px;
+    background:#ffffff;
+    color:#134e4a;
+    font-size:13px;
+    font-weight:700;
+    outline:none;
+`;
+
+
+const searchButton =
+    document.createElement("button");
+
+searchButton.type =
+    "button";
+
+searchButton.textContent =
+    "🔎";
+
+searchButton.style.cssText = `
+    width:48px;
+    height:48px;
+    flex-shrink:0;
+    border-radius:15px;
+    background:#f59e0b;
+    color:#172554;
+    font-size:18px;
+    font-weight:900;
+`;
+
+
+searchWrapper.appendChild(
+    searchInput
+);
+
+searchWrapper.appendChild(
+    searchButton
+);
+
+
+const contentArea =
+    document.querySelector(
+        ".content-area"
+    );
+
+
+const firebaseStatus =
+    document.getElementById(
+        "firebaseStatus"
+    );
+
+
+contentArea.insertBefore(
+    searchWrapper,
+    firebaseStatus
+);
+
+
+/* ============================================================
+   SEARCH EVENTS
+============================================================ */
+
+function performSearch() {
+
+    const items =
+        window.nanhiLearningContent &&
+        window.nanhiLearningContent.length > 0
+            ? window.nanhiLearningContent
+            : demoLearningContent;
+
+
+    searchLearningContent(
+        searchInput.value,
+        items
+    );
+
+}
+
+
+searchButton.addEventListener(
+    "click",
+    performSearch
+);
+
+
+searchInput.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            performSearch();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   LIVE SEARCH
+============================================================ */
+
+searchInput.addEventListener(
+    "input",
+    () => {
+
+        if (
+            searchInput.value.trim() === ""
+        ) {
+
+            const items =
+                window.nanhiLearningContent &&
+                window.nanhiLearningContent.length > 0
+                    ? window.nanhiLearningContent
+                    : demoLearningContent;
+
+
+            renderLearningContent(
+                items,
+                null,
+                items === demoLearningContent
+            );
+
+        }
+
+    }
+);
+
+</script>
+<style>
+
+.search-wrapper {
+    display: flex;
+
+    gap: 8px;
+
+    margin-bottom: 16px;
+}
+
+.search-input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 48px;
+
+    padding:
+        0 15px;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    color: #134e4a;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    outline: none;
+}
+
+.search-input:focus {
+    border-color: #14b8a6;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(20,184,166,.10);
+}
+
+.search-input::placeholder {
+    color: #94a3b8;
+}
+
+.search-button {
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fbbf24,
+            #f59e0b
+        );
+
+    color: #172554;
+
+    font-size: 18px;
+
+    font-weight: 900;
+}
+
+.search-button:active {
+    transform: scale(.96);
+}
+
+</style>
+
+
+<script>
+
+/* ============================================================
+   SEARCH UI
+============================================================ */
+
+const searchWrapper =
+    document.createElement("div");
+
+searchWrapper.className =
+    "search-wrapper";
+
+
+const searchInput =
+    document.createElement("input");
+
+searchInput.className =
+    "search-input";
+
+searchInput.type =
+    "search";
+
+searchInput.placeholder =
+    "Search lessons, folders or files...";
+
+searchInput.autocomplete =
+    "off";
+
+
+const searchButton =
+    document.createElement("button");
+
+searchButton.className =
+    "search-button";
+
+searchButton.type =
+    "button";
+
+searchButton.textContent =
+    "🔎";
+
+
+searchWrapper.appendChild(
+    searchInput
+);
+
+searchWrapper.appendChild(
+    searchButton
+);
+
+
+const contentArea =
+    document.querySelector(
+        ".content-area"
+    );
+
+const firebaseStatusElement =
+    document.getElementById(
+        "firebaseStatus"
+    );
+
+
+contentArea.insertBefore(
+    searchWrapper,
+    firebaseStatusElement
+);
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+function performContentSearch() {
+
+    const items =
+        window.nanhiLearningContent &&
+        window.nanhiLearningContent.length
+            ? window.nanhiLearningContent
+            : demoLearningContent;
+
+
+    searchLearningContent(
+        searchInput.value,
+        items
+    );
+
+}
+
+
+searchButton.addEventListener(
+    "click",
+    performContentSearch
+);
+
+
+searchInput.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            performContentSearch();
+
+        }
+
+    }
+);
+
+
+searchInput.addEventListener(
+    "input",
+    () => {
+
+        if (
+            searchInput.value.trim() === ""
+        ) {
+
+            const items =
+                window.nanhiLearningContent &&
+                window.nanhiLearningContent.length
+                    ? window.nanhiLearningContent
+                    : demoLearningContent;
+
+
+            renderLearningContent(
+                items,
+                null,
+                items === demoLearningContent
+            );
+
+        }
+
+    }
+);
+
+</script>
+<script>
+
+/* ============================================================
+   CONTENT NAVIGATION
+============================================================ */
+
+function goToHome() {
+
+    window.location.href =
+        "home.html";
+
+}
+
+
+function goToProfile() {
+
+    window.location.href =
+        "profile.html";
+
+}
+
+
+/* ============================================================
+   KEYBOARD / BACK NAVIGATION
+============================================================ */
+
+window.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key === "Escape"
+        ) {
+
+            goToHome();
+
+        }
+
+    }
+);
+
+
+/* ============================================================
+   PREVENT EMPTY LINK ERRORS
+============================================================ */
+
+document
+    .querySelectorAll(
+        "a[href='#']"
+    )
+    .forEach(
+        (link) => {
+
+            link.addEventListener(
+                "click",
+                (event) => {
+
+                    event.preventDefault();
+
+                }
+            );
+
+        }
+    );
+
+
+/* ============================================================
+   PAGE READY
+============================================================ */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        document.body.classList.add(
+            "page-ready"
+        );
+
+    }
+);
+
+</script>
+<script>
+
+/* ============================================================
+   FINAL PAGE INITIALIZATION
+============================================================ */
+
+function initializeContentPage() {
+
+    const items =
+        window.nanhiLearningContent &&
+        window.nanhiLearningContent.length > 0
+            ? window.nanhiLearningContent
+            : demoLearningContent;
+
+
+    if (
+        typeof renderLearningContent ===
+        "function"
+    ) {
+
+        renderLearningContent(
+            items,
+            null,
+            items === demoLearningContent
+        );
+
+    }
+
+}
+
+
+/* ============================================================
+   INITIALIZE
+============================================================ */
+
+if (
+    document.readyState ===
+    "loading"
+) {
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        initializeContentPage
+    );
+
+} else {
+
+    initializeContentPage();
+
+}
+
+
+/* ============================================================
+   FINAL PAGE CLOSE
+============================================================ */
 
 </script>
 
 </body>
 
 </html>
-
-
-        
