@@ -1026,236 +1026,597 @@ button {
 
 <script type="module">
 
-    import {
-        auth,
-        db,
-        storage
-    } from "./firebase.js";
-
-    import {
-        onAuthStateChanged,
-        signOut,
-        updateProfile
-    } from
-    "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-    import {
-        doc,
-        getDoc,
-        setDoc,
-        serverTimestamp
-    } from
-    "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
-    import {
-        ref,
-        uploadBytes,
-        getDownloadURL
-    } from
-    "https://www.gstatic.com/firebasejs/12.1.0/firebase-storage.js";
+/*
+============================================================
+   NANHI PATHSHALA — PROFILE SYSTEM
+============================================================
+   Firebase Authentication
+   Firestore
+   Profile Photo → Firestore + LocalStorage
+   Firebase Storage NOT USED
+============================================================
+*/
 
 
-    const profileName =
-        document.getElementById("profileName");
+/*
+============================================================
+   FIREBASE IMPORTS
+============================================================
+*/
 
-    const profileEmail =
-        document.getElementById("profileEmail");
-
-    const accountEmail =
-        document.getElementById("accountEmail");
-
-    const profilePhoto =
-        document.getElementById("profilePhoto");
-
-    const profilePlaceholder =
-        document.getElementById("profilePlaceholder");
-
-    const photoInput =
-        document.getElementById("photoInput");
-
-    const fullName =
-        document.getElementById("fullName");
-
-    const rollNumber =
-        document.getElementById("rollNumber");
-
-    const className =
-        document.getElementById("className");
-
-    const schoolName =
-        document.getElementById("schoolName");
-
-    const schoolType =
-        document.getElementById("schoolType");
-
-    const medium =
-        document.getElementById("medium");
-
-    const mobile =
-        document.getElementById("mobile");
-
-    const state =
-        document.getElementById("state");
-
-    const district =
-        document.getElementById("district");
-
-    const schoolAddress =
-        document.getElementById("schoolAddress");
-
-    const bio =
-        document.getElementById("bio");
-
-    const saveButton =
-        document.getElementById("saveProfileButton");
-
-    const logoutButton =
-        document.getElementById("logoutButton");
-
-    const message =
-        document.getElementById("message");
+import {
+    auth,
+    db,
+    onAuthStateChanged
+} from "./firebase.js";
 
 
-    let currentUser = null;
+import {
+    signOut,
+    updateProfile
+} from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
-    function showMessage(
-        text,
-        type = "error"
-    ) {
+import {
+    doc,
+    getDoc,
+    setDoc,
+    serverTimestamp
+} from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-        message.textContent = text;
 
-        message.className =
-            "message show " + type;
+/*
+============================================================
+   HTML ELEMENTS
+============================================================
+*/
 
+const profileName =
+    document.getElementById(
+        "profileName"
+    );
+
+
+const profileEmail =
+    document.getElementById(
+        "profileEmail"
+    );
+
+
+const accountEmail =
+    document.getElementById(
+        "accountEmail"
+    );
+
+
+const profilePhoto =
+    document.getElementById(
+        "profilePhoto"
+    );
+
+
+const profilePlaceholder =
+    document.getElementById(
+        "profilePlaceholder"
+    );
+
+
+const photoInput =
+    document.getElementById(
+        "photoInput"
+    );
+
+
+const fullName =
+    document.getElementById(
+        "fullName"
+    );
+
+
+const rollNumber =
+    document.getElementById(
+        "rollNumber"
+    );
+
+
+const className =
+    document.getElementById(
+        "className"
+    );
+
+
+const schoolName =
+    document.getElementById(
+        "schoolName"
+    );
+
+
+const schoolType =
+    document.getElementById(
+        "schoolType"
+    );
+
+
+const medium =
+    document.getElementById(
+        "medium"
+    );
+
+
+const mobile =
+    document.getElementById(
+        "mobile"
+    );
+
+
+const state =
+    document.getElementById(
+        "state"
+    );
+
+
+const district =
+    document.getElementById(
+        "district"
+    );
+
+
+const schoolAddress =
+    document.getElementById(
+        "schoolAddress"
+    );
+
+
+const bio =
+    document.getElementById(
+        "bio"
+    );
+
+
+const saveButton =
+    document.getElementById(
+        "saveProfileButton"
+    );
+
+
+const logoutButton =
+    document.getElementById(
+        "logoutButton"
+    );
+
+
+const backButton =
+    document.getElementById(
+        "backButton"
+    );
+
+
+const message =
+    document.getElementById(
+        "message"
+    );
+
+
+/*
+============================================================
+   CURRENT USER
+============================================================
+*/
+
+let currentUser = null;
+
+
+/*
+============================================================
+   MESSAGE
+============================================================
+*/
+
+function showMessage(
+    text,
+    type = "error"
+) {
+
+    if (!message) {
+        return;
     }
 
 
-    function fillProfile(data, user) {
-
-        fullName.value =
-            data?.name ||
-            user.displayName ||
-            "";
-
-        rollNumber.value =
-            data?.rollNumber || "";
-
-        className.value =
-            data?.className || "";
-
-        schoolName.value =
-            data?.schoolName || "";
-
-        schoolType.value =
-            data?.schoolType || "";
-
-        medium.value =
-            data?.medium || "";
-
-        mobile.value =
-            data?.phone || "";
-
-        state.value =
-            data?.state || "";
-
-        district.value =
-            data?.district || "";
-
-        schoolAddress.value =
-            data?.schoolAddress || "";
-
-        bio.value =
-            data?.bio || "";
+    message.textContent =
+        text;
 
 
-        profileName.textContent =
-            data?.name ||
-            user.displayName ||
-            "Student";
+    message.className =
+        "message show " +
+        type;
 
-        profileEmail.textContent =
-            user.email || "";
-
-        accountEmail.textContent =
-            user.email || "";
+}
 
 
-        if (data?.photoURL) {
+/*
+============================================================
+   LOAD PROFILE DATA INTO FORM
+============================================================
+*/
 
-            profilePhoto.src =
-                data.photoURL;
+function fillProfile(
+    data,
+    user
+) {
 
-            profilePhoto.style.display =
-                "block";
+    if (!user) {
+        return;
+    }
 
-            profilePlaceholder.style.display =
-                "none";
+
+    fullName.value =
+        data?.name ||
+        user.displayName ||
+        "";
+
+
+    rollNumber.value =
+        data?.rollNumber ||
+        "";
+
+
+    className.value =
+        data?.className ||
+        "";
+
+
+    schoolName.value =
+        data?.schoolName ||
+        "";
+
+
+    schoolType.value =
+        data?.schoolType ||
+        "";
+
+
+    medium.value =
+        data?.medium ||
+        "";
+
+
+    mobile.value =
+        data?.phone ||
+        "";
+
+
+    state.value =
+        data?.state ||
+        "";
+
+
+    district.value =
+        data?.district ||
+        "";
+
+
+    schoolAddress.value =
+        data?.schoolAddress ||
+        "";
+
+
+    bio.value =
+        data?.bio ||
+        "";
+
+
+    profileName.textContent =
+        data?.name ||
+        user.displayName ||
+        "Student";
+
+
+    profileEmail.textContent =
+        user.email ||
+        "";
+
+
+    accountEmail.textContent =
+        user.email ||
+        "";
+
+
+    /*
+    ========================================================
+       PROFILE PHOTO
+    ========================================================
+    */
+
+    const savedPhoto =
+        data?.photoData ||
+        data?.photoURL ||
+        localStorage.getItem(
+            "nanhiPathshalaProfilePhoto_" +
+            user.uid
+        );
+
+
+    if (savedPhoto) {
+
+        profilePhoto.src =
+            savedPhoto;
+
+
+        profilePhoto.style.display =
+            "block";
+
+
+        profilePlaceholder.style.display =
+            "none";
+
+    }
+
+}
+
+
+/*
+============================================================
+   AUTHENTICATION CHECK + PROFILE LOAD
+============================================================
+*/
+
+onAuthStateChanged(
+    auth,
+    async (user) => {
+
+        if (!user) {
+
+            window.location.replace(
+                "login.html"
+            );
+
+            return;
+        }
+
+
+        currentUser =
+            user;
+
+
+        try {
+
+            const userRef =
+                doc(
+                    db,
+                    "users",
+                    user.uid
+                );
+
+
+            const snapshot =
+                await getDoc(
+                    userRef
+                );
+
+
+            const data =
+                snapshot.exists()
+                    ? snapshot.data()
+                    : {};
+
+
+            fillProfile(
+                data,
+                user
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Profile load error:",
+                error
+            );
+
+
+            /*
+            Show local/auth data
+            even if Firestore read fails.
+            */
+
+            fillProfile(
+                {},
+                user
+            );
+
+
+            showMessage(
+                "Profile data could not be loaded from Firebase."
+            );
 
         }
 
     }
+);
 
 
-    /*
-    =========================
-       AUTH CHECK
-    =========================
-    */
+/*
+============================================================
+   PROFILE PHOTO UPLOAD
+   FIREBASE STORAGE NOT USED
+   FIRESTORE + LOCALSTORAGE
+============================================================
+*/
 
-    onAuthStateChanged(
-        auth,
-        async (user) => {
+if (photoInput) {
 
-            if (!user) {
+    photoInput.addEventListener(
+        "change",
+        async () => {
 
-                window.location.replace(
-                    "login.html"
+            const file =
+                photoInput.files[0];
+
+
+            if (!file) {
+                return;
+            }
+
+
+            if (!currentUser) {
+
+                showMessage(
+                    "Please wait. Your account is still loading."
                 );
+
+                photoInput.value = "";
 
                 return;
             }
 
 
-            currentUser = user;
+            if (
+                !file.type.startsWith(
+                    "image/"
+                )
+            ) {
+
+                showMessage(
+                    "Please select an image file."
+                );
+
+                photoInput.value = "";
+
+                return;
+            }
+
+
+            /*
+            Maximum original file:
+            5 MB
+            */
+
+            if (
+                file.size >
+                5 * 1024 * 1024
+            ) {
+
+                showMessage(
+                    "Profile photo must be smaller than 5 MB."
+                );
+
+                photoInput.value = "";
+
+                return;
+            }
 
 
             try {
 
-                const userRef =
+                showMessage(
+                    "Preparing profile photo...",
+                    "success"
+                );
+
+
+                const photoData =
+                    await compressProfilePhoto(
+                        file
+                    );
+
+
+                /*
+                ====================================================
+                   SAVE PHOTO TO FIRESTORE
+                ====================================================
+                */
+
+                showMessage(
+                    "Saving profile photo...",
+                    "success"
+                );
+
+
+                await setDoc(
                     doc(
                         db,
                         "users",
-                        user.uid
+                        currentUser.uid
+                    ),
+                    {
+
+                        photoData:
+                            photoData,
+
+                        updatedAt:
+                            serverTimestamp()
+
+                    },
+                    {
+                        merge: true
+                    }
+                );
+
+
+                /*
+                ====================================================
+                   LOCAL STORAGE CACHE
+                ====================================================
+                */
+
+                try {
+
+                    localStorage.setItem(
+                        "nanhiPathshalaProfilePhoto_" +
+                        currentUser.uid,
+                        photoData
                     );
 
-                const snapshot =
-                    await getDoc(userRef);
+                } catch (localError) {
+
+                    console.warn(
+                        "LocalStorage unavailable:",
+                        localError
+                    );
+
+                }
 
 
-                const data =
-                    snapshot.exists()
-                        ? snapshot.data()
-                        : {};
+                /*
+                ====================================================
+                   UPDATE SCREEN
+                ====================================================
+                */
+
+                profilePhoto.src =
+                    photoData;
 
 
-                fillProfile(
-                    data,
-                    user
+                profilePhoto.style.display =
+                    "block";
+
+
+                profilePlaceholder.style.display =
+                    "none";
+
+
+                showMessage(
+                    "Profile photo saved successfully.",
+                    "success"
                 );
 
 
             } catch (error) {
 
                 console.error(
-                    "Profile load error:",
+                    "Profile photo save error:",
                     error
                 );
 
-                fillProfile(
-                    {},
-                    user
+
+                showMessage(
+                    "Unable to save profile photo: " +
+                    (
+                        error.message ||
+                        "Please try again."
+                    )
                 );
 
             }
@@ -1263,222 +1624,7 @@ button {
         }
     );
 
-
-
-/*
-============================================================
-   PROFILE PHOTO UPLOAD
-   Firebase Storage NOT USED
-   Firestore + LocalStorage
-============================================================
-*/
-
-photoInput.addEventListener(
-    "change",
-    async () => {
-
-        const file =
-            photoInput.files[0];
-
-
-        if (!file) {
-            return;
-        }
-
-
-        if (!currentUser) {
-
-            showMessage(
-                "Please wait. Your account is still loading."
-            );
-
-            photoInput.value = "";
-
-            return;
-        }
-
-
-        if (
-            !file.type.startsWith("image/")
-        ) {
-
-            showMessage(
-                "Please select an image file."
-            );
-
-            photoInput.value = "";
-
-            return;
-        }
-
-
-        /*
-        Maximum original file size:
-        5 MB
-        */
-
-        if (
-            file.size >
-            5 * 1024 * 1024
-        ) {
-
-            showMessage(
-                "Profile photo must be smaller than 5 MB."
-            );
-
-            photoInput.value = "";
-
-            return;
-        }
-
-
-        try {
-
-            showMessage(
-                "Preparing profile photo...",
-                "success"
-            );
-
-
-            /*
-            ====================================================
-               IMAGE COMPRESS
-            ====================================================
-            */
-
-            const photoData =
-                await compressProfilePhoto(
-                    file
-                );
-
-
-            /*
-            ====================================================
-               SAVE TO FIRESTORE
-            ====================================================
-            */
-
-            showMessage(
-                "Saving profile photo...",
-                "success"
-            );
-
-
-            await setDoc(
-                doc(
-                    db,
-                    "users",
-                    currentUser.uid
-                ),
-                {
-
-                    photoData:
-                        photoData,
-
-                    updatedAt:
-                        serverTimestamp()
-
-                },
-                {
-                    merge: true
-                }
-            );
-
-
-            /*
-            ====================================================
-               SAVE LOCAL COPY
-            ====================================================
-            */
-
-            try {
-
-                localStorage.setItem(
-                    "nanhiPathshalaProfilePhoto_" +
-                    currentUser.uid,
-                    photoData
-                );
-
-            } catch (localError) {
-
-                console.warn(
-                    "Local photo cache unavailable:",
-                    localError
-                );
-
-            }
-
-
-            /*
-            ====================================================
-               UPDATE PROFILE PREVIEW
-            ====================================================
-            */
-
-            profilePhoto.src =
-                photoData;
-
-            profilePhoto.style.display =
-                "block";
-
-            profilePlaceholder.style.display =
-                "none";
-
-
-            /*
-            ====================================================
-               OPTIONAL FIREBASE AUTH PHOTO
-               This uses the same Base64 data.
-            ====================================================
-            */
-
-            try {
-
-                await updateProfile(
-                    currentUser,
-                    {
-                        photoURL:
-                            photoData
-                    }
-                );
-
-            } catch (authPhotoError) {
-
-                /*
-                Firestore photo is already saved.
-                So don't treat this as a complete failure.
-                */
-
-                console.warn(
-                    "Firebase Auth photo update skipped:",
-                    authPhotoError
-                );
-
-            }
-
-
-            showMessage(
-                "Profile photo saved successfully.",
-                "success"
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                "Profile photo save error:",
-                error
-            );
-
-
-            showMessage(
-                "Unable to save profile photo. Please try again."
-            );
-
-        }
-
-    }
-);
+}
 
 
 /*
@@ -1492,225 +1638,217 @@ async function compressProfilePhoto(
 ) {
 
     return new Promise(
-        (resolve, reject) => {
+        (
+            resolve,
+            reject
+        ) => {
 
             const reader =
                 new FileReader();
 
 
-            reader.onload = (
-                event
-            ) => {
+            reader.onload =
+                (event) => {
 
-                const image =
-                    new Image();
-
-
-                image.onload = () => {
-
-                    /*
-                    Maximum image dimension.
-                    */
-
-                    const maxSize =
-                        600;
+                    const image =
+                        new Image();
 
 
-                    let width =
-                        image.width;
+                    image.onload =
+                        () => {
 
-                    let height =
-                        image.height;
+                            const maxSize =
+                                600;
 
 
-                    /*
-                    Keep original aspect ratio.
-                    */
+                            let width =
+                                image.width;
 
-                    if (
-                        width >
-                        height
-                    ) {
 
-                        if (
-                            width >
-                            maxSize
-                        ) {
+                            let height =
+                                image.height;
 
-                            height =
-                                Math.round(
-                                    height *
-                                    maxSize /
-                                    width
-                                );
 
-                            width =
-                                maxSize;
+                            /*
+                            Keep aspect ratio.
+                            */
 
-                        }
+                            if (
+                                width >
+                                maxSize ||
+                                height >
+                                maxSize
+                            ) {
 
-                    } else {
-
-                        if (
-                            height >
-                            maxSize
-                        ) {
-
-                            width =
-                                Math.round(
-                                    width *
-                                    maxSize /
+                                if (
+                                    width >
                                     height
+                                ) {
+
+                                    height =
+                                        Math.round(
+                                            height *
+                                            maxSize /
+                                            width
+                                        );
+
+                                    width =
+                                        maxSize;
+
+                                } else {
+
+                                    width =
+                                        Math.round(
+                                            width *
+                                            maxSize /
+                                            height
+                                        );
+
+                                    height =
+                                        maxSize;
+
+                                }
+
+                            }
+
+
+                            const canvas =
+                                document.createElement(
+                                    "canvas"
                                 );
 
-                            height =
-                                maxSize;
 
-                        }
-
-                    }
+                            canvas.width =
+                                width;
 
 
-                    /*
-                    Create compressed canvas.
-                    */
-
-                    const canvas =
-                        document.createElement(
-                            "canvas"
-                        );
+                            canvas.height =
+                                height;
 
 
-                    canvas.width =
-                        width;
-
-                    canvas.height =
-                        height;
-
-
-                    const context =
-                        canvas.getContext(
-                            "2d"
-                        );
+                            const context =
+                                canvas.getContext(
+                                    "2d"
+                                );
 
 
-                    context.drawImage(
-                        image,
-                        0,
-                        0,
-                        width,
-                        height
-                    );
+                            if (!context) {
+
+                                reject(
+                                    new Error(
+                                        "Canvas is not supported."
+                                    )
+                                );
+
+                                return;
+
+                            }
 
 
-                    /*
-                    JPEG compression.
-                    */
-
-                    const compressed =
-                        canvas.toDataURL(
-                            "image/jpeg",
-                            0.70
-                        );
-
-
-                    /*
-                    Check approximate
-                    Base64 size.
-                    */
-
-                    const approximateBytes =
-                        Math.ceil(
-                            compressed.length *
-                            0.75
-                        );
-
-
-                    /*
-                    Firestore document limit
-                    is roughly 1 MiB.
-
-                    Keep photo comfortably
-                    below that limit.
-                    */
-
-                    if (
-                        approximateBytes >
-                        700000
-                    ) {
-
-                        const smaller =
-                            canvas.toDataURL(
-                                "image/jpeg",
-                                0.50
+                            context.drawImage(
+                                image,
+                                0,
+                                0,
+                                width,
+                                height
                             );
 
 
-                        const smallerBytes =
-                            Math.ceil(
-                                smaller.length *
-                                0.75
+                            /*
+                            First compression.
+                            */
+
+                            let compressed =
+                                canvas.toDataURL(
+                                    "image/jpeg",
+                                    0.70
+                                );
+
+
+                            let approximateBytes =
+                                Math.ceil(
+                                    compressed.length *
+                                    0.75
+                                );
+
+
+                            /*
+                            Second compression
+                            if needed.
+                            */
+
+                            if (
+                                approximateBytes >
+                                700000
+                            ) {
+
+                                compressed =
+                                    canvas.toDataURL(
+                                        "image/jpeg",
+                                        0.50
+                                    );
+
+
+                                approximateBytes =
+                                    Math.ceil(
+                                        compressed.length *
+                                        0.75
+                                    );
+
+                            }
+
+
+                            if (
+                                approximateBytes >
+                                700000
+                            ) {
+
+                                reject(
+                                    new Error(
+                                        "Profile photo is too large after compression."
+                                    )
+                                );
+
+                                return;
+
+                            }
+
+
+                            resolve(
+                                compressed
                             );
 
+                        };
 
-                        if (
-                            smallerBytes >
-                            700000
-                        ) {
+
+                    image.onerror =
+                        () => {
 
                             reject(
                                 new Error(
-                                    "Profile photo is too large after compression."
+                                    "Unable to process the selected image."
                                 )
                             );
 
-                            return;
-
-                        }
+                        };
 
 
-                        resolve(
-                            smaller
-                        );
-
-                        return;
-
-                    }
-
-
-                    resolve(
-                        compressed
-                    );
+                    image.src =
+                        event.target.result;
 
                 };
 
 
-                image.onerror = () => {
+            reader.onerror =
+                () => {
 
                     reject(
                         new Error(
-                            "Unable to read the selected image."
+                            "Unable to read image file."
                         )
                     );
 
                 };
-
-
-                image.src =
-                    event.target.result;
-
-            };
-
-
-            reader.onerror = () => {
-
-                reject(
-                    new Error(
-                        "Unable to read image file."
-                    )
-                );
-
-            };
 
 
             reader.readAsDataURL(
@@ -1723,18 +1861,24 @@ async function compressProfilePhoto(
 }
 
 
-
 /*
 ============================================================
-       SAVE PROFILE
-    ============================================================
-    */
+   SAVE PROFILE
+============================================================
+*/
+
+if (saveButton) {
 
     saveButton.addEventListener(
         "click",
         async () => {
 
             if (!currentUser) {
+
+                showMessage(
+                    "Please wait for your account to load."
+                );
+
                 return;
             }
 
@@ -1742,36 +1886,50 @@ async function compressProfilePhoto(
             const name =
                 fullName.value.trim();
 
+
             const roll =
                 rollNumber.value.trim();
+
 
             const selectedClass =
                 className.value;
 
+
             const school =
                 schoolName.value.trim();
+
 
             const type =
                 schoolType.value;
 
+
             const studyMedium =
                 medium.value;
+
 
             const phone =
                 mobile.value.trim();
 
+
             const userState =
                 state.value.trim();
+
 
             const userDistrict =
                 district.value.trim();
 
+
             const address =
                 schoolAddress.value.trim();
+
 
             const about =
                 bio.value.trim();
 
+
+            /*
+            Name validation
+            */
 
             if (!name) {
 
@@ -1785,9 +1943,15 @@ async function compressProfilePhoto(
             }
 
 
+            /*
+            Mobile validation
+            */
+
             if (
                 phone &&
-                !/^[0-9]{10}$/.test(phone)
+                !/^[0-9]{10}$/.test(
+                    phone
+                )
             ) {
 
                 showMessage(
@@ -1800,7 +1964,9 @@ async function compressProfilePhoto(
             }
 
 
-            saveButton.disabled = true;
+            saveButton.disabled =
+                true;
+
 
             saveButton.innerHTML =
                 "Saving Profile...";
@@ -1809,8 +1975,9 @@ async function compressProfilePhoto(
             try {
 
                 /*
-                Update Firebase Authentication
-                display name.
+                ====================================================
+                   UPDATE FIREBASE AUTH PROFILE
+                ====================================================
                 */
 
                 await updateProfile(
@@ -1823,8 +1990,9 @@ async function compressProfilePhoto(
 
 
                 /*
-                Update user's own Firestore
-                document.
+                ====================================================
+                   FIRESTORE PROFILE
+                ====================================================
                 */
 
                 await setDoc(
@@ -1842,7 +2010,8 @@ async function compressProfilePhoto(
                             name,
 
                         email:
-                            currentUser.email || "",
+                            currentUser.email ||
+                            "",
 
                         rollNumber:
                             roll,
@@ -1884,6 +2053,12 @@ async function compressProfilePhoto(
                 );
 
 
+                /*
+                ====================================================
+                   UPDATE PROFILE NAME ON SCREEN
+                ====================================================
+                */
+
                 profileName.textContent =
                     name;
 
@@ -1903,13 +2078,19 @@ async function compressProfilePhoto(
 
 
                 showMessage(
-                    "Unable to save your profile. Please try again."
+                    "Unable to save your profile: " +
+                    (
+                        error.message ||
+                        "Please try again."
+                    )
                 );
 
 
             } finally {
 
-                saveButton.disabled = false;
+                saveButton.disabled =
+                    false;
+
 
                 saveButton.innerHTML =
                     "Save Profile <span>✓</span>";
@@ -1918,10 +2099,17 @@ async function compressProfilePhoto(
 
         }
     );
-   /* ============================================================
-       LOGOUT
-    ============================================================
-    */
+
+}
+
+
+/*
+============================================================
+   LOGOUT
+============================================================
+*/
+
+if (logoutButton) {
 
     logoutButton.addEventListener(
         "click",
@@ -1940,7 +2128,10 @@ async function compressProfilePhoto(
 
             try {
 
-                await signOut(auth);
+                await signOut(
+                    auth
+                );
+
 
                 window.location.replace(
                     "login.html"
@@ -1954,43 +2145,51 @@ async function compressProfilePhoto(
                     error
                 );
 
+
                 showMessage(
-                    "Unable to sign out. Please try again."
+                    "Unable to sign out: " +
+                    (
+                        error.message ||
+                        "Please try again."
+                    )
                 );
 
             }
 
         }
     );
-</script>
-<script>
+
+}
 
 
-    /*
-    ============================================================
-       BACK TO HOME
-    ============================================================
-    */
+/*
+============================================================
+   BACK TO HOME
+============================================================
+*/
 
-    document
-        .getElementById("backButton")
-        .addEventListener(
-            "click",
-            () => {
+if (backButton) {
 
-                window.location.href =
-                    "home.html";
+    backButton.addEventListener(
+        "click",
+        () => {
 
-            }
-        );
-</script>
-<script>
+            window.location.href =
+                "home.html";
 
-    /*
-    ============================================================
-       MOBILE NUMBER INPUT
-    ============================================================
-    */
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   MOBILE NUMBER INPUT
+============================================================
+*/
+
+if (mobile) {
 
     mobile.addEventListener(
         "input",
@@ -1998,19 +2197,28 @@ async function compressProfilePhoto(
 
             mobile.value =
                 mobile.value
-                    .replace(/\D/g, "")
-                    .slice(0, 10);
+                    .replace(
+                        /\D/g,
+                        ""
+                    )
+                    .slice(
+                        0,
+                        10
+                    );
 
         }
     );
-</script>
-<script>
 
-    /*
-    ============================================================
-       PROFILE PHOTO PREVIEW
-    ============================================================
-    */
+}
+
+
+/*
+============================================================
+   PROFILE PHOTO ERROR
+============================================================
+*/
+
+if (profilePhoto) {
 
     profilePhoto.addEventListener(
         "error",
@@ -2019,39 +2227,21 @@ async function compressProfilePhoto(
             profilePhoto.style.display =
                 "none";
 
-            profilePlaceholder.style.display =
-                "flex";
 
-        }
-    );
-</script>
-<script>
+            if (
+                profilePlaceholder
+            ) {
 
-
-    /*
-    ============================================================
-       PAGE VISIBILITY SECURITY
-    ============================================================
-    */
-
-    window.addEventListener(
-        "pageshow",
-        () => {
-
-            if (!auth.currentUser) {
-
-                window.location.replace(
-                    "login.html"
-                );
+                profilePlaceholder.style.display =
+                    "flex";
 
             }
 
         }
     );
 
+}
 
 </script>
-
 </body>
-
 </html>
