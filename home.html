@@ -1492,13 +1492,16 @@ button {
         );
 
 </script>
-/*
+<script>
+
+    /*
     ============================================================
        PWA INSTALL
     ============================================================
     */
 
     let deferredInstallPrompt = null;
+
 
     window.addEventListener(
         "beforeinstallprompt",
@@ -1546,8 +1549,7 @@ button {
 
 
                 if (
-                    result.outcome ===
-                    "accepted"
+                    result.outcome === "accepted"
                 ) {
 
                     console.log(
@@ -1591,32 +1593,33 @@ button {
     ============================================================
     */
 
-    window.nanhiLogout = async function () {
+    window.nanhiLogout =
+        async function () {
 
-        try {
+            try {
 
-            await signOut(auth);
+                await signOut(auth);
 
-            window.location.replace(
-                "login.html"
-            );
+                window.location.replace(
+                    "login.html"
+                );
 
-        } catch (error) {
+            } catch (error) {
 
-            console.error(
-                "Logout error:",
-                error
-            );
+                console.error(
+                    "Logout error:",
+                    error
+                );
 
-        }
+            }
 
-    };
+        };
 
 
     /*
     ============================================================
        SECURITY
-       Prevent this page from being used without Firebase login.
+       Prevent page access without login
     ============================================================
     */
 
@@ -1634,7 +1637,6 @@ button {
 
         }
     );
-
 
 </script>
 
