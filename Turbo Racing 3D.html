@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Turbo Racing 3D | Game Zone</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
+    
+    <!-- Three.js Library for 3D Graphics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #87CEEB; /* Sky color */
+            font-family: 'Nunito', sans-serif;
+            touch-action: none; 
+            -webkit-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        #game-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        .font-racing { font-family: 'Black Ops One', cursive; }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+        }
+
+        .action-btn {
+            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+            border: 2px solid #fca5a5;
+            box-shadow: 0 6px 0 #7f1d1d, 0 10px 20px rgba(239, 68, 68, 0.5);
+            transition: transform 0.1s;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        
+        .action-btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0 #7f1d1d, 0 5px 10px rgba(239, 68, 68, 0.4);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.5)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 25px rgba(239, 68, 68, 0.9)); transform: scale(1.05); }
+        }
+        .animate-glow { animation: pulse-glow 2s infinite; }
+    </style>
+</head>
+<body class="text-white">
+
+    <!-- 3D Game Container -->
+    <div id="game-container"></div>
+
+    <!-- HUD (Score & Speed) -->
+    <div id="hud" class="absolute top-4 left-0 w-full px-4 flex justify-between items-start z-10 hidden pointer-events-none">
+        <div class="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 flex flex-col shadow-lg">
+            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Score</span>
+            <span id="scoreDisplay" class="text-3xl font-black text-yellow-400 font-racing tracking-wider">0</span>
+        </div>
+        <div class="bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/20 flex flex-col items-end shadow-lg">
+            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Speed</span>
+            <span id="speedDisplay" class="text-2xl font-black text-cyan-400 font-racing italic">120 KM/H</span>
+        </div>
+    </div>
+
+    <!-- Start Menu -->
+    <div id="startMenu" class="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-md">
+        <div class="glass-panel rounded-3xl p-6 w-11/12 max-w-sm flex flex-col items-center text-center">
+            <div class="text-7xl mb-2 animate-glow">🏎️</div>
+            <h1 class="text-4xl font-racing text-transparent bg-clip-text bg-gradient-to-b from-yellow-300 to-orange-500 mb-0 tracking-wider uppercase">
+                Turbo
+            </h1>
+            <h1 class="text-5xl font-racing text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-red-600 mb-6 tracking-widest uppercase filter drop-shadow-lg">
+                3D Racing
+            </h1>
+            
+            <div class="bg-white/10 px-4 py-3 rounded-xl mb-8 border border-white/10">
+                <p class="text-cyan-300 font-black text-sm uppercase tracking-widest mb-1">
+                    👆 Slide to Steer
+                </p>
+                <p class="text-gray-300 text-xs font-bold">
+                    Dodge traffic & Collect coins
+                </p>
+            </div>
+
+            <button id="startBtn" class="action-btn w-full py-5 rounded-2xl text-2xl font-black font-racing shadow-xl">
+                RACE NOW
+            </button>
+        </div>
+    </div>
+
+    <!-- Game Over Menu -->
+    <div id="gameOverMenu" class="absolute inset-0 z-30 flex flex-col items-center justify-center bg-red-950/95 backdrop-blur-xl hidden">
+        <div class="text-7xl mb-2 animate-glow">💥</div>
+        <h2 class="text-5xl font-racing text-red-500 mb-6 tracking-widest uppercase filter drop-shadow-[0_0_15px_rgba(239,68,68,0.8)]">
+            CRASHED!
+        </h2>
+        
+        <div class="glass-panel rounded-3xl p-6 w-11/12 max-w-sm text-center mb-8 border-red-500/50">
+            <p class="text-xs text-gray-400 font-bold uppercase tracking-widest mb-1">Final Score</p>
+            <div id="finalScore" class="text-6xl font-black text-yellow-400 font-racing mb-6">0</div>
+            
+            <div class="h-px w-full bg-gradient-to-r from-transparent via-red-500/50 to-transparent mb-6"></div>
+            
+            <p class="text-[10px] text-cyan-400 font-bold uppercase tracking-widest mb-1">Best Score</p>
+            <div id="bestScore" class="text-3xl font-black text-white font-racing">0</div>
+        </div>
+        
+        <div class="flex flex-col gap-4 w-11/12 max-w-sm">
+            <button id="restartBtn" class="action-btn w-full py-4 rounded-2xl text-xl font-black font-racing bg-gradient-to-b from-green-400 to-green-600 border-green-300 shadow-[0_6px_0_#166534]">
+                PLAY AGAIN
+            </button>
+            <button id="exitBtn" class="action-btn w-full py-4 rounded-2xl text-xl font-black font-racing bg-gradient-to-b from-gray-500 to-gray-700 border-gray-400 shadow-[0_6px_0_#374151]">
+                EXIT
+            </button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * ========================================================
+         * 1. REALISTIC AUDIO SYSTEM (वेब ऑडियो API)
+         * ========================================================
+         */
+        let audioCtx = null;
+        let engineOsc1 = null, engineOsc2 = null;
+        let engineFilter = null, engineGain = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        const Sounds = {
+            startEngine: () => {
+                initAudio();
+                if (engineOsc1) return;
+                
+                // असली कार जैसी आवाज़ के लिए दो ऑसिलेटर (Dual Oscillator Engine)
+                engineOsc1 = audioCtx.createOscillator();
+                engineOsc2 = audioCtx.createOscillator();
+                engineFilter = audioCtx.createBiquadFilter();
+                engineGain = audioCtx.createGain();
+
+                engineOsc1.type = 'sawtooth';
+                engineOsc2.type = 'square'; // भारीपन (Growl) के लिए
+                
+                // बेस फ्रीक्वेंसी (Idle RPM)
+                engineOsc1.frequency.value = 40; 
+                engineOsc2.frequency.value = 20; // एक ऑक्टेव नीचे
+                
+                // फ़िल्टर (आवाज़ को स्मूथ करने के लिए)
+                engineFilter.type = 'lowpass';
+                engineFilter.frequency.value = 200;
+
+                engineGain.gain.value = 0.15; // वॉल्यूम
+
+                engineOsc1.connect(engineFilter);
+                engineOsc2.connect(engineFilter);
+                engineFilter.connect(engineGain);
+                engineGain.connect(audioCtx.destination);
+
+                engineOsc1.start();
+                engineOsc2.start();
+            },
+            updateEngine: (speedMultiplier) => {
+                if(engineOsc1 && audioCtx) {
+                    // स्पीड के हिसाब से RPM बढ़ाएं
+                    const targetFreq1 = 40 + (speedMultiplier * 30);
+                    const targetFreq2 = targetFreq1 / 2;
+                    const targetFilter = 200 + (speedMultiplier * 300);
+                    
+                    engineOsc1.frequency.setTargetAtTime(targetFreq1, audioCtx.currentTime, 0.1);
+                    engineOsc2.frequency.setTargetAtTime(targetFreq2, audioCtx.currentTime, 0.1);
+                    engineFilter.frequency.setTargetAtTime(targetFilter, audioCtx.currentTime, 0.1);
+                }
+            },
+            stopEngine: () => {
+                if(engineGain) {
+                    engineGain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.1);
+                    setTimeout(() => {
+                        if(engineOsc1) {
+                            engineOsc1.stop(); engineOsc2.stop();
+                            engineOsc1.disconnect(); engineOsc2.disconnect();
+                            engineOsc1 = null; engineOsc2 = null;
+                        }
+                    }, 200);
+                }
+            },
+            coin: () => {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(987.77, audioCtx.currentTime); // B5
+                osc.frequency.setValueAtTime(1318.51, audioCtx.currentTime + 0.1); // E6
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.3);
+            },
+            crash: () => {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.5);
+                gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+                if (navigator.vibrate) navigator.vibrate([200, 50, 200]); // मोबाइल वाइब्रेशन
+            },
+            click: () => {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+            }
+        };
+
+        /**
+         * ========================================================
+         * 2. THREE.JS 3D ENGINE SETUP
+         * ========================================================
+         */
+        const container = document.getElementById('game-container');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB); // आसमानी रंग
+        scene.fog = new THREE.Fog(0x87CEEB, 20, 150); // धुंध (Fog) ताकि एंडलाइन छिप जाए
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+        // कैमरा कार के पीछे और थोड़ा ऊपर सेट किया गया है
+        camera.position.set(0, 7, 15);
+        camera.lookAt(0, 0, -20);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // मोबाइल पर परफॉरमेंस के लिए
+        renderer.shadowMap.enabled = false; // मोबाइल परफॉरमेंस के लिए शैडो बंद
+        container.appendChild(renderer.domElement);
+
+        // लाइट्स
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 10);
+        scene.add(dirLight);
+
+        // पर्यावरण (सड़क और घास)
+        const roadWidth = 14;
+        
+        // घास का मैदान
+        const grassGeo = new THREE.PlaneGeometry(200, 500);
+        const grassMat = new THREE.MeshLambertMaterial({ color: 0x166534 });
+        const grass = new THREE.Mesh(grassGeo, grassMat);
+        grass.rotation.x = -Math.PI / 2;
+        grass.position.y = -0.1;
+        scene.add(grass);
+
+        // मुख्य सड़क
+        const roadGeo = new THREE.PlaneGeometry(roadWidth, 500);
+        const roadMat = new THREE.MeshLambertMaterial({ color: 0x334155 });
+        const road = new THREE.Mesh(roadGeo, roadMat);
+        road.rotation.x = -Math.PI / 2;
+        scene.add(road);
+
+        // सड़क की पट्टियां (Moving Lines)
+        const lines = [];
+        const lineGeo = new THREE.PlaneGeometry(0.3, 3);
+        const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7 });
+        
+        for (let i = 0; i < 20; i++) {
+            const line = new THREE.Mesh(lineGeo, lineMat);
+            line.rotation.x = -Math.PI / 2;
+            line.position.y = 0.01;
+            line.position.z = -i * 10;
+            // दो लेन्स बनाने के लिए
+            const lineClone = line.clone();
+            line.position.x = -roadWidth/6;
+            lineClone.position.x = roadWidth/6;
+            scene.add(line);
+            scene.add(lineClone);
+            lines.push(line, lineClone);
+        }
+
+        // 3D कार बनाने का फंक्शन
+        function createCarMesh(colorHex) {
+            const carGroup = new THREE.Group();
+            
+            // मुख्य बॉडी
+            const bodyGeo = new THREE.BoxGeometry(1.8, 0.8, 3.5);
+            const bodyMat = new THREE.MeshLambertMaterial({ color: colorHex });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 0.6;
+            carGroup.add(body);
+
+            // छत / शीशा
+            const topGeo = new THREE.BoxGeometry(1.4, 0.6, 1.8);
+            const topMat = new THREE.MeshLambertMaterial({ color: 0x0f172a }); // Dark glass
+            const top = new THREE.Mesh(topGeo, topMat);
+            top.position.y = 1.3;
+            top.position.z = -0.2;
+            carGroup.add(top);
+
+            // टायर
+            const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.3, 16);
+            const wheelMat = new THREE.MeshLambertMaterial({ color: 0x111111 });
+            
+            const positions = [
+                [-1, 0.4, -1.2], [1, 0.4, -1.2], // Front
+                [-1, 0.4, 1.2], [1, 0.4, 1.2]    // Back
+            ];
+            
+            positions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+                wheel.rotation.z = Math.PI / 2;
+                wheel.position.set(...pos);
+                carGroup.add(wheel);
+            });
+
+            return carGroup;
+        }
+
+        // सिक्के (Coins)
+        const coinGeo = new THREE.TorusGeometry(0.6, 0.2, 8, 16);
+        const coinMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
+
+        /**
+         * ========================================================
+         * 3. GAME STATE & LOGIC
+         * ========================================================
+         */
+        const state = {
+            status: 'START',
+            score: 0,
+            bestScore: localStorage.getItem('turboRacing3DBest') || 0,
+            speed: 1,
+            distance: 0
+        };
+
+        const ui = {
+            startMenu: document.getElementById('startMenu'),
+            gameOverMenu: document.getElementById('gameOverMenu'),
+            hud: document.getElementById('hud'),
+            score: document.getElementById('scoreDisplay'),
+            speed: document.getElementById('speedDisplay'),
+            finalScore: document.getElementById('finalScore'),
+            bestScore: document.getElementById('bestScore'),
+            startBtn: document.getElementById('startBtn'),
+            restartBtn: document.getElementById('restartBtn'),
+            exitBtn: document.getElementById('exitBtn')
+        };
+
+        let playerCar = null;
+        let playerTargetX = 0;
+        let enemies = [];
+        let coins = [];
+
+        function initGame(e) {
+            if(e) e.preventDefault();
+            
+            // ऑडियो शुरू करें
+            Sounds.click();
+            Sounds.startEngine();
+
+            // प्लेयर कार सेटअप
+            if (!playerCar) {
+                playerCar = createCarMesh(0xef4444); // Red
+                scene.add(playerCar);
+            }
+            playerCar.position.set(0, 0, 0);
+            playerTargetX = 0;
+
+            // पुरानी चीजें साफ करें
+            enemies.forEach(en => scene.remove(en.mesh));
+            coins.forEach(c => scene.remove(c.mesh));
+            enemies = [];
+            coins = [];
+
+            state.score = 0;
+            state.speed = 1;
+            state.distance = 0;
+            state.status = 'PLAYING';
+
+            ui.startMenu.classList.add('hidden');
+            ui.gameOverMenu.classList.add('hidden');
+            ui.hud.classList.remove('hidden');
+            
+            updateHUD();
+        }
+
+        function updateHUD() {
+            ui.score.innerText = Math.floor(state.score);
+            const visualSpeed = Math.floor(120 + (state.speed * 80));
+            ui.speed.innerText = `${visualSpeed} KM/H`;
+        }
+
+        function gameOver() {
+            state.status = 'GAMEOVER';
+            Sounds.stopEngine();
+            Sounds.crash();
+            
+            // कार टकराने का एनिमेशन
+            playerCar.rotation.z = Math.PI / 4;
+            playerCar.position.y = 1;
+
+            if (state.score > state.bestScore) {
+                state.bestScore = Math.floor(state.score);
+                localStorage.setItem('turboRacing3DBest', state.bestScore);
+            }
+
+            setTimeout(() => {
+                ui.hud.classList.add('hidden');
+                ui.gameOverMenu.classList.remove('hidden');
+                ui.finalScore.innerText = Math.floor(state.score);
+                ui.bestScore.innerText = state.bestScore;
+            }, 1000);
+        }
+
+        // कॉलिजन चेक (Box3 का उपयोग करके)
+        function checkCollisions() {
+            const playerBox = new THREE.Box3().setFromObject(playerCar);
+            // थोड़ा सा बॉक्स छोटा करें ताकि टक्कर सटीक हो
+            playerBox.expandByScalar(-0.3); 
+
+            // दुश्मनों से टक्कर
+            for (let i = 0; i < enemies.length; i++) {
+                const enemyBox = new THREE.Box3().setFromObject(enemies[i].mesh);
+                enemyBox.expandByScalar(-0.3);
+                if (playerBox.intersectsBox(enemyBox)) {
+                    gameOver();
+                    return;
+                }
+            }
+
+            // सिक्कों से टक्कर
+            for (let i = coins.length - 1; i >= 0; i--) {
+                const coinBox = new THREE.Box3().setFromObject(coins[i].mesh);
+                if (playerBox.intersectsBox(coinBox)) {
+                    Sounds.coin();
+                    state.score += 50;
+                    scene.remove(coins[i].mesh);
+                    coins.splice(i, 1);
+                    updateHUD();
+                }
+            }
+        }
+
+        /**
+         * ========================================================
+         * 4. MAIN ANIMATION LOOP
+         * ========================================================
+         */
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (state.status === 'PLAYING') {
+                // 1. कार की स्टीयरिंग (स्मूथ मूवमेंट)
+                playerCar.position.x += (playerTargetX - playerCar.position.x) * 0.15;
+                
+                // कार मुड़ते समय थोड़ा टिल्ट (Tilt) हो
+                playerCar.rotation.y = (playerCar.position.x - playerTargetX) * -0.05;
+                playerCar.rotation.z = (playerCar.position.x - playerTargetX) * -0.05;
+
+                // 2. सड़क की पट्टियाँ हिलाना
+                const moveSpeed = 1.5 * state.speed;
+                lines.forEach(line => {
+                    line.position.z += moveSpeed;
+                    if (line.position.z > 10) line.position.z = -190;
+                });
+
+                // 3. दुश्मन कारें पैदा करना
+                if (Math.random() < 0.03 * state.speed) {
+                    const colors = [0x3b82f6, 0x10b981, 0xf59e0b, 0x8b5cf6];
+                    const enMesh = createCarMesh(colors[Math.floor(Math.random() * colors.length)]);
+                    
+                    // रैंडम लेन (-5, 0, 5)
+                    const lane = (Math.floor(Math.random() * 3) - 1) * (roadWidth/3.2);
+                    enMesh.position.set(lane, 0, -150);
+                    
+                    // दुश्मन की अपनी स्पीड (प्लेयर से कम)
+                    const enSpeed = (Math.random() * 0.5 + 0.3) * state.speed; 
+                    
+                    scene.add(enMesh);
+                    enemies.push({ mesh: enMesh, speed: enSpeed });
+                }
+
+                // 4. सिक्के पैदा करना
+                if (Math.random() < 0.04) {
+                    const cMesh = new THREE.Mesh(coinGeo, coinMat);
+                    const lane = (Math.floor(Math.random() * 3) - 1) * (roadWidth/3.2);
+                    cMesh.position.set(lane, 1, -150);
+                    scene.add(cMesh);
+                    coins.push({ mesh: cMesh });
+                }
+
+                // 5. दुश्मन और सिक्कों को अपडेट करना
+                for (let i = enemies.length - 1; i >= 0; i--) {
+                    const en = enemies[i];
+                    en.mesh.position.z += moveSpeed - en.speed; // रिलेटिव स्पीड
+                    if (en.mesh.position.z > 20) {
+                        scene.remove(en.mesh);
+                        enemies.splice(i, 1);
+                    }
+                }
+
+                for (let i = coins.length - 1; i >= 0; i--) {
+                    const c = coins[i];
+                    c.mesh.position.z += moveSpeed;
+                    c.mesh.rotation.y += 0.1; // सिक्का घूमेगा
+                    if (c.mesh.position.z > 20) {
+                        scene.remove(c.mesh);
+                        coins.splice(i, 1);
+                    }
+                }
+
+                checkCollisions();
+
+                // 6. स्कोर और स्पीड बढ़ाना
+                state.distance += state.speed;
+                if (state.distance > 20) {
+                    state.score += 1;
+                    state.distance = 0;
+                    if(state.score % 10 === 0) updateHUD();
+                }
+                
+                if (state.speed < 2.5) {
+                    state.speed += 0.0005;
+                    Sounds.updateEngine(state.speed);
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // लूप चालू करें
+        animate();
+
+        /**
+         * ========================================================
+         * 5. MOBILE TOUCH CONTROLS
+         * ========================================================
+         */
+        function handleTouch(e) {
+            e.preventDefault(); 
+            if (state.status === 'PLAYING' && playerCar) {
+                const touchX = e.touches ? e.touches[0].clientX : e.clientX;
+                // स्क्रीन की X पोजीशन को सड़क की चौड़ाई (-6 से +6) में बदलें
+                const normalizedX = (touchX / window.innerWidth) * 2 - 1; 
+                playerTargetX = normalizedX * (roadWidth / 2 - 1);
+            }
+        }
+
+        // मोबाइल टच
+        window.addEventListener('touchstart', handleTouch, { passive: false });
+        window.addEventListener('touchmove', handleTouch, { passive: false });
+        
+        // डेस्कटॉप माउस (टेस्टिंग के लिए)
+        window.addEventListener('mousemove', (e) => {
+            if(e.buttons === 1) handleTouch(e); // क्लिक करके ड्रैग
+        });
+
+        // स्क्रीन रिसाइज
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // बटन्स
+        ['touchstart', 'click'].forEach(evt => {
+            ui.startBtn.addEventListener(evt, initGame, { passive: false });
+            ui.restartBtn.addEventListener(evt, (e) => {
+                // कार का एनीमेशन ठीक करें
+                if(playerCar) {
+                    playerCar.rotation.z = 0;
+                    playerCar.position.y = 0;
+                }
+                initGame(e);
+            }, { passive: false });
+            
+            ui.exitBtn.addEventListener(evt, (e) => {
+                e.preventDefault();
+                Sounds.click();
+                setTimeout(() => {
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage('closeGame', '*');
+                    } else {
+                        window.location.href = 'game.html';
+                    }
+                }, 200);
+            });
+        });
+
+    </script>
+</body>
+</html>
