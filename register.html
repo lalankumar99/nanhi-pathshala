@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <meta name="theme-color" content="#f59e0b">
+    <meta name="msapplication-TileColor" content="#f59e0b">
+
+    <title>Register • Nanhi Pathshala</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Nunito", sans-serif;
+
+            background:
+                radial-gradient(
+                    circle at 10% 10%,
+                    #ccfbf1 0,
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 90% 15%,
+                    #fef3c7 0,
+                    transparent 28%
+                ),
+                linear-gradient(
+                    135deg,
+                    #f0fdfa,
+                    #ffffff,
+                    #fffbeb
+                );
+
+            color: #134e4a;
+
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        button {
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .page {
+            min-height: 100vh;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* =========================
+           BACKGROUND
+        ========================== */
+
+        .blob {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .blob-one {
+            width: 230px;
+            height: 230px;
+
+            top: -100px;
+            left: -80px;
+
+            background: #99f6e4;
+
+            opacity: .45;
+
+            filter: blur(10px);
+        }
+
+        .blob-two {
+            width: 200px;
+            height: 200px;
+
+            right: -70px;
+            top: 90px;
+
+            background: #fde68a;
+
+            opacity: .50;
+
+            filter: blur(10px);
+        }
+
+        .blob-three {
+            width: 270px;
+            height: 270px;
+
+            bottom: -160px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            background: #bfdbfe;
+
+            opacity: .28;
+
+            filter: blur(15px);
+        }
+
+        /* =========================
+           TOP BAR
+        ========================== */
+
+        .top-bar {
+            position: absolute;
+
+            top: 16px;
+            left: 16px;
+            right: 16px;
+
+            z-index: 20;
+
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-button,
+        .language-button {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+
+            padding: 9px 14px;
+
+            border-radius: 999px;
+
+            background: rgba(255,255,255,.80);
+
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+
+            border: 1px solid rgba(255,255,255,.95);
+
+            color: #0f766e;
+
+            font-size: 13px;
+            font-weight: 800;
+
+            box-shadow:
+                0 6px 20px rgba(15,118,110,.08);
+
+            transition: .2s;
+        }
+
+        .back-button:active,
+        .language-button:active {
+            transform: scale(.96);
+        }
+
+        /* =========================
+           MAIN CONTAINER
+        ========================== */
+
+        .container {
+            position: relative;
+            z-index: 5;
+
+            min-height: 100vh;
+
+            display: flex;
+            justify-content: center;
+
+            padding: 80px 18px 35px;
+        }
+
+        .register-wrapper {
+            width: 100%;
+            max-width: 470px;
+
+            animation:
+                registerEntrance .65s ease-out both;
+        }
+
+        @keyframes registerEntrance {
+
+            from {
+                opacity: 0;
+
+                transform:
+                    translateY(25px)
+                    scale(.97);
+            }
+
+            to {
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
+
+        }
+
+        /* =========================
+           BRAND
+        ========================== */
+
+        .brand {
+            text-align: center;
+
+            margin-bottom: 20px;
+        }
+
+        .brand-icon {
+            width: 68px;
+            height: 68px;
+
+            margin: 0 auto 10px;
+
+            border-radius: 22px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #2dd4bf,
+                    #0d9488
+                );
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            box-shadow:
+                0 14px 30px rgba(13,148,136,.22),
+                inset 0 2px 5px rgba(255,255,255,.35);
+        }
+
+        .brand-icon::after {
+            content: "📚";
+
+            font-size: 32px;
+        }
+
+        .brand h1 {
+            font-family: "Quicksand", sans-serif;
+
+            font-size: 28px;
+
+            font-weight: 900;
+
+            color: #134e4a;
+        }
+
+        .brand p {
+            margin-top: 3px;
+
+            color: #0d9488;
+
+            font-size: 13px;
+
+            font-weight: 800;
+        }
+
+        /* =========================
+           CARD
+        ========================== */
+
+        .card {
+            background:
+                rgba(255,255,255,.94);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            border:
+                1px solid rgba(255,255,255,.95);
+
+            border-radius: 30px;
+
+            box-shadow:
+                0 25px 65px
+                rgba(15,23,42,.10);
+
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 25px 24px;
+
+            text-align: center;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #14b8a6,
+                    #0d9488
+                );
+        }
+
+        .card-header h2 {
+            font-family: "Quicksand", sans-serif;
+
+            font-size: 25px;
+
+            font-weight: 900;
+        }
+
+        .card-header p {
+            margin-top: 5px;
+
+            color: #ccfbf1;
+
+            font-size: 13px;
+
+            font-weight: 700;
+        }
+
+        .form {
+            padding: 26px 24px 28px;
+        }
+
+        /* Continue in Part 2 */
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="page">
+
+    <div class="blob blob-one"></div>
+
+    <div class="blob blob-two"></div>
+
+    <div class="blob blob-three"></div>
+
+
+    <div class="top-bar">
+
+        <button
+            type="button"
+            class="back-button"
+            id="backButton"
+        >
+            ← Back
+        </button>
+
+        <button
+            type="button"
+            class="language-button"
+            id="languageButton"
+        >
+            🌐 English
+        </button>
+
+    </div>
+
+
+    <main class="container">
+
+        <div class="register-wrapper">
+
+            <div class="brand">
+
+                <div class="brand-icon"></div>
+
+                <h1>
+                    Nanhi Pathshala
+                </h1>
+
+                <p>
+                    Learn • Play • Grow
+                </p>
+
+            </div>
+
+
+            <section class="card">
+
+                <header class="card-header">
+
+                    <h2>
+                        Create Your Account
+                    </h2>
+
+                    <p>
+                        Start your learning journey today
+                    </p>
+
+                </header>
+
+
+                <form
+                    class="form"
+                    id="registerForm"
+                >
+
+                    <div
+                        class="message"
+                        id="message"
+                    ></div>
+                    <div class="field">
+
+                        <label
+                            class="label"
+                            for="fullName"
+                        >
+                            Full Name
+                        </label>
+
+                        <div class="input-wrap">
+
+                            <span class="input-icon">
+                                👤
+                            </span>
+
+                            <input
+                                class="input"
+                                id="fullName"
+                                type="text"
+                                autocomplete="name"
+                                placeholder="Enter your full name"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label
+                            class="label"
+                            for="email"
+                        >
+                            Email Address
+                        </label>
+
+                        <div class="input-wrap">
+
+                            <span class="input-icon">
+                                ✉️
+                            </span>
+
+                            <input
+                                class="input"
+                                id="email"
+                                type="email"
+                                autocomplete="email"
+                                placeholder="Enter your email"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label
+                            class="label"
+                            for="password"
+                        >
+                            Create Password
+                        </label>
+
+                        <div class="input-wrap">
+
+                            <span class="input-icon">
+                                🔒
+                            </span>
+
+                            <input
+                                class="input"
+                                id="password"
+                                type="password"
+                                autocomplete="new-password"
+                                placeholder="Create a password"
+                                minlength="6"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="password-toggle"
+                                id="passwordToggle"
+                                aria-label="Show password"
+                            >
+                                👁️
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label
+                            class="label"
+                            for="confirmPassword"
+                        >
+                            Confirm Password
+                        </label>
+
+                        <div class="input-wrap">
+
+                            <span class="input-icon">
+                                🔐
+                            </span>
+
+                            <input
+                                class="input"
+                                id="confirmPassword"
+                                type="password"
+                                autocomplete="new-password"
+                                placeholder="Confirm your password"
+                                minlength="6"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+                    <div class="field">
+
+                        <label
+                            class="label"
+                            for="className"
+                        >
+                            Class / Grade
+                        </label>
+
+                        <div class="input-wrap">
+
+                            <span class="input-icon">
+                                🎓
+                            </span>
+
+                            <select
+                                class="input select-input"
+                                id="className"
+                                required
+                            >
+
+                                <option
+                                    value=""
+                                    selected
+                                    disabled
+                                >
+                                    Select your class
+                                </option>
+
+                                <option value="Nursery">
+                                    Nursery
+                                </option>
+
+                                <option value="LKG">
+                                    LKG
+                                </option>
+
+                                <option value="UKG">
+                                    UKG
+                                </option>
+
+                                <option value="1">
+                                    Class 1
+                                </option>
+
+                                <option value="2">
+                                    Class 2
+                                </option>
+
+                                <option value="3">
+                                    Class 3
+                                </option>
+
+                                <option value="4">
+                                    Class 4
+                                </option>
+
+                                <option value="5">
+                                    Class 5
+                                </option>
+
+                                <option value="6">
+                                    Class 6
+                                </option>
+
+                                <option value="7">
+                                    Class 7
+                                </option>
+
+                                <option value="8">
+                                    Class 8
+                                </option>
+
+                                <option value="9">
+                                    Class 9
+                                </option>
+
+                                <option value="10">
+                                    Class 10
+                                </option>
+
+                                <option value="11">
+                                    Class 11
+                                </option>
+
+                                <option value="12">
+                                    Class 12
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="field">
+
+                        <label
+                            class="label"
+                            for="phone"
+                        >
+                            Mobile Number
+                        </label>
+
+                        <div class="input-wrap">
+
+                            <span class="input-icon">
+                                📱
+                            </span>
+
+                            <input
+                                class="input"
+                                id="phone"
+                                type="tel"
+                                inputmode="numeric"
+                                autocomplete="tel"
+                                placeholder="Enter mobile number"
+                                maxlength="10"
+                                pattern="[0-9]{10}"
+                                required
+                            >
+
+                        </div>
+
+                    </div>
+
+
+                    <label class="terms">
+
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            required
+                        >
+
+                        <span>
+                            I agree to the
+                            <button
+                                type="button"
+                                class="terms-button"
+                                id="termsButton"
+                            >
+                                Terms & Privacy Policy
+                            </button>
+                        </span>
+
+                    </label>
+
+
+                    <button
+                        type="submit"
+                        class="register-button-main"
+                        id="registerButton"
+                    >
+                        Create Account
+                        <span>→</span>
+                    </button>
+
+
+                    <div class="login-link">
+
+                        <p>
+                            Already have an account?
+                        </p>
+
+                        <button
+                            type="button"
+                            id="loginLink"
+                        >
+                            Login to Nanhi Pathshala
+                        </button>
+
+                    </div>
+
+
+                    <div class="secure">
+
+                        <span>
+                            🔐
+                        </span>
+
+                        <span>
+                            Your account is securely protected by Firebase
+                        </span>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+
+            <div class="footer">
+
+                Nanhi Pathshala
+                •
+                Learn • Play • Grow
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+<style>
+
+    /* =========================
+       REGISTER FORM STYLES
+    ========================== */
+
+    .field {
+        margin-bottom: 17px;
+    }
+
+    .label {
+        display: block;
+
+        margin-bottom: 7px;
+
+        color: #475569;
+
+        font-size: 13px;
+
+        font-weight: 900;
+    }
+
+    .input-wrap {
+        position: relative;
+    }
+
+    .input-icon {
+        position: absolute;
+
+        left: 15px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        color: #94a3b8;
+
+        font-size: 17px;
+
+        pointer-events: none;
+    }
+
+    .input {
+        width: 100%;
+        height: 52px;
+
+        padding: 0 45px;
+
+        border: 2px solid #e2e8f0;
+
+        border-radius: 15px;
+
+        background: #f8fafc;
+
+        color: #1e293b;
+
+        font-size: 14px;
+
+        font-weight: 700;
+
+        transition: .2s;
+    }
+
+    .input:focus {
+        outline: none;
+
+        border-color: #14b8a6;
+
+        background: #ffffff;
+
+        box-shadow:
+            0 0 0 4px
+            rgba(20,184,166,.10);
+    }
+
+    .input::placeholder {
+        color: #94a3b8;
+    }
+
+    .select-input {
+        appearance: none;
+
+        -webkit-appearance: none;
+
+        cursor: pointer;
+    }
+
+    .password-toggle {
+        position: absolute;
+
+        right: 9px;
+        top: 50%;
+
+        transform: translateY(-50%);
+
+        width: 36px;
+        height: 36px;
+
+        border-radius: 10px;
+
+        background: transparent;
+
+        color: #94a3b8;
+
+        font-size: 17px;
+    }
+
+    .password-toggle:active {
+        background: #f1f5f9;
+    }
+
+
+    /* =========================
+       TERMS
+    ========================== */
+
+    .terms {
+        display: flex;
+
+        align-items: flex-start;
+
+        gap: 9px;
+
+        margin:
+            5px 0 20px;
+
+        color: #64748b;
+
+        font-size: 12px;
+
+        line-height: 1.5;
+
+        font-weight: 700;
+
+        cursor: pointer;
+    }
+
+    .terms input {
+        width: 17px;
+        height: 17px;
+
+        margin-top: 1px;
+
+        flex-shrink: 0;
+
+        accent-color: #14b8a6;
+
+        cursor: pointer;
+    }
+
+    .terms-button {
+        padding: 0;
+
+        background: transparent;
+
+        color: #0d9488;
+
+        font-weight: 900;
+
+        text-decoration: underline;
+    }
+
+
+    /* =========================
+       REGISTER BUTTON
+    ========================== */
+
+    .register-button-main {
+        width: 100%;
+        height: 54px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 8px;
+
+        border-radius: 16px;
+
+        background:
+            linear-gradient(
+                135deg,
+                #fbbf24,
+                #f59e0b
+            );
+
+        color: #172554;
+
+        font-size: 16px;
+
+        font-weight: 900;
+
+        box-shadow:
+            0 10px 22px
+            rgba(245,158,11,.22);
+
+        transition:
+            transform .2s ease,
+            box-shadow .2s ease,
+            opacity .2s ease;
+    }
+
+    .register-button-main:hover {
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 14px 28px
+            rgba(245,158,11,.28);
+    }
+
+    .register-button-main:active {
+        transform: scale(.98);
+    }
+
+    .register-button-main:disabled {
+        opacity: .65;
+
+        cursor: not-allowed;
+
+        transform: none;
+    }
+
+
+    /* =========================
+       LOGIN LINK
+    ========================== */
+
+    .login-link {
+        margin-top: 21px;
+
+        text-align: center;
+
+        color: #64748b;
+
+        font-size: 13px;
+
+        font-weight: 700;
+    }
+
+    .login-link button {
+        margin-top: 5px;
+
+        background: transparent;
+
+        color: #0d9488;
+
+        font-size: 14px;
+
+        font-weight: 900;
+    }
+
+    .login-link button:hover {
+        text-decoration: underline;
+    }
+
+
+    /* =========================
+       SECURITY
+    ========================== */
+
+    .secure {
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        margin-top: 19px;
+
+        color: #94a3b8;
+
+        font-size: 11px;
+
+        font-weight: 700;
+
+        text-align: center;
+    }
+
+
+    /* =========================
+       MESSAGE
+    ========================== */
+
+    .message {
+        display: none;
+
+        margin-bottom: 17px;
+
+        padding: 12px 14px;
+
+        border-radius: 13px;
+
+        font-size: 12px;
+
+        font-weight: 800;
+    }
+
+    .message.show {
+        display: block;
+    }
+
+    .message.error {
+        background: #fee2e2;
+
+        color: #b91c1c;
+    }
+
+    .message.success {
+        background: #dcfce7;
+
+        color: #15803d;
+    }
+
+
+    /* =========================
+       FOOTER
+    ========================== */
+
+    .footer {
+        text-align: center;
+
+        margin-top: 20px;
+
+        color: #94a3b8;
+
+        font-size: 11px;
+
+        font-weight: 700;
+    }
+
+
+    /* =========================
+       MOBILE
+    ========================== */
+
+    @media (max-width: 380px) {
+
+        .container {
+            padding-left: 14px;
+            padding-right: 14px;
+        }
+
+        .brand h1 {
+            font-size: 26px;
+        }
+
+        .card {
+            border-radius: 25px;
+        }
+
+        .form {
+            padding: 22px 18px;
+        }
+
+        .card-header {
+            padding: 23px 18px;
+        }
+
+    }
+
+</style>
+<script type="module">
+
+    import { auth, db } from "./firebase.js";
+
+    import {
+        createUserWithEmailAndPassword,
+        updateProfile
+    } from
+    "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+    import {
+        doc,
+        setDoc,
+        serverTimestamp
+    } from
+    "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+    const registerForm =
+        document.getElementById("registerForm");
+
+    const fullNameInput =
+        document.getElementById("fullName");
+
+    const emailInput =
+        document.getElementById("email");
+
+    const passwordInput =
+        document.getElementById("password");
+
+    const confirmPasswordInput =
+        document.getElementById("confirmPassword");
+
+    const classInput =
+        document.getElementById("className");
+
+    const phoneInput =
+        document.getElementById("phone");
+
+    const termsInput =
+        document.getElementById("terms");
+
+    const registerButton =
+        document.getElementById("registerButton");
+
+    const message =
+        document.getElementById("message");
+
+
+    function showMessage(text, type = "error") {
+
+        message.textContent = text;
+
+        message.className =
+            "message show " + type;
+
+    }
+
+
+    /* =========================
+       PASSWORD SHOW / HIDE
+    ========================== */
+
+    document
+        .getElementById("passwordToggle")
+        .addEventListener(
+            "click",
+            () => {
+
+                const hidden =
+                    passwordInput.type === "password";
+
+                passwordInput.type =
+                    hidden
+                        ? "text"
+                        : "password";
+
+                document.getElementById(
+                    "passwordToggle"
+                ).textContent =
+                    hidden
+                        ? "🙈"
+                        : "👁️";
+
+            }
+        );
+
+
+    /* =========================
+       REGISTER
+    ========================== */
+
+    registerForm.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            const fullName =
+                fullNameInput.value.trim();
+
+            const email =
+                emailInput.value.trim();
+
+            const password =
+                passwordInput.value;
+
+            const confirmPassword =
+                confirmPasswordInput.value;
+
+            const className =
+                classInput.value;
+
+            const phone =
+                phoneInput.value.trim();
+
+
+            if (password !== confirmPassword) {
+
+                showMessage(
+                    "Passwords do not match."
+                );
+
+                return;
+            }
+
+
+            if (!/^[0-9]{10}$/.test(phone)) {
+
+                showMessage(
+                    "Please enter a valid 10-digit mobile number."
+                );
+
+                return;
+            }
+
+
+            if (!termsInput.checked) {
+
+                showMessage(
+                    "Please accept the Terms & Privacy Policy."
+                );
+
+                return;
+            }
+
+
+            registerButton.disabled = true;
+
+            registerButton.innerHTML =
+                "Creating account...";
+
+
+            try {
+
+                const credential =
+                    await createUserWithEmailAndPassword(
+                        auth,
+                        email,
+                        password
+                    );
+
+
+                const user =
+                    credential.user;
+
+
+                await updateProfile(
+                    user,
+                    {
+                        displayName: fullName
+                    }
+                );
+
+
+                await setDoc(
+                    doc(db, "users", user.uid),
+                    {
+                        uid: user.uid,
+
+                        name: fullName,
+
+                        email: email,
+
+                        phone: phone,
+
+                        className: className,
+
+                        role: "student",
+
+                        createdAt:
+                            serverTimestamp(),
+
+                        updatedAt:
+                            serverTimestamp()
+                    }
+                );
+
+
+                showMessage(
+                    "Account created successfully!",
+                    "success"
+                );
+
+
+                setTimeout(() => {
+
+                    window.location.href =
+                        "home.html";
+
+                }, 900);
+
+
+            } catch (error) {
+
+                let errorText =
+                    "Unable to create your account.";
+
+
+                if (
+                    error.code ===
+                    "auth/email-already-in-use"
+                ) {
+
+                    errorText =
+                        "This email is already registered.";
+
+                }
+
+                else if (
+                    error.code ===
+                    "auth/weak-password"
+                ) {
+
+                    errorText =
+                        "Password should be at least 6 characters.";
+
+                }
+
+                else if (
+                    error.code ===
+                    "auth/invalid-email"
+                ) {
+
+                    errorText =
+                        "Please enter a valid email address.";
+
+                }
+
+
+                showMessage(errorText);
+
+
+            } finally {
+
+                registerButton.disabled = false;
+
+                registerButton.innerHTML =
+                    "Create Account <span>→</span>";
+
+            }
+
+        }
+    );
+
+</script>
+<script>
+
+    /* =========================
+       BACK TO LOGIN
+    ========================== */
+
+    document
+        .getElementById("loginLink")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "login.html";
+
+            }
+        );
+
+
+    /* =========================
+       BACK BUTTON
+    ========================== */
+
+    document
+        .getElementById("backButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                window.location.href =
+                    "login.html";
+
+            }
+        );
+
+
+    /* =========================
+       LANGUAGE
+    ========================== */
+
+    document
+        .getElementById("languageButton")
+        .addEventListener(
+            "click",
+            () => {
+
+                showMessage(
+                    "English is currently selected.",
+                    "success"
+                );
+
+            }
+        );
+
+
+    /* =========================
+       TERMS
+    ========================== */
+
+    document
+        .getElementById("termsButton")
+        .addEventListener(
+            "click",
+            (event) => {
+
+                event.preventDefault();
+
+                alert(
+                    "Nanhi Pathshala Terms & Privacy Policy"
+                );
+
+            }
+        );
+
+
+    /* =========================
+       MOBILE NUMBER
+    ========================== */
+
+    phoneInput.addEventListener(
+        "input",
+        () => {
+
+            phoneInput.value =
+                phoneInput.value
+                    .replace(/\D/g, "")
+                    .slice(0, 10);
+
+        }
+    );
+
+
+    /* =========================
+       PASSWORD STRENGTH
+    ========================== */
+
+    passwordInput.addEventListener(
+        "input",
+        () => {
+
+            if (
+                passwordInput.value.length > 0 &&
+                passwordInput.value.length < 6
+            ) {
+
+                passwordInput.setCustomValidity(
+                    "Password must be at least 6 characters."
+                );
+
+            } else {
+
+                passwordInput.setCustomValidity("");
+
+            }
+
+        }
+    );
+
+
+    /* =========================
+       CONFIRM PASSWORD
+    ========================== */
+
+    confirmPasswordInput.addEventListener(
+        "input",
+        () => {
+
+            if (
+                confirmPasswordInput.value &&
+                confirmPasswordInput.value !==
+                passwordInput.value
+            ) {
+
+                confirmPasswordInput.setCustomValidity(
+                    "Passwords do not match."
+                );
+
+            } else {
+
+                confirmPasswordInput.setCustomValidity("");
+
+            }
+
+        }
+    );
+
+</script>
+
+</body>
+
+</html>
+
+
