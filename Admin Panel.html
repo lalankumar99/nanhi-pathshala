@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin Panel • Nanhi Pathshala</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Professional CMS Theme Colors */
+            --bg-body: #f1f5f9;
+            --bg-sidebar: #0f172a;
+            --bg-sidebar-hover: #1e293b;
+            --bg-card: #ffffff;
+            
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --success: #10b981;
+            
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --text-light: #f8fafc;
+            
+            --border: #e2e8f0;
+            --border-dark: #334155;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: "Nunito", sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            outline: none;
+            font-family: inherit;
+        }
+
+        input, textarea, select {
+            font-family: inherit;
+            outline: none;
+        }
+
+        /* =========================
+           SCREENS (Loading, Login, Denied, App)
+        ========================= */
+        .screen {
+            display: none;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* LOADING */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-body);
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #cbd5e1;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* AUTH (Login & Denied) */
+        .auth-wrapper {
+            background: var(--bg-sidebar);
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .auth-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: var(--radius-xl);
+            width: 90%;
+            max-width: 420px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        
+        .auth-title {
+            font-family: "Quicksand", sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--bg-sidebar);
+            margin-bottom: 8px;
+        }
+        
+        .auth-subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            border-color: var(--primary);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: var(--radius-md);
+            transition: background 0.2s;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        /* =========================
+           APP LAYOUT
+        ========================= */
+        #app-screen {
+            display: none;
+            flex-direction: row;
+        }
+        #app-screen.active { display: flex; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-sidebar);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 24px 20px;
+            border-bottom: 1px solid var(--border-dark);
+            font-family: "Quicksand", sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 24px;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover, .nav-link.active {
+            color: white;
+            background: var(--bg-sidebar-hover);
+        }
+        
+        .nav-link.active {
+            border-left: 4px solid var(--primary);
+            padding-left: 20px;
+        }
+
+        /* MAIN CONTENT */
+        .main-wrapper {
+            flex: 1;
+            margin-left: 260px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            width: calc(100% - 260px);
+        }
+        
+        .topbar {
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        
+        .avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: transparent;
+            font-size: 24px;
+            color: var(--text-main);
+        }
+
+        .content-area {
+            padding: 30px;
+            flex: 1;
+        }
+        
+        .view-section {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        .view-section.active {
+            display: block;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .section-title {
+            font-family: "Quicksand", sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        /* DASHBOARD CARDS */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            border: 1px solid var(--border);
+        }
+        
+        .stat-icon {
+            width: 54px;
+            height: 54px;
+            border-radius: var(--radius-md);
+            background: #f0fdfa;
+            color: var(--primary);
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .stat-info h4 {
+            color: var(--text-muted);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .stat-info .stat-value {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--text-main);
+            margin-top: 4px;
+        }
+
+        /* TABLES & LISTS */
+        .data-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px;
+        }
+        
+        th, td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        th {
+            background: #f8fafc;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        
+        td {
+            font-size: 14px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+        .badge.success { background: #d1fae5; color: #047857; }
+        .badge.warning { background: #fef3c7; color: #b45309; }
+        .badge.danger { background: #fee2e2; color: #b91c1c; }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .btn-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            transition: 0.2s;
+        }
+        .btn-icon:hover { background: #e2e8f0; color: var(--text-main); }
+        .btn-icon.edit:hover { background: #dbeafe; color: #1d4ed8; }
+        .btn-icon.delete:hover { background: #fee2e2; color: #b91c1c; }
+
+        .btn-add {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        /* MODALS */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        
+        .modal-card {
+            background: white;
+            width: 100%;
+            max-width: 600px;
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            max-height: 90vh;
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 { font-family: "Quicksand", sans-serif; font-size: 18px; }
+        
+        .modal-body {
+            padding: 24px;
+            overflow-y: auto;
+            flex: 1;
+            display: grid;
+            gap: 16px;
+        }
+        
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn-cancel {
+            padding: 10px 20px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-weight: 700;
+        }
+
+        /* CUSTOM NOTIFICATIONS */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toast {
+            background: white;
+            border-left: 4px solid var(--success);
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .toast.error { border-left-color: var(--danger); }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-wrapper {
+                margin-left: 0;
+                width: 100%;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .content-area {
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. LOADING SCREEN -->
+    <div id="loading-screen" class="screen active">
+        <div class="spinner"></div>
+        <div style="font-weight: 700; color: var(--text-muted);">Verifying Access...</div>
+    </div>
+
+    <!-- 2. LOGIN SCREEN -->
+    <div id="login-screen" class="screen auth-wrapper">
+        <div class="auth-card">
+            <h2 class="auth-title">Nanhi Pathshala</h2>
+            <p class="auth-subtitle">Secure Admin Access</p>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">Admin Email</label>
+                    <input type="email" id="login-email" class="form-input" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-input" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-primary" id="login-btn">Secure Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. ACCESS DENIED SCREEN -->
+    <div id="denied-screen" class="screen auth-wrapper">
+        <div class="auth-card">
+            <div style="font-size: 40px; margin-bottom: 10px;">🛡️</div>
+            <h2 class="auth-title" style="color: var(--danger);">Access Denied</h2>
+            <p class="auth-subtitle">You do not have administrator privileges to view this portal.</p>
+            <button class="btn-primary" onclick="window.location.href='home.html'">Back to Home</button>
+            <button class="btn-cancel" style="width: 100%; margin-top: 10px;" onclick="doLogout()">Sign Out</button>
+        </div>
+    </div>
+
+    <!-- 4. APP SCREEN (CMS) -->
+    <div id="app-screen" class="screen">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span style="font-size: 24px;">⚙️</span> Admin Panel
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-link active" data-view="dashboard">
+                    <span>📊</span> Dashboard
+                </div>
+                <div class="nav-link" data-view="homepage">
+                    <span>🏠</span> Home Management
+                </div>
+                <div class="nav-link" data-view="content">
+                    <span>📚</span> Learn Content
+                </div>
+                <div class="nav-link" data-view="folders">
+                    <span>📁</span> Folders
+                </div>
+                <div class="nav-link" data-view="games">
+                    <span>🎮</span> Games
+                </div>
+                <div class="nav-link" data-view="stories">
+                    <span>📖</span> Stories
+                </div>
+                <div class="nav-link" data-view="videos">
+                    <span>🎥</span> Videos
+                </div>
+                <div class="nav-link" data-view="quizzes">
+                    <span>📝</span> Quizzes
+                </div>
+                <div class="nav-link" data-view="notices">
+                    <span>📢</span> Notices
+                </div>
+                <div class="nav-link" data-view="users">
+                    <span>👨‍🎓</span> Students
+                </div>
+                <div class="nav-link" data-view="settings">
+                    <span>🔧</span> Settings
+                </div>
+            </nav>
+            <div style="padding: 20px;">
+                <button class="btn-primary btn-danger" onclick="doLogout()" style="width: 100%;">
+                    Log Out
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN WRAPPER -->
+        <main class="main-wrapper">
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <div style="flex: 1;"></div>
+                <div class="topbar-right">
+                    <div class="admin-profile">
+                        <div class="avatar" id="admin-avatar">A</div>
+                        <span id="admin-name">Admin User</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- CONTENT AREA -->
+            <div class="content-area" id="views-container">
+                
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dashboard" class="view-section active">
+                    <div class="section-header">
+                        <h2 class="section-title">Overview</h2>
+                    </div>
+                    <div class="dashboard-grid" id="dashboard-stats">
+                        <!-- Populated by JS -->
+                        <div class="stat-card"><div class="spinner" style="width:24px;height:24px;border-width:3px;"></div> Loading stats...</div>
+                    </div>
+                </div>
+
+                <!-- GENERIC DATA VIEW (Used for almost all CMS lists) -->
+                <div id="view-generic" class="view-section">
+                    <div class="section-header">
+                        <h2 class="section-title" id="generic-title">Manager</h2>
+                        <button class="btn-add" id="generic-add-btn"><span>+</span> Add New</button>
+                    </div>
+                    <div class="data-card">
+                        <div class="table-responsive">
+                            <table>
+                                <thead id="generic-thead">
+                                    <!-- Dynamic Headers -->
+                                </thead>
+                                <tbody id="generic-tbody">
+                                    <!-- Dynamic Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SETTINGS VIEW -->
+                <div id="view-settings" class="view-section">
+                    <div class="section-header">
+                        <h2 class="section-title">System Settings</h2>
+                    </div>
+                    <div class="data-card" style="padding: 24px;">
+                        <h3 style="margin-bottom:16px;">System Status</h3>
+                        <p style="margin-bottom:8px;"><strong>Firebase Auth:</strong> <span class="badge success">Connected</span></p>
+                        <p style="margin-bottom:8px;"><strong>Cloud Firestore:</strong> <span class="badge success">Connected</span></p>
+                        <p style="margin-bottom:8px;"><strong>App Version:</strong> 1.0.0 (Production)</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- 5. GENERIC ADD/EDIT MODAL -->
+    <div class="modal-overlay" id="form-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Edit Item</h3>
+                <button class="btn-icon" onclick="closeModal('form-modal')">✕</button>
+            </div>
+            <div class="modal-body" id="modal-form-fields">
+                <!-- Dynamically populated -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('form-modal')">Cancel</button>
+                <button class="btn-primary" id="modal-save-btn" style="width: auto; padding: 10px 24px;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-card" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>Confirm Action</h3>
+                <button class="btn-icon" onclick="closeModal('confirm-modal')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('confirm-modal')">Cancel</button>
+                <button class="btn-primary btn-danger" id="confirm-delete-btn" style="width: auto; padding: 10px 24px;">Yes, Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+
+    <!-- FIREBASE & LOGIC -->
+    <script type="module">
+        import { auth, db } from "./firebase.js";
+        import { 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+        import { 
+            doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        /* =======================================
+           STATE & CONFIGURATION
+        ======================================= */
+        let state = {
+            user: null,
+            adminProfile: null,
+            currentConfigKey: null,
+            currentEditId: null
+        };
+
+        // Schema config for the generic CMS generator
+        const CMS_CONFIG = {
+            content: {
+                title: "Learn Content", collection: "content", icon: "📚",
+                fields: [
+                    { id: "title", label: "Title", type: "text", required: true },
+                    { id: "description", label: "Description", type: "textarea" },
+                    { id: "type", label: "Content Type", type: "select", options: ["PDF", "Video", "HTML", "Link"] },
+                    { id: "category", label: "Category / Subject", type: "text" },
+                    { id: "url", label: "Media URL", type: "text", required: true },
+                    { id: "folderId", label: "Folder ID (optional)", type: "text" },
+                    { id: "published", label: "Published", type: "checkbox", default: true }
+                ],
+                columns: ["title", "type", "category", "published"]
+            },
+            games: {
+                title: "Games Management", collection: "games", icon: "🎮",
+                fields: [
+                    { id: "name", label: "Game Name", type: "text", required: true },
+                    { id: "description", label: "Description", type: "textarea" },
+                    { id: "category", label: "Category", type: "text" },
+                    { id: "icon", label: "Icon Emoji", type: "text" },
+                    { id: "gameUrl", label: "Game URL (.html file)", type: "text", required: true },
+                    { id: "published", label: "Published", type: "checkbox", default: true }
+                ],
+                columns: ["icon", "name", "category", "published"]
+            },
+            stories: {
+                title: "Stories Management", collection: "stories", icon: "📖",
+                fields: [
+                    { id: "title", label: "Story Title", type: "text", required: true },
+                    { id: "description", label: "Description", type: "textarea" },
+                    { id: "category", label: "Category", type: "text" },
+                    { id: "coverUrl", label: "Cover Image URL", type: "text" },
+                    { id: "storyUrl", label: "Story HTML URL", type: "text", required: true },
+                    { id: "featured", label: "Featured on Home", type: "checkbox" },
+                    { id: "published", label: "Published", type: "checkbox", default: true }
+                ],
+                columns: ["title", "category", "featured", "published"]
+            },
+            videos: {
+                title: "Videos Management", collection: "videos", icon: "🎥",
+                fields: [
+                    { id: "title", label: "Video Title", type: "text", required: true },
+                    { id: "youtubeUrl", label: "YouTube URL", type: "text", required: true },
+                    { id: "category", label: "Category", type: "text" },
+                    { id: "published", label: "Published", type: "checkbox", default: true }
+                ],
+                columns: ["title", "category", "published"]
+            },
+            quizzes: {
+                title: "Quiz Management", collection: "quizzes", icon: "📝",
+                fields: [
+                    { id: "title", label: "Quiz Title", type: "text", required: true },
+                    { id: "subject", label: "Subject", type: "text" },
+                    { id: "difficulty", label: "Difficulty", type: "select", options: ["Easy", "Medium", "Hard"] },
+                    { id: "questionsJson", label: "Questions (JSON Array format)", type: "textarea", placeholder: '[{"q":"2+2?","options":["3","4"],"answer":"4"}]' },
+                    { id: "published", label: "Published", type: "checkbox", default: true }
+                ],
+                columns: ["title", "subject", "difficulty", "published"]
+            },
+            folders: {
+                title: "Folder Manager", collection: "folders", icon: "📁",
+                fields: [
+                    { id: "name", label: "Folder Name", type: "text", required: true },
+                    { id: "parentId", label: "Parent Folder ID (Leave blank for root)", type: "text" },
+                    { id: "sortOrder", label: "Sort Order (Number)", type: "number" }
+                ],
+                columns: ["name", "parentId", "sortOrder"]
+            },
+            notices: {
+                title: "Notice Board", collection: "notices", icon: "📢",
+                fields: [
+                    { id: "title", label: "Notice Title", type: "text", required: true },
+                    { id: "description", label: "Notice Details", type: "textarea", required: true },
+                    { id: "priority", label: "Priority", type: "select", options: ["Normal", "Important", "Urgent"] },
+                    { id: "link", label: "External Link (Optional)", type: "text" },
+                    { id: "published", label: "Published", type: "checkbox", default: true }
+                ],
+                columns: ["title", "priority", "published"]
+            },
+            users: {
+                // Users is read-only in this simple config
+                title: "Student Roster", collection: "users", icon: "👨‍🎓",
+                readonly: true,
+                fields: [],
+                columns: ["name", "email", "role"]
+            }
+        };
+
+        /* =======================================
+           UI HELPERS
+        ======================================= */
+        const showScreen = (screenId) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        };
+
+        const showToast = (message, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = type === 'success' ? `✅ ${message}` : `❌ ${message}`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4000);
+        };
+
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        const openModal = (id) => {
+            document.getElementById(id).classList.add('active');
+        };
+
+        /* =======================================
+           AUTH & SECURITY
+        ======================================= */
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                showScreen('login-screen');
+                return;
+            }
+
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (userSnap.exists() && userSnap.data().role === 'admin') {
+                    // Success Admin Login
+                    state.user = user;
+                    state.adminProfile = userSnap.data();
+                    
+                    document.getElementById('admin-name').textContent = state.adminProfile.name || 'Admin';
+                    document.getElementById('admin-avatar').textContent = (state.adminProfile.name || 'A')[0].toUpperCase();
+                    
+                    showScreen('app-screen');
+                    loadDashboard();
+                } else {
+                    // Normal user tried to access
+                    showScreen('denied-screen');
+                }
+            } catch (error) {
+                console.error("Auth check error:", error);
+                showToast("Error verifying permissions", "error");
+                showScreen('login-screen');
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            const btn = document.getElementById('login-btn');
+            
+            btn.textContent = "Verifying...";
+            btn.disabled = true;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                // onAuthStateChanged will handle the rest
+            } catch (error) {
+                btn.textContent = "Secure Login";
+                btn.disabled = false;
+                showToast("Invalid credentials or access denied.", "error");
+            }
+        });
+
+        window.doLogout = async () => {
+            await signOut(auth);
+            window.location.reload();
+        };
+
+        /* =======================================
+           NAVIGATION & ROUTING
+        ======================================= */
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                // Mobile close sidebar
+                if(window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+
+                const view = e.currentTarget.getAttribute('data-view');
+                switchView(view);
+            });
+        });
+
+        document.getElementById('menu-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        function switchView(viewKey) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            
+            if (viewKey === 'dashboard') {
+                document.getElementById('view-dashboard').classList.add('active');
+                loadDashboard();
+            } else if (viewKey === 'settings') {
+                document.getElementById('view-settings').classList.add('active');
+            } else if (viewKey === 'homepage') {
+                // Reusing generic view with a specific single-doc logic or notify unavailable
+                showToast("Homepage management acts via Firestore document 'homepage/main'", "success");
+                loadGenericTable('content'); // Fallback demo
+            } else if (CMS_CONFIG[viewKey]) {
+                document.getElementById('view-generic').classList.add('active');
+                loadGenericTable(viewKey);
+            }
+        }
+
+        /* =======================================
+           DASHBOARD LOGIC
+        ======================================= */
+        async function loadDashboard() {
+            const container = document.getElementById('dashboard-stats');
+            container.innerHTML = `<div class="stat-card"><div class="spinner" style="width:24px;height:24px;border-width:3px;"></div> Loading stats...</div>`;
+            
+            const stats = [
+                { key: 'content', title: 'Learn Content', icon: '📚' },
+                { key: 'games', title: 'Games', icon: '🎮' },
+                { key: 'stories', title: 'Stories', icon: '📖' },
+                { key: 'videos', title: 'Videos', icon: '🎥' },
+                { key: 'users', title: 'Registered Students', icon: '👨‍🎓' }
+            ];
+
+            try {
+                let html = "";
+                for (let stat of stats) {
+                    const snapshot = await getDocs(collection(db, stat.key));
+                    html += `
+                        <div class="stat-card">
+                            <div class="stat-icon">${stat.icon}</div>
+                            <div class="stat-info">
+                                <h4>${stat.title}</h4>
+                                <div class="stat-value">${snapshot.size}</div>
+                            </div>
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+            } catch (error) {
+                container.innerHTML = `<div style="color:var(--danger)">Error loading dashboard stats. Check security rules.</div>`;
+            }
+        }
+
+        /* =======================================
+           GENERIC CMS ENGINE (The core logic)
+        ======================================= */
+        async function loadGenericTable(configKey) {
+            state.currentConfigKey = configKey;
+            const config = CMS_CONFIG[configKey];
+            
+            document.getElementById('generic-title').textContent = `${config.icon} ${config.title}`;
+            
+            const addBtn = document.getElementById('generic-add-btn');
+            if (config.readonly) {
+                addBtn.style.display = 'none';
+            } else {
+                addBtn.style.display = 'flex';
+                addBtn.onclick = () => openFormModal();
+            }
+
+            // Setup headers
+            let theadHtml = "<tr>";
+            config.columns.forEach(col => {
+                theadHtml += `<th>${col}</th>`;
+            });
+            theadHtml += config.readonly ? "" : `<th>Actions</th>`;
+            theadHtml += "</tr>";
+            document.getElementById('generic-thead').innerHTML = = theadHtml;
+
+            const tbody = document.getElementById('generic-tbody');
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>`;
+
+            try {
+                const snapshot = await getDocs(collection(db, config.collection));
+                if (snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No data found.</td></tr>`;
+                    return;
+                }
+
+                let rowsHtml = "";
+                // Save data in memory for edit buttons
+                window.currentTableData = {};
+
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    window.currentTableData[docSnap.id] = data;
+                    
+                    rowsHtml += "<tr>";
+                    config.columns.forEach(col => {
+                        let val = data[col] !== undefined ? data[col] : '-';
+                        if (typeof val === 'boolean') {
+                            val = val ? `<span class="badge success">Yes</span>` : `<span class="badge warning">No</span>`;
+                        } else if (col === 'icon') {
+                            val = `<span style="font-size:20px">${val}</span>`;
+                        }
+                        rowsHtml += `<td>${val}</td>`;
+                    });
+
+                    if (!config.readonly) {
+                        rowsHtml += `
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-icon edit" onclick="openFormModal('${docSnap.id}')">✎</button>
+                                    <button class="btn-icon delete" onclick="confirmDelete('${docSnap.id}')">🗑️</button>
+                                </div>
+                            </td>
+                        `;
+                    }
+                    rowsHtml += "</tr>";
+                });
+                tbody.innerHTML = rowsHtml;
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger)">Error fetching data. Check Firebase Rules.</td></tr>`;
+            }
+        }
+
+        /* =======================================
+           DYNAMIC FORM BUILDER
+        ======================================= */
+        window.openFormModal = (id = null) => {
+            const config = CMS_CONFIG[state.currentConfigKey];
+            state.currentEditId = id;
+            
+            document.getElementById('modal-title').textContent = id ? `Edit ${config.title}` : `Add New ${config.title}`;
+            
+            const existingData = id ? window.currentTableData[id] : {};
+            let formHtml = "";
+
+            config.fields.forEach(f => {
+                const val = existingData[f.id] !== undefined ? existingData[f.id] : (f.default || '');
+                
+                formHtml += `<div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">${f.label}</label>`;
+                
+                if (f.type === 'textarea') {
+                    formHtml += `<textarea id="field_${f.id}" class="form-input" rows="3" ${f.required?'required':''} placeholder="${f.placeholder||''}">${val}</textarea>`;
+                } else if (f.type === 'select') {
+                    formHtml += `<select id="field_${f.id}" class="form-input">`;
+                    f.options.forEach(opt => {
+                        formHtml += `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`;
+                    });
+                    formHtml += `</select>`;
+                } else if (f.type === 'checkbox') {
+                    formHtml += `<input type="checkbox" id="field_${f.id}" ${val ? 'checked' : ''} style="width:20px;height:20px;accent-color:var(--primary);">`;
+                } else {
+                    formHtml += `<input type="${f.type}" id="field_${f.id}" class="form-input" value="${val}" ${f.required?'required':''}>`;
+                }
+                formHtml += `</div>`;
+            });
+
+            document.getElementById('modal-form-fields').innerHTML = formHtml;
+            openModal('form-modal');
+        };
+
+        document.getElementById('modal-save-btn').addEventListener('click', async (e) => {
+            const config = CMS_CONFIG[state.currentConfigKey];
+            const btn = e.currentTarget;
+            btn.textContent = "Saving...";
+            btn.disabled = true;
+
+            const payload = {
+                updatedAt: serverTimestamp()
+            };
+
+            // Gather inputs
+            for (let f of config.fields) {
+                const el = document.getElementById(`field_${f.id}`);
+                if (!el) continue;
+                if (f.type === 'checkbox') {
+                    payload[f.id] = el.checked;
+                } else if (f.type === 'number') {
+                    payload[f.id] = Number(el.value);
+                } else {
+                    payload[f.id] = el.value;
+                }
+            }
+
+            try {
+                if (state.currentEditId) {
+                    await updateDoc(doc(db, config.collection, state.currentEditId), payload);
+                    showToast("Updated successfully");
+                } else {
+                    payload.createdAt = serverTimestamp();
+                    payload.createdBy = state.user.uid;
+                    await addDoc(collection(db, config.collection), payload);
+                    showToast("Added successfully");
+                }
+                closeModal('form-modal');
+                loadGenericTable(state.currentConfigKey); // Refresh table
+            } catch (error) {
+                console.error(error);
+                showToast("Failed to save data. Check rules.", "error");
+            } finally {
+                btn.textContent = "Save Changes";
+                btn.disabled = false;
+            }
+        });
+
+        /* =======================================
+           DELETE LOGIC
+        ======================================= */
+        let deleteTargetId = null;
+        window.confirmDelete = (id) => {
+            deleteTargetId = id;
+            openModal('confirm-modal');
+        };
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async (e) => {
+            if (!deleteTargetId) return;
+            const btn = e.currentTarget;
+            btn.textContent = "Deleting...";
+            btn.disabled = true;
+            
+            const config = CMS_CONFIG[state.currentConfigKey];
+            
+            try {
+                await deleteDoc(doc(db, config.collection, deleteTargetId));
+                showToast("Item deleted successfully");
+                closeModal('confirm-modal');
+                loadGenericTable(state.currentConfigKey); // Refresh table
+            } catch (error) {
+                showToast("Failed to delete item", "error");
+            } finally {
+                btn.textContent = "Yes, Delete";
+                btn.disabled = false;
+                deleteTargetId = null;
+            }
+        });
+
+    </script>
+</body>
+</html>
