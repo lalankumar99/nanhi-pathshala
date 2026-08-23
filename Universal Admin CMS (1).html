@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin CMS • Nanhi Pathshala</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Nanhi Pathshala Admin Branding */
+            --bg-body: #f1f5f9;
+            --bg-sidebar: #0f172a;
+            --bg-sidebar-hover: #1e293b;
+            --bg-card: #ffffff;
+            
+            --primary: #0d9488;
+            --primary-hover: #0f766e;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --success: #10b981;
+            --info: #0ea5e9;
+            
+            --text-main: #334155;
+            --text-muted: #64748b;
+            --text-light: #f8fafc;
+            
+            --border: #e2e8f0;
+            --border-dark: #334155;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Nunito", sans-serif; background: var(--bg-body); color: var(--text-main); overflow-x: hidden; }
+        button { cursor: pointer; border: none; outline: none; font-family: inherit; transition: 0.2s; }
+        input, textarea, select { font-family: inherit; outline: none; }
+
+        /* SCREENS */
+        .screen { display: none; min-height: 100vh; width: 100%; }
+        .screen.active { display: flex; }
+
+        /* LOADING */
+        #loading-screen { position: fixed; inset: 0; background: var(--bg-body); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; gap: 16px; }
+        .spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* AUTH SCREENS */
+        .auth-wrapper { background: var(--bg-sidebar); flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { background: var(--bg-card); padding: 40px; border-radius: var(--radius-xl); width: 100%; max-width: 420px; box-shadow: var(--shadow-lg); text-align: center; }
+        .auth-title { font-family: "Quicksand", sans-serif; font-size: 28px; font-weight: 900; color: var(--bg-sidebar); margin-bottom: 8px; }
+        .auth-subtitle { color: var(--text-muted); font-size: 15px; margin-bottom: 30px; font-weight: 700; }
+        
+        .form-group { text-align: left; margin-bottom: 20px; }
+        .form-label { display: block; font-size: 13px; font-weight: 800; color: var(--text-main); margin-bottom: 8px; }
+        .form-input { width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); font-size: 15px; transition: 0.2s; background: #f8fafc; }
+        .form-input:focus { border-color: var(--primary); background: white; }
+        
+        .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: white; font-size: 16px; font-weight: 800; border-radius: var(--radius-md); }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-primary:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-danger { background: var(--danger); }
+        .btn-danger:hover { background: var(--danger-hover); }
+
+        /* APP LAYOUT */
+        #app-screen { display: none; flex-direction: row; }
+        #app-screen.active { display: flex; }
+
+        /* SIDEBAR */
+        .sidebar { width: 260px; background: var(--bg-sidebar); color: var(--text-light); display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .sidebar-header { padding: 24px 20px; border-bottom: 1px solid var(--border-dark); font-family: "Quicksand", sans-serif; font-size: 20px; font-weight: 900; display: flex; align-items: center; gap: 12px; }
+        .sidebar-nav { flex: 1; padding: 20px 0; overflow-y: auto; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 14px 24px; color: #94a3b8; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .nav-link:hover, .nav-link.active { color: white; background: var(--bg-sidebar-hover); }
+        .nav-link.active { border-left: 4px solid var(--primary); padding-left: 20px; }
+
+        /* MAIN CONTENT */
+        .main-wrapper { flex: 1; margin-left: 260px; display: flex; flex-direction: column; min-height: 100vh; width: calc(100% - 260px); }
+        .topbar { height: 70px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 50; }
+        .admin-profile { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 15px; }
+        .avatar { width: 38px; height: 38px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; }
+        .menu-toggle { display: none; background: transparent; font-size: 26px; color: var(--text-main); }
+
+        .content-area { padding: 30px; flex: 1; }
+        .view-section { display: none; animation: fadeIn 0.3s; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+        .section-title { font-family: "Quicksand", sans-serif; font-size: 26px; font-weight: 900; display: flex; align-items: center; gap: 12px; }
+        .btn-add { background: var(--primary); color: white; padding: 12px 24px; border-radius: var(--radius-md); font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow-sm); }
+        .btn-add:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+        /* DASHBOARD CARDS */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; }
+        .stat-card { background: white; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 20px; border: 1px solid var(--border); }
+        .stat-icon { width: 54px; height: 54px; border-radius: var(--radius-md); background: #f0fdfa; color: var(--primary); font-size: 26px; display: flex; align-items: center; justify-content: center; }
+        .stat-info h4 { color: var(--text-muted); font-size: 13px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; }
+        .stat-info .stat-value { font-size: 32px; font-weight: 900; color: var(--text-main); margin-top: 4px; font-family: "Quicksand", sans-serif; }
+
+        /* TABLES */
+        .data-card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); overflow: hidden; }
+        .table-responsive { width: 100%; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 18px 24px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background: #f8fafc; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 800; }
+        td { font-size: 15px; color: var(--text-main); font-weight: 600; vertical-align: middle; }
+        
+        .td-title { font-weight: 800; color: var(--text-main); font-size: 16px; margin-bottom: 4px; display: block; }
+        .td-desc { font-size: 13px; color: var(--text-muted); font-weight: 600; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .doc-id-badge { display: inline-flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 4px 10px; border-radius: 6px; font-family: "Fira Code", monospace; font-size: 12px; font-weight: 500; color: #475569; }
+        .copy-btn { cursor: pointer; color: var(--primary); font-size: 14px; background: transparent; padding: 2px; }
+        .copy-btn:hover { color: var(--primary-hover); transform: scale(1.1); }
+
+        .badge { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; }
+        .badge.success { background: #d1fae5; color: #047857; }
+        .badge.warning { background: #fef3c7; color: #b45309; }
+
+        .action-btns { display: flex; gap: 10px; }
+        .btn-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: #f1f5f9; font-size: 16px; transition: 0.2s; }
+        .btn-icon.edit { color: #2563eb; background: #dbeafe; }
+        .btn-icon.edit:hover { background: #bfdbfe; transform: translateY(-2px); }
+        .btn-icon.delete { color: #dc2626; background: #fee2e2; }
+        .btn-icon.delete:hover { background: #fecaca; transform: translateY(-2px); }
+
+        /* MODALS */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        .modal-card { background: white; width: 100%; max-width: 1000px; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); display: flex; flex-direction: column; max-height: 95vh; }
+        .modal-card.sm { max-width: 450px; }
+        
+        .modal-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h3 { font-family: "Quicksand", sans-serif; font-size: 22px; font-weight: 900; }
+        
+        .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+        
+        .modal-footer { padding: 20px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 12px; background: #f8fafc; border-radius: 0 0 var(--radius-xl) var(--radius-xl); }
+        
+        .btn-cancel { padding: 12px 24px; background: white; border: 2px solid var(--border); border-radius: var(--radius-md); font-weight: 800; font-size: 15px; color: var(--text-main); }
+        .btn-cancel:hover { background: #f1f5f9; }
+
+        /* UNIVERSAL HTML EDITOR UI */
+        .html-editor-container { border: 2px solid var(--border-dark); border-radius: var(--radius-md); overflow: hidden; display: flex; flex-direction: column; background: #1e1e1e; }
+        .html-editor-header { background: #2d2d2d; padding: 10px 16px; color: #a3a3a3; font-size: 12px; font-family: monospace; font-weight: bold; border-bottom: 1px solid #404040; display: flex; justify-content: space-between; }
+        .code-textarea { width: 100%; height: 400px; padding: 16px; background: #1e1e1e; color: #d4d4d4; font-family: "Fira Code", monospace; font-size: 14px; line-height: 1.6; border: none; resize: vertical; outline: none; }
+        .code-textarea:focus { border: none; outline: none; }
+        
+        .checkbox-label { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 800; cursor: pointer; padding: 10px 0; }
+        .checkbox-input { width: 22px; height: 22px; accent-color: var(--primary); cursor: pointer; }
+
+        /* PREVIEW IFRAME */
+        .preview-container { width: 100%; height: 600px; background: white; border: 2px solid var(--border); border-radius: var(--radius-md); overflow: hidden; position: relative; }
+        #preview-iframe { width: 100%; height: 100%; border: none; }
+        .btn-fullscreen { position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.7); color: white; border-radius: var(--radius-md); padding: 10px 16px; font-weight: 800; display: flex; align-items: center; gap: 8px; backdrop-filter: blur(4px); }
+        .btn-fullscreen:hover { background: rgba(0,0,0,0.9); transform: scale(1.05); }
+
+        /* CUSTOM TOASTS */
+        .toast-container { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: white; border-left: 5px solid var(--success); padding: 16px 24px; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); font-weight: 800; font-size: 15px; display: flex; align-items: center; gap: 12px; animation: slideUp 0.3s ease-out forwards; min-width: 300px; color: var(--text-main); }
+        .toast.error { border-left-color: var(--danger); }
+        .toast.info { border-left-color: var(--info); }
+        @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); box-shadow: var(--shadow-lg); }
+            .sidebar.open { transform: translateX(0); }
+            .main-wrapper { margin-left: 0; width: 100%; }
+            .menu-toggle { display: block; }
+            .content-area { padding: 16px; }
+            .section-header { flex-direction: column; align-items: flex-start; }
+            .btn-add { width: 100%; justify-content: center; }
+            th, td { padding: 14px 16px; }
+            .modal-card { max-height: 100vh; border-radius: 0; }
+            .code-textarea { height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. LOADING SCREEN -->
+    <div id="loading-screen" class="screen active">
+        <div class="spinner"></div>
+        <div style="font-weight: 800; color: var(--text-muted); font-size: 16px;">Verifying Admin Security...</div>
+    </div>
+
+    <!-- 2. LOGIN SCREEN -->
+    <div id="login-screen" class="screen auth-wrapper">
+        <div class="auth-card">
+            <h2 class="auth-title">Nanhi Pathshala</h2>
+            <p class="auth-subtitle">Admin CMS Portal</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label class="form-label">Email Address</label>
+                    <input type="email" id="login-email" class="form-input" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="login-password" class="form-input" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-primary" id="login-btn">Sign In to CMS</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. ACCESS DENIED SCREEN -->
+    <div id="denied-screen" class="screen auth-wrapper">
+        <div class="auth-card">
+            <div style="font-size: 48px; margin-bottom: 16px;">🛡️</div>
+            <h2 class="auth-title" style="color: var(--danger);">Access Denied</h2>
+            <p class="auth-subtitle" style="margin-bottom: 24px;">Your account does not have administrator privileges. Firestore security rules prevent access.</p>
+            <button class="btn-primary" onclick="window.location.href='home.html'">Return to Student Home</button>
+            <button class="btn-cancel" style="width: 100%; margin-top: 12px;" onclick="doLogout()">Sign Out completely</button>
+        </div>
+    </div>
+
+    <!-- 4. MAIN APP SCREEN -->
+    <div id="app-screen" class="screen">
+        
+        <!-- SIDEBAR -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span style="font-size: 26px;">🏔️</span> Pyramid CMS
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-link active" data-view="dashboard"><span>📊</span> Dashboard</div>
+                <div class="nav-link" data-view="content"><span>📚</span> Learn Content</div>
+                <div class="nav-link" data-view="games"><span>🎮</span> Games</div>
+                <div class="nav-link" data-view="stories"><span>📖</span> Stories</div>
+                <div class="nav-link" data-view="videos"><span>🎥</span> Videos</div>
+                <div class="nav-link" data-view="quizzes"><span>📝</span> Quizzes</div>
+                <div class="nav-link" data-view="notices"><span>📢</span> Notices</div>
+                <div class="nav-link" data-view="folders"><span>📁</span> Folders</div>
+            </nav>
+            <div style="padding: 24px;">
+                <button class="btn-primary btn-danger" onclick="doLogout()" style="width: 100%; font-size: 14px;">
+                    Secure Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN WRAPPER -->
+        <main class="main-wrapper">
+            <header class="topbar">
+                <button class="menu-toggle" id="menu-toggle">☰</button>
+                <div style="flex: 1;"></div>
+                <div class="admin-profile">
+                    <span id="admin-name">Admin</span>
+                    <div class="avatar" id="admin-avatar">A</div>
+                </div>
+            </header>
+
+            <div class="content-area">
+                
+                <!-- DASHBOARD VIEW -->
+                <div id="view-dashboard" class="view-section active">
+                    <div class="section-header">
+                        <h2 class="section-title">📊 Live Dashboard Overview</h2>
+                    </div>
+                    <div class="dashboard-grid" id="dashboard-stats">
+                        <div class="stat-card">Loading realtime stats...</div>
+                    </div>
+                </div>
+
+                <!-- UNIVERSAL CONTENT MANAGER VIEW -->
+                <div id="view-universal" class="view-section">
+                    <div class="section-header">
+                        <h2 class="section-title" id="universal-title">Manager</h2>
+                        <button class="btn-add" onclick="openUniversalModal()"><span>+</span> Add New Content</button>
+                    </div>
+                    <div class="data-card">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Content Details</th>
+                                        <th>Status</th>
+                                        <th>Document ID</th>
+                                        <th>Last Updated</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="universal-tbody">
+                                    <tr><td colspan="5" style="text-align:center;">Loading content...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- 5. UNIVERSAL ADD/EDIT MODAL -->
+    <div class="modal-overlay" id="universal-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modal-title">Create Content</h3>
+                <button class="btn-cancel" style="padding: 6px 12px;" onclick="closeModal('universal-modal')">✕</button>
+            </div>
+            <div class="modal-body" id="universal-form-container">
+                
+                <div class="form-group">
+                    <label class="form-label">1. Title</label>
+                    <input type="text" id="uc-title" class="form-input" placeholder="Enter content title..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">2. Description</label>
+                    <textarea id="uc-desc" class="form-input" rows="2" placeholder="Brief description..." required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">3. HTML Code (Universal Content)</label>
+                    <div class="html-editor-container">
+                        <div class="html-editor-header">
+                            <span>index.html</span>
+                            <span>UTF-8 • HTML/CSS/JS</span>
+                        </div>
+                        <textarea id="uc-html" class="code-textarea" placeholder="<h1>Start typing HTML here...</h1>" spellcheck="false"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="uc-published" class="checkbox-input" checked>
+                        4. Published (Visible to Students)
+                    </label>
+                </div>
+
+            </div>
+            
+            <!-- FOLDER FORM CONTAINER (Hidden by default) -->
+            <div class="modal-body" id="folder-form-container" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Folder Name</label>
+                    <input type="text" id="fold-name" class="form-input" placeholder="e.g. Science" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Parent Folder ID (Optional)</label>
+                    <input type="text" id="fold-parent" class="form-input" placeholder="Leave blank for root folder">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Sort Order</label>
+                    <input type="number" id="fold-sort" class="form-input" value="1">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('universal-modal')">Cancel</button>
+                <button class="btn-primary" style="background: var(--info); width: auto; padding: 12px 24px;" id="btn-preview-content">Live Preview</button>
+                <button class="btn-primary" id="modal-save-btn" style="width: auto; padding: 12px 30px;">Save Content</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. LIVE PREVIEW MODAL -->
+    <div class="modal-overlay" id="preview-modal" style="z-index: 1010;">
+        <div class="modal-card" style="max-width: 1200px; height: 90vh;">
+            <div class="modal-header">
+                <h3>Live Content Preview</h3>
+                <button class="btn-cancel" style="padding: 6px 12px;" onclick="closeModal('preview-modal')">✕ Close Preview</button>
+            </div>
+            <div class="modal-body" style="padding: 0; background: #000;">
+                <div class="preview-container" id="preview-wrapper" style="height: 100%; border:none; border-radius:0;">
+                    <button class="btn-fullscreen" onclick="goFullscreen()">⛶ Fullscreen (Landscape)</button>
+                    <iframe id="preview-iframe" sandbox="allow-scripts allow-same-origin"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. CONFIRM DELETE MODAL -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal-card sm">
+            <div class="modal-header">
+                <h3 style="color: var(--danger);">Confirm Deletion</h3>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 16px; font-weight: 700;">Are you absolutely sure you want to delete this item?</p>
+                <p style="font-size: 14px; color: var(--text-muted); margin-top: 8px;">This action permanently removes the document from Firestore and cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="closeModal('confirm-modal')">Cancel</button>
+                <button class="btn-primary btn-danger" id="confirm-delete-btn" style="width: auto; padding: 12px 24px;">Yes, Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- ==========================================
+         JAVASCRIPT & FIREBASE LOGIC
+    =========================================== -->
+    <script type="module">
+        import { auth, db } from "./firebase.js";
+        import { 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            signOut 
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+        import { 
+            doc, getDoc, collection, addDoc, updateDoc, deleteDoc, serverTimestamp, onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        /* --- STATE & CONFIG --- */
+        let state = {
+            user: null,
+            uid: null,
+            activeView: 'dashboard',
+            currentCollection: null,
+            editingId: null,
+            tableData: {}, // In-memory store for quick edit population
+            unsubscribers: [] // Track onSnapshot listeners to prevent memory leaks
+        };
+
+        const CMS_CONFIG = {
+            content: { title: "Learn Content", collection: "content", icon: "📚" },
+            games: { title: "Games", collection: "games", icon: "🎮" },
+            stories: { title: "Stories", collection: "stories", icon: "📖" },
+            videos: { title: "Videos", collection: "videos", icon: "🎥" },
+            quizzes: { title: "Quizzes", collection: "quizzes", icon: "📝" },
+            notices: { title: "Notices", collection: "notices", icon: "📢" },
+            folders: { title: "Folders", collection: "folders", icon: "📁", isFolder: true }
+        };
+
+        /* --- UI HELPERS --- */
+        const showScreen = (id) => {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        };
+
+        window.showToast = (msg, type = 'success') => {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            const icon = type === 'success' ? '✅' : (type === 'error' ? '❌' : 'ℹ️');
+            toast.innerHTML = `<span>${icon}</span> <span>${msg}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 4500);
+        };
+
+        window.openModal = (id) => document.getElementById(id).classList.add('active');
+        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+
+        // Copy Doc ID Utility
+        window.copyId = (id) => {
+            navigator.clipboard.writeText(id).then(() => {
+                showToast(`Copied ID: ${id}`, 'info');
+            }).catch(() => {
+                showToast("Clipboard access denied.", "error");
+            });
+        };
+
+        /* --- AUTHENTICATION FLOW --- */
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                showScreen('login-screen');
+                return;
+            }
+
+            try {
+                const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                
+                if (userSnap.exists() && userSnap.data().role === 'admin') {
+                    state.user = user;
+                    state.uid = user.uid;
+                    const name = userSnap.data().name || 'Admin';
+                    
+                    document.getElementById('admin-name').textContent = name;
+                    document.getElementById('admin-avatar').textContent = name.charAt(0).toUpperCase();
+                    
+                    showScreen('app-screen');
+                    initDashboard();
+                } else {
+                    showScreen('denied-screen');
+                }
+            } catch (error) {
+                console.error("Role Check Error:", error);
+                showToast("Error verifying permissions. Database might be unreachable.", "error");
+                showScreen('login-screen');
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('login-btn');
+            btn.textContent = "Verifying...";
+            btn.disabled = true;
+
+            try {
+                await signInWithEmailAndPassword(auth, 
+                    document.getElementById('login-email').value, 
+                    document.getElementById('login-password').value
+                );
+            } catch (error) {
+                btn.textContent = "Sign In to CMS";
+                btn.disabled = false;
+                showToast("Invalid credentials or access denied.", "error");
+            }
+        });
+
+        window.doLogout = async () => {
+            clearListeners();
+            await signOut(auth);
+            window.location.reload();
+        };
+
+        /* --- NAVIGATION --- */
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+                
+                if (window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+
+                const view = e.currentTarget.getAttribute('data-view');
+                switchView(view);
+            });
+        });
+
+        document.getElementById('menu-toggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('open');
+        });
+
+        function clearListeners() {
+            state.unsubscribers.forEach(unsub => unsub());
+            state.unsubscribers = [];
+        }
+
+        function switchView(view) {
+            clearListeners(); // Remove old realtime listeners
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            state.activeView = view;
+            
+            if (view === 'dashboard') {
+                document.getElementById('view-dashboard').classList.add('active');
+                initDashboard();
+            } else if (CMS_CONFIG[view]) {
+                document.getElementById('view-universal').classList.add('active');
+                initUniversalTable(view);
+            }
+        }
+
+        /* --- DASHBOARD REALTIME --- */
+        function initDashboard() {
+            const container = document.getElementById('dashboard-stats');
+            container.innerHTML = "";
+            
+            const statsConfig = ['content', 'games', 'stories', 'videos', 'quizzes', 'notices', 'folders'];
+            
+            statsConfig.forEach(key => {
+                const conf = CMS_CONFIG[key];
+                const card = document.createElement('div');
+                card.className = 'stat-card';
+                card.innerHTML = `
+                    <div class="stat-icon">${conf.icon}</div>
+                    <div class="stat-info">
+                        <h4>${conf.title}</h4>
+                        <div class="stat-value" id="stat-${key}">-</div>
+                    </div>
+                `;
+                container.appendChild(card);
+
+                // Realtime Count Listener
+                const unsub = onSnapshot(collection(db, conf.collection), (snapshot) => {
+                    const el = document.getElementById(`stat-${key}`);
+                    if(el) el.textContent = snapshot.size;
+                }, (err) => {
+                    console.error(`Dashboard listener error for ${key}:`, err);
+                });
+                state.unsubscribers.push(unsub);
+            });
+        }
+
+        /* --- UNIVERSAL CMS TABLE (REALTIME) --- */
+        function initUniversalTable(configKey) {
+            state.currentCollection = configKey;
+            const config = CMS_CONFIG[configKey];
+            
+            document.getElementById('universal-title').innerHTML = `${config.icon} ${config.title} Management`;
+            const tbody = document.getElementById('universal-tbody');
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;"><div class="spinner" style="margin: 20px auto; width:30px; height:30px; border-width:3px;"></div></td></tr>`;
+            
+            state.tableData = {};
+
+            const unsub = onSnapshot(collection(db, config.collection), (snapshot) => {
+                if (snapshot.empty) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: var(--text-muted);">No documents found in ${config.title}. Create one!</td></tr>`;
+                    return;
+                }
+
+                let html = "";
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    state.tableData[docSnap.id] = data; // Store in memory
+                    
+                    const isPublished = data.published !== false; // Default true if missing
+                    const title = config.isFolder ? data.name : (data.title || 'Untitled');
+                    const desc = config.isFolder ? `Parent: ${data.parentId || 'Root'} | Sort: ${data.sortOrder}` : (data.description || 'No description');
+                    const date = data.updatedAt ? new Date(data.updatedAt.toDate()).toLocaleDateString() : 'Just now';
+
+                    html += `
+                        <tr>
+                            <td>
+                                <span class="td-title">${title}</span>
+                                <div class="td-desc">${desc}</div>
+                            </td>
+                            <td>
+                                ${!config.isFolder ? 
+                                  (isPublished ? `<span class="badge success">Published</span>` : `<span class="badge warning">Draft</span>`) 
+                                  : `<span class="badge info">Folder</span>`}
+                            </td>
+                            <td>
+                                <div class="doc-id-badge">
+                                    ${docSnap.id}
+                                    <button class="copy-btn" onclick="copyId('${docSnap.id}')" title="Copy ID">📋</button>
+                                </div>
+                            </td>
+                            <td>${date}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn-icon edit" onclick="openUniversalModal('${docSnap.id}')">✎</button>
+                                    <button class="btn-icon delete" onclick="triggerDelete('${docSnap.id}')">🗑️</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                tbody.innerHTML = html;
+                
+            }, (error) => {
+                console.error("Table Realtime Error:", error);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: var(--danger); font-weight:800;">Firebase Permission Denied or Network Error.</td></tr>`;
+                showToast("Failed to sync realtime data.", "error");
+            });
+
+            state.unsubscribers.push(unsub);
+        }
+
+        /* --- ADD / EDIT UNIVERSAL MODAL --- */
+        window.openUniversalModal = (id = null) => {
+            state.editingId = id;
+            const config = CMS_CONFIG[state.currentCollection];
+            
+            document.getElementById('modal-title').textContent = id ? `Edit ${config.title}` : `Create New ${config.title}`;
+            
+            const uniContainer = document.getElementById('universal-form-container');
+            const folContainer = document.getElementById('folder-form-container');
+            
+            // Toggle form schema based on if it's a folder or Universal HTML content
+            if (config.isFolder) {
+                uniContainer.style.display = 'none';
+                folContainer.style.display = 'block';
+                
+                const data = id ? state.tableData[id] : { name: "", parentId: "", sortOrder: 1 };
+                document.getElementById('fold-name').value = data.name || "";
+                document.getElementById('fold-parent').value = data.parentId || "";
+                document.getElementById('fold-sort').value = data.sortOrder || 1;
+                document.getElementById('btn-preview-content').style.display = 'none';
+            } else {
+                uniContainer.style.display = 'block';
+                folContainer.style.display = 'none';
+                document.getElementById('btn-preview-content').style.display = 'block';
+                
+                // Pure Universal Schema mapping
+                const data = id ? state.tableData[id] : { title: "", description: "", htmlContent: "", published: true };
+                document.getElementById('uc-title').value = data.title || "";
+                document.getElementById('uc-desc').value = data.description || "";
+                document.getElementById('uc-html').value = data.htmlContent || "";
+                document.getElementById('uc-published').checked = data.published !== false;
+            }
+
+            openModal('universal-modal');
+        };
+
+        // Textarea Tab Support for Code Editor
+        document.getElementById('uc-html').addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + "    " + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+        });
+
+        /* --- SAVE / UPDATE DATA --- */
+        document.getElementById('modal-save-btn').addEventListener('click', async (e) => {
+            const btn = e.currentTarget;
+            btn.textContent = "Saving to Firestore...";
+            btn.disabled = true;
+
+            const config = CMS_CONFIG[state.currentCollection];
+            const payload = {
+                updatedAt: serverTimestamp(),
+                updatedBy: state.uid
+            };
+
+            // Grab data based on schema type
+            if (config.isFolder) {
+                payload.name = document.getElementById('fold-name').value.trim();
+                payload.parentId = document.getElementById('fold-parent').value.trim();
+                payload.sortOrder = Number(document.getElementById('fold-sort').value);
+                if (!payload.name) {
+                    showToast("Folder Name is required.", "error");
+                    resetBtn(btn); return;
+                }
+            } else {
+                payload.title = document.getElementById('uc-title').value.trim();
+                payload.description = document.getElementById('uc-desc').value.trim();
+                payload.htmlContent = document.getElementById('uc-html').value; // Keep exact formatting
+                payload.published = document.getElementById('uc-published').checked;
+                
+                if (!payload.title) {
+                    showToast("Title is required.", "error");
+                    resetBtn(btn); return;
+                }
+            }
+
+            try {
+                if (state.editingId) {
+                    await updateDoc(doc(db, config.collection, state.editingId), payload);
+                    showToast("Document updated successfully.");
+                } else {
+                    payload.createdAt = serverTimestamp();
+                    payload.createdBy = state.uid;
+                    await addDoc(collection(db, config.collection), payload);
+                    showToast("New document created successfully.");
+                }
+                closeModal('universal-modal');
+            } catch (error) {
+                console.error("Save Error:", error);
+                showToast("Failed to save. Check Firestore Rules.", "error");
+            } finally {
+                resetBtn(btn);
+            }
+        });
+
+        function resetBtn(btn) {
+            btn.textContent = "Save Content";
+            btn.disabled = false;
+        }
+
+        /* --- LIVE PREVIEW (ISOLATED) --- */
+        document.getElementById('btn-preview-content').addEventListener('click', () => {
+            const rawHtml = document.getElementById('uc-html').value;
+            const iframe = document.getElementById('preview-iframe');
+            
+            // Use srcdoc to render the HTML securely within the iframe boundary
+            iframe.srcdoc = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>body{margin:0; font-family:sans-serif;}</style>
+                </head>
+                <body>
+                    ${rawHtml}
+                </body>
+                </html>
+            `;
+            openModal('preview-modal');
+        });
+
+        // Fullscreen API & Landscape Lock
+        window.goFullscreen = () => {
+            const wrapper = document.getElementById('preview-wrapper');
+            if (wrapper.requestFullscreen) {
+                wrapper.requestFullscreen().then(() => {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock("landscape").catch(e => {
+                            console.log("Landscape lock not supported on this device/browser.");
+                        });
+                    }
+                }).catch(err => {
+                    showToast(`Error entering fullscreen: ${err.message}`, "error");
+                });
+            } else {
+                showToast("Fullscreen API not supported by this browser.", "error");
+            }
+        };
+
+        /* --- DELETE WORKFLOW --- */
+        let targetDeleteId = null;
+        window.triggerDelete = (id) => {
+            targetDeleteId = id;
+            openModal('confirm-modal');
+        };
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', async (e) => {
+            if (!targetDeleteId) return;
+            const btn = e.currentTarget;
+            btn.textContent = "Deleting Document...";
+            btn.disabled = true;
+
+            const config = CMS_CONFIG[state.currentCollection];
+            
+            try {
+                await deleteDoc(doc(db, config.collection, targetDeleteId));
+                showToast("Document permanently deleted.");
+                closeModal('confirm-modal');
+            } catch (error) {
+                console.error("Delete error:", error);
+                showToast("Deletion failed. Permission denied?", "error");
+            } finally {
+                btn.textContent = "Yes, Delete Permanently";
+                btn.disabled = false;
+                targetDeleteId = null;
+            }
+        });
+
+    </script>
+</body>
+</html>
