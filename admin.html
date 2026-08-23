@@ -749,463 +749,3717 @@
     <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toast-container"></div>
 
+<script type="module">
 
-    <!-- FIREBASE & LOGIC -->
-    <script type="module">
-        import { auth, db } from "./firebase.js";
-        import { 
-            signInWithEmailAndPassword, 
-            onAuthStateChanged, 
-            signOut 
-        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-        import { 
-            doc, getDoc, collection, getDocs, addDoc, updateDoc, deleteDoc, serverTimestamp, query, orderBy
-        } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+/*
+============================================================
+   FIREBASE & LOGIC
+   PART 1 — IMPORTS + STATE + CMS CONFIGURATION
+============================================================
+*/
 
-        /* =======================================
-           STATE & CONFIGURATION
-        ======================================= */
-        let state = {
-            user: null,
-            adminProfile: null,
-            currentConfigKey: null,
-            currentEditId: null
-        };
 
-        // Schema config for the generic CMS generator
-        const CMS_CONFIG = {
-            content: {
-                title: "Learn Content", collection: "content", icon: "📚",
-                fields: [
-                    { id: "title", label: "Title", type: "text", required: true },
-                    { id: "description", label: "Description", type: "textarea" },
-                    { id: "type", label: "Content Type", type: "select", options: ["PDF", "Video", "HTML", "Link"] },
-                    { id: "category", label: "Category / Subject", type: "text" },
-                    { id: "url", label: "Media URL", type: "text", required: true },
-                    { id: "folderId", label: "Folder ID (optional)", type: "text" },
-                    { id: "published", label: "Published", type: "checkbox", default: true }
-                ],
-                columns: ["title", "type", "category", "published"]
+/*
+============================================================
+   FIREBASE IMPORTS
+============================================================
+*/
+
+import {
+    auth,
+    db
+} from "./firebase.js";
+
+
+import {
+    signInWithEmailAndPassword,
+    onAuthStateChanged,
+    signOut
+} from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+import {
+    doc,
+    getDoc,
+    collection,
+    getDocs,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    serverTimestamp,
+    query,
+    orderBy
+} from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+/*
+============================================================
+   APPLICATION STATE
+============================================================
+*/
+
+let state = {
+
+    user: null,
+
+    adminProfile: null,
+
+    currentConfigKey: null,
+
+    currentEditId: null
+
+};
+
+
+/*
+============================================================
+   CMS CONFIGURATION
+============================================================
+*/
+
+const CMS_CONFIG = {
+
+    /*
+    ========================================================
+       LEARN CONTENT
+    ========================================================
+    */
+
+    content: {
+
+        title:
+            "Learn Content",
+
+        collection:
+            "content",
+
+        icon:
+            "📚",
+
+        fields: [
+
+            {
+                id: "title",
+                label: "Title",
+                type: "text",
+                required: true
             },
-            games: {
-                title: "Games Management", collection: "games", icon: "🎮",
-                fields: [
-                    { id: "name", label: "Game Name", type: "text", required: true },
-                    { id: "description", label: "Description", type: "textarea" },
-                    { id: "category", label: "Category", type: "text" },
-                    { id: "icon", label: "Icon Emoji", type: "text" },
-                    { id: "gameUrl", label: "Game URL (.html file)", type: "text", required: true },
-                    { id: "published", label: "Published", type: "checkbox", default: true }
-                ],
-                columns: ["icon", "name", "category", "published"]
+
+            {
+                id: "description",
+                label: "Description",
+                type: "textarea"
             },
-            stories: {
-                title: "Stories Management", collection: "stories", icon: "📖",
-                fields: [
-                    { id: "title", label: "Story Title", type: "text", required: true },
-                    { id: "description", label: "Description", type: "textarea" },
-                    { id: "category", label: "Category", type: "text" },
-                    { id: "coverUrl", label: "Cover Image URL", type: "text" },
-                    { id: "storyUrl", label: "Story HTML URL", type: "text", required: true },
-                    { id: "featured", label: "Featured on Home", type: "checkbox" },
-                    { id: "published", label: "Published", type: "checkbox", default: true }
-                ],
-                columns: ["title", "category", "featured", "published"]
+
+            {
+                id: "type",
+                label: "Content Type",
+                type: "select",
+                options: [
+                    "PDF",
+                    "Video",
+                    "HTML",
+                    "Link"
+                ]
             },
-            videos: {
-                title: "Videos Management", collection: "videos", icon: "🎥",
-                fields: [
-                    { id: "title", label: "Video Title", type: "text", required: true },
-                    { id: "youtubeUrl", label: "YouTube URL", type: "text", required: true },
-                    { id: "category", label: "Category", type: "text" },
-                    { id: "published", label: "Published", type: "checkbox", default: true }
-                ],
-                columns: ["title", "category", "published"]
+
+            {
+                id: "category",
+                label: "Category / Subject",
+                type: "text"
             },
-            quizzes: {
-                title: "Quiz Management", collection: "quizzes", icon: "📝",
-                fields: [
-                    { id: "title", label: "Quiz Title", type: "text", required: true },
-                    { id: "subject", label: "Subject", type: "text" },
-                    { id: "difficulty", label: "Difficulty", type: "select", options: ["Easy", "Medium", "Hard"] },
-                    { id: "questionsJson", label: "Questions (JSON Array format)", type: "textarea", placeholder: '[{"q":"2+2?","options":["3","4"],"answer":"4"}]' },
-                    { id: "published", label: "Published", type: "checkbox", default: true }
-                ],
-                columns: ["title", "subject", "difficulty", "published"]
+
+            {
+                id: "url",
+                label: "Media URL",
+                type: "text",
+                required: true
             },
-            folders: {
-                title: "Folder Manager", collection: "folders", icon: "📁",
-                fields: [
-                    { id: "name", label: "Folder Name", type: "text", required: true },
-                    { id: "parentId", label: "Parent Folder ID (Leave blank for root)", type: "text" },
-                    { id: "sortOrder", label: "Sort Order (Number)", type: "number" }
-                ],
-                columns: ["name", "parentId", "sortOrder"]
+
+            {
+                id: "folderId",
+                label: "Folder ID (optional)",
+                type: "text"
             },
-            notices: {
-                title: "Notice Board", collection: "notices", icon: "📢",
-                fields: [
-                    { id: "title", label: "Notice Title", type: "text", required: true },
-                    { id: "description", label: "Notice Details", type: "textarea", required: true },
-                    { id: "priority", label: "Priority", type: "select", options: ["Normal", "Important", "Urgent"] },
-                    { id: "link", label: "External Link (Optional)", type: "text" },
-                    { id: "published", label: "Published", type: "checkbox", default: true }
-                ],
-                columns: ["title", "priority", "published"]
-            },
-            users: {
-                // Users is read-only in this simple config
-                title: "Student Roster", collection: "users", icon: "👨‍🎓",
-                readonly: true,
-                fields: [],
-                columns: ["name", "email", "role"]
+
+            {
+                id: "published",
+                label: "Published",
+                type: "checkbox",
+                default: true
             }
-        };
 
-        /* =======================================
-           UI HELPERS
-        ======================================= */
-        const showScreen = (screenId) => {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-        };
+        ],
 
-        const showToast = (message, type = 'success') => {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = type === 'success' ? `✅ ${message}` : `❌ ${message}`;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 4000);
-        };
+        columns: [
+            "title",
+            "type",
+            "category",
+            "published"
+        ]
 
-        window.closeModal = (id) => {
-            document.getElementById(id).classList.remove('active');
-        };
+    },
 
-        const openModal = (id) => {
-            document.getElementById(id).classList.add('active');
-        };
 
-        /* =======================================
-           AUTH & SECURITY
-        ======================================= */
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                showScreen('login-screen');
+    /*
+    ========================================================
+       GAMES
+    ========================================================
+    */
+
+    games: {
+
+        title:
+            "Games Management",
+
+        collection:
+            "games",
+
+        icon:
+            "🎮",
+
+        fields: [
+
+            {
+                id: "name",
+                label: "Game Name",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "description",
+                label: "Description",
+                type: "textarea"
+            },
+
+            {
+                id: "category",
+                label: "Category",
+                type: "text"
+            },
+
+            {
+                id: "icon",
+                label: "Icon Emoji",
+                type: "text"
+            },
+
+            {
+                id: "gameUrl",
+                label: "Game URL (.html file)",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "published",
+                label: "Published",
+                type: "checkbox",
+                default: true
+            }
+
+        ],
+
+        columns: [
+            "icon",
+            "name",
+            "category",
+            "published"
+        ]
+
+    },
+
+
+    /*
+    ========================================================
+       STORIES
+    ========================================================
+    */
+
+    stories: {
+
+        title:
+            "Stories Management",
+
+        collection:
+            "stories",
+
+        icon:
+            "📖",
+
+        fields: [
+
+            {
+                id: "title",
+                label: "Story Title",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "description",
+                label: "Description",
+                type: "textarea"
+            },
+
+            {
+                id: "category",
+                label: "Category",
+                type: "text"
+            },
+
+            {
+                id: "coverUrl",
+                label: "Cover Image URL",
+                type: "text"
+            },
+
+            {
+                id: "storyUrl",
+                label: "Story HTML URL",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "featured",
+                label: "Featured on Home",
+                type: "checkbox"
+            },
+
+            {
+                id: "published",
+                label: "Published",
+                type: "checkbox",
+                default: true
+            }
+
+        ],
+
+        columns: [
+            "title",
+            "category",
+            "featured",
+            "published"
+        ]
+
+    },
+
+
+    /*
+    ========================================================
+       VIDEOS
+    ========================================================
+    */
+
+    videos: {
+
+        title:
+            "Videos Management",
+
+        collection:
+            "videos",
+
+        icon:
+            "🎥",
+
+        fields: [
+
+            {
+                id: "title",
+                label: "Video Title",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "youtubeUrl",
+                label: "YouTube URL",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "category",
+                label: "Category",
+                type: "text"
+            },
+
+            {
+                id: "published",
+                label: "Published",
+                type: "checkbox",
+                default: true
+            }
+
+        ],
+
+        columns: [
+            "title",
+            "category",
+            "published"
+        ]
+
+    },
+
+
+    /*
+    ========================================================
+       QUIZZES
+    ========================================================
+    */
+
+    quizzes: {
+
+        title:
+            "Quiz Management",
+
+        collection:
+            "quizzes",
+
+        icon:
+            "📝",
+
+        fields: [
+
+            {
+                id: "title",
+                label: "Quiz Title",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "subject",
+                label: "Subject",
+                type: "text"
+            },
+
+            {
+                id: "difficulty",
+                label: "Difficulty",
+                type: "select",
+
+                options: [
+                    "Easy",
+                    "Medium",
+                    "Hard"
+                ]
+
+            },
+
+            {
+                id: "questionsJson",
+                label: "Questions (JSON Array format)",
+                type: "textarea",
+
+                placeholder:
+                    '[{"q":"2+2?","options":["3","4"],"answer":"4"}]'
+
+            },
+
+            {
+                id: "published",
+                label: "Published",
+                type: "checkbox",
+                default: true
+            }
+
+        ],
+
+        columns: [
+            "title",
+            "subject",
+            "difficulty",
+            "published"
+        ]
+
+    },
+
+
+    /*
+    ========================================================
+       FOLDERS
+    ========================================================
+    */
+
+    folders: {
+
+        title:
+            "Folder Manager",
+
+        collection:
+            "folders",
+
+        icon:
+            "📁",
+
+        fields: [
+
+            {
+                id: "name",
+                label: "Folder Name",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "parentId",
+                label:
+                    "Parent Folder ID (Leave blank for root)",
+
+                type:
+                    "text"
+            },
+
+            {
+                id: "sortOrder",
+                label:
+                    "Sort Order (Number)",
+
+                type:
+                    "number"
+            }
+
+        ],
+
+        columns: [
+            "name",
+            "parentId",
+            "sortOrder"
+        ]
+
+    },
+
+
+    /*
+    ========================================================
+       NOTICES
+    ========================================================
+    */
+
+    notices: {
+
+        title:
+            "Notice Board",
+
+        collection:
+            "notices",
+
+        icon:
+            "📢",
+
+        fields: [
+
+            {
+                id: "title",
+                label: "Notice Title",
+                type: "text",
+                required: true
+            },
+
+            {
+                id: "description",
+                label: "Notice Details",
+                type: "textarea",
+                required: true
+            },
+
+            {
+                id: "priority",
+                label: "Priority",
+                type: "select",
+
+                options: [
+                    "Normal",
+                    "Important",
+                    "Urgent"
+                ]
+
+            },
+
+            {
+                id: "link",
+                label: "External Link (Optional)",
+                type: "text"
+            },
+
+            {
+                id: "published",
+                label: "Published",
+                type: "checkbox",
+                default: true
+            }
+
+        ],
+
+        columns: [
+            "title",
+            "priority",
+            "published"
+        ]
+
+    },
+
+
+    /*
+    ========================================================
+       STUDENTS / USERS
+       READ ONLY
+    ========================================================
+    */
+
+    users: {
+
+        title:
+            "Student Roster",
+
+        collection:
+            "users",
+
+        icon:
+            "👨‍🎓",
+
+        readonly:
+            true,
+
+        fields:
+            [],
+
+        columns: [
+            "name",
+            "email",
+            "role"
+        ]
+
+    }
+
+};
+    /*
+============================================================
+   PART 2 — UI HELPERS
+============================================================
+*/
+
+
+/*
+============================================================
+   SHOW SCREEN
+============================================================
+*/
+
+const showScreen = (
+    screenId
+) => {
+
+    document
+        .querySelectorAll(
+            ".screen"
+        )
+        .forEach(
+            (screen) => {
+
+                screen.classList.remove(
+                    "active"
+                );
+
+            }
+        );
+
+
+    const target =
+        document.getElementById(
+            screenId
+        );
+
+
+    if (target) {
+
+        target.classList.add(
+            "active"
+        );
+
+    }
+
+};
+
+
+/*
+============================================================
+   SHOW TOAST MESSAGE
+============================================================
+*/
+
+const showToast = (
+    message,
+    type = "success"
+) => {
+
+    const container =
+        document.getElementById(
+            "toast-container"
+        );
+
+
+    if (!container) {
+
+        console.error(
+            "Toast container not found."
+        );
+
+        return;
+
+    }
+
+
+    const toast =
+        document.createElement(
+            "div"
+        );
+
+
+    toast.className =
+        "toast " +
+        type;
+
+
+    /*
+    Use textContent instead of
+    innerHTML for Firebase/user data.
+    */
+
+    const icon =
+        document.createElement(
+            "span"
+        );
+
+
+    icon.textContent =
+        type === "success"
+            ? "✅"
+            : "❌";
+
+
+    const text =
+        document.createElement(
+            "span"
+        );
+
+
+    text.textContent =
+        message;
+
+
+    toast.appendChild(
+        icon
+    );
+
+
+    toast.appendChild(
+        text
+    );
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    setTimeout(
+        () => {
+
+            toast.remove();
+
+        },
+        4000
+    );
+
+};
+
+
+/*
+============================================================
+   OPEN MODAL
+============================================================
+*/
+
+const openModal = (
+    modalId
+) => {
+
+    const modal =
+        document.getElementById(
+            modalId
+        );
+
+
+    if (!modal) {
+
+        console.error(
+            "Modal not found:",
+            modalId
+        );
+
+        return;
+
+    }
+
+
+    modal.classList.add(
+        "active"
+    );
+
+};
+
+
+/*
+============================================================
+   CLOSE MODAL
+============================================================
+*/
+
+window.closeModal = (
+    modalId
+) => {
+
+    const modal =
+        document.getElementById(
+            modalId
+        );
+
+
+    if (!modal) {
+
+        return;
+
+    }
+
+
+    modal.classList.remove(
+        "active"
+    );
+
+};
+
+
+/*
+============================================================
+   CLOSE MODAL WHEN CLICKING BACKDROP
+============================================================
+*/
+
+document.addEventListener(
+    "click",
+    (event) => {
+
+        if (
+            event.target.classList.contains(
+                "modal"
+            )
+        ) {
+
+            event.target.classList.remove(
+                "active"
+            );
+
+        }
+
+    }
+);
+
+
+/*
+============================================================
+   ESC KEY — CLOSE MODAL
+============================================================
+*/
+
+document.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key !== "Escape"
+        ) {
+
+            return;
+
+        }
+
+
+        document
+            .querySelectorAll(
+                ".modal.active"
+            )
+            .forEach(
+                (modal) => {
+
+                    modal.classList.remove(
+                        "active"
+                    );
+
+                }
+            );
+
+    }
+);
+
+
+/*
+============================================================
+   SAFE TEXT HELPER
+============================================================
+*/
+
+const safeText = (
+    value
+) => {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(
+        value
+    );
+
+};
+
+
+/*
+============================================================
+   FIREBASE ERROR MESSAGE
+============================================================
+*/
+
+const getFirebaseErrorMessage = (
+    error
+) => {
+
+    if (!error) {
+
+        return "Something went wrong.";
+
+    }
+
+
+    switch (
+        error.code
+    ) {
+
+        case "permission-denied":
+
+            return "You do not have permission to perform this action.";
+
+
+        case "unauthenticated":
+
+            return "Please sign in again.";
+
+
+        case "unavailable":
+
+            return "Firebase is temporarily unavailable. Please try again.";
+
+
+        case "network-request-failed":
+
+            return "Network error. Please check your internet connection.";
+
+
+        case "auth/invalid-credential":
+
+            return "Invalid email or password.";
+
+
+        case "auth/user-not-found":
+
+            return "No account was found with this email.";
+
+
+        case "auth/wrong-password":
+
+            return "Incorrect password.";
+
+
+        case "auth/too-many-requests":
+
+            return "Too many attempts. Please try again later.";
+
+
+        default:
+
+            return (
+                error.message ||
+                "Something went wrong. Please try again."
+            );
+
+    }
+
+};
+
+
+/*
+============================================================
+   DISABLE / ENABLE BUTTON
+============================================================
+*/
+
+const setButtonLoading = (
+    button,
+    loadingText,
+    normalText
+) => {
+
+    if (!button) {
+
+        return;
+
+    }
+
+
+    if (loadingText) {
+
+        button.textContent =
+            loadingText;
+
+    }
+
+
+    button.disabled =
+        true;
+
+
+    button.dataset.normalText =
+        normalText || "";
+
+};
+
+
+const restoreButton = (
+    button
+) => {
+
+    if (!button) {
+
+        return;
+
+    }
+
+
+    button.disabled =
+        false;
+
+
+    if (
+        button.dataset.normalText
+    ) {
+
+        button.textContent =
+            button.dataset.normalText;
+
+    }
+
+};
+    /*
+============================================================
+   PART 3 — AUTHENTICATION & ADMIN SECURITY
+============================================================
+*/
+
+
+/*
+============================================================
+   FIREBASE AUTH STATE CHECK
+============================================================
+*/
+
+onAuthStateChanged(
+    auth,
+    async (user) => {
+
+        /*
+        --------------------------------------------------------
+           USER NOT LOGGED IN
+        --------------------------------------------------------
+        */
+
+        if (!user) {
+
+            state.user =
+                null;
+
+            state.adminProfile =
+                null;
+
+
+            showScreen(
+                "login-screen"
+            );
+
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------------
+           TEMPORARILY STORE AUTH USER
+        --------------------------------------------------------
+        */
+
+        state.user =
+            user;
+
+
+        try {
+
+            /*
+            ----------------------------------------------------
+               GET USER PROFILE FROM FIRESTORE
+            ----------------------------------------------------
+            */
+
+            const userRef =
+                doc(
+                    db,
+                    "users",
+                    user.uid
+                );
+
+
+            const userSnap =
+                await getDoc(
+                    userRef
+                );
+
+
+            /*
+            ----------------------------------------------------
+               USER DOCUMENT DOES NOT EXIST
+            ----------------------------------------------------
+            */
+
+            if (
+                !userSnap.exists()
+            ) {
+
+                state.user =
+                    null;
+
+                state.adminProfile =
+                    null;
+
+
+                showScreen(
+                    "denied-screen"
+                );
+
+
                 return;
+
             }
 
-            try {
-                const userRef = doc(db, "users", user.uid);
-                const userSnap = await getDoc(userRef);
-                
-                if (userSnap.exists() && userSnap.data().role === 'admin') {
-                    // Success Admin Login
-                    state.user = user;
-                    state.adminProfile = userSnap.data();
-                    
-                    document.getElementById('admin-name').textContent = state.adminProfile.name || 'Admin';
-                    document.getElementById('admin-avatar').textContent = (state.adminProfile.name || 'A')[0].toUpperCase();
-                    
-                    showScreen('app-screen');
-                    loadDashboard();
-                } else {
-                    // Normal user tried to access
-                    showScreen('denied-screen');
-                }
-            } catch (error) {
-                console.error("Auth check error:", error);
-                showToast("Error verifying permissions", "error");
-                showScreen('login-screen');
+
+            /*
+            ----------------------------------------------------
+               GET USER DATA
+            ----------------------------------------------------
+            */
+
+            const userData =
+                userSnap.data();
+
+
+            /*
+            ----------------------------------------------------
+               ADMIN ROLE CHECK
+            ----------------------------------------------------
+            */
+
+            if (
+                userData.role !==
+                "admin"
+            ) {
+
+                state.adminProfile =
+                    null;
+
+
+                showScreen(
+                    "denied-screen"
+                );
+
+
+                return;
+
             }
-        });
 
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-password').value;
-            const btn = document.getElementById('login-btn');
-            
-            btn.textContent = "Verifying...";
-            btn.disabled = true;
 
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-                // onAuthStateChanged will handle the rest
-            } catch (error) {
-                btn.textContent = "Secure Login";
-                btn.disabled = false;
-                showToast("Invalid credentials or access denied.", "error");
+            /*
+            ----------------------------------------------------
+               ADMIN VERIFIED
+            ----------------------------------------------------
+            */
+
+            state.adminProfile =
+                userData;
+
+
+            /*
+            ----------------------------------------------------
+               ADMIN NAME
+            ----------------------------------------------------
+            */
+
+            const adminName =
+                document.getElementById(
+                    "admin-name"
+                );
+
+
+            if (adminName) {
+
+                adminName.textContent =
+                    userData.name ||
+                    user.displayName ||
+                    "Admin";
+
             }
-        });
 
-        window.doLogout = async () => {
-            await signOut(auth);
-            window.location.reload();
-        };
 
-        /* =======================================
-           NAVIGATION & ROUTING
-        ======================================= */
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                e.currentTarget.classList.add('active');
-                
-                // Mobile close sidebar
-                if(window.innerWidth <= 768) {
-                    document.getElementById('sidebar').classList.remove('open');
-                }
+            /*
+            ----------------------------------------------------
+               ADMIN AVATAR
+            ----------------------------------------------------
+            */
 
-                const view = e.currentTarget.getAttribute('data-view');
-                switchView(view);
-            });
-        });
+            const adminAvatar =
+                document.getElementById(
+                    "admin-avatar"
+                );
 
-        document.getElementById('menu-toggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('open');
-        });
 
-        function switchView(viewKey) {
-            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
-            
-            if (viewKey === 'dashboard') {
-                document.getElementById('view-dashboard').classList.add('active');
-                loadDashboard();
-            } else if (viewKey === 'settings') {
-                document.getElementById('view-settings').classList.add('active');
-            } else if (viewKey === 'homepage') {
-                // Reusing generic view with a specific single-doc logic or notify unavailable
-                showToast("Homepage management acts via Firestore document 'homepage/main'", "success");
-                loadGenericTable('content'); // Fallback demo
-            } else if (CMS_CONFIG[viewKey]) {
-                document.getElementById('view-generic').classList.add('active');
-                loadGenericTable(viewKey);
+            if (adminAvatar) {
+
+                const name =
+                    userData.name ||
+                    user.displayName ||
+                    "A";
+
+
+                adminAvatar.textContent =
+                    name
+                        .trim()
+                        .charAt(0)
+                        .toUpperCase();
+
             }
+
+
+            /*
+            ----------------------------------------------------
+               SHOW ADMIN APPLICATION
+            ----------------------------------------------------
+            */
+
+            showScreen(
+                "app-screen"
+            );
+
+
+            /*
+            ----------------------------------------------------
+               LOAD DASHBOARD
+               Function will be created in
+               the following parts.
+            ----------------------------------------------------
+            */
+
+            if (
+                typeof loadDashboard ===
+                "function"
+            ) {
+
+                await loadDashboard();
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                "Admin authentication check error:",
+                error
+            );
+
+
+            state.adminProfile =
+                null;
+
+
+            /*
+            ----------------------------------------------------
+               PERMISSION / FIREBASE ERROR
+            ----------------------------------------------------
+            */
+
+            showToast(
+                getFirebaseErrorMessage(
+                    error
+                ),
+                "error"
+            );
+
+
+            showScreen(
+                "login-screen"
+            );
+
         }
 
-        /* =======================================
-           DASHBOARD LOGIC
-        ======================================= */
-        async function loadDashboard() {
-            const container = document.getElementById('dashboard-stats');
-            container.innerHTML = `<div class="stat-card"><div class="spinner" style="width:24px;height:24px;border-width:3px;"></div> Loading stats...</div>`;
-            
-            const stats = [
-                { key: 'content', title: 'Learn Content', icon: '📚' },
-                { key: 'games', title: 'Games', icon: '🎮' },
-                { key: 'stories', title: 'Stories', icon: '📖' },
-                { key: 'videos', title: 'Videos', icon: '🎥' },
-                { key: 'users', title: 'Registered Students', icon: '👨‍🎓' }
-            ];
+    }
+);
+
+
+/*
+============================================================
+   ADMIN LOGIN FORM
+============================================================
+*/
+
+const loginForm =
+    document.getElementById(
+        "login-form"
+    );
+
+
+if (loginForm) {
+
+    loginForm.addEventListener(
+        "submit",
+        async (event) => {
+
+            event.preventDefault();
+
+
+            /*
+            ----------------------------------------------------
+               GET LOGIN INPUTS
+            ----------------------------------------------------
+            */
+
+            const emailInput =
+                document.getElementById(
+                    "login-email"
+                );
+
+
+            const passwordInput =
+                document.getElementById(
+                    "login-password"
+                );
+
+
+            const loginButton =
+                document.getElementById(
+                    "login-btn"
+                );
+
+
+            if (
+                !emailInput ||
+                !passwordInput
+            ) {
+
+                showToast(
+                    "Login fields are missing.",
+                    "error"
+                );
+
+
+                return;
+
+            }
+
+
+            const email =
+                emailInput.value
+                    .trim();
+
+
+            const password =
+                passwordInput.value;
+
+
+            /*
+            ----------------------------------------------------
+               BASIC VALIDATION
+            ----------------------------------------------------
+            */
+
+            if (!email) {
+
+                showToast(
+                    "Please enter your email.",
+                    "error"
+                );
+
+
+                emailInput.focus();
+
+
+                return;
+
+            }
+
+
+            if (!password) {
+
+                showToast(
+                    "Please enter your password.",
+                    "error"
+                );
+
+
+                passwordInput.focus();
+
+
+                return;
+
+            }
+
+
+            /*
+            ----------------------------------------------------
+               LOGIN BUTTON LOADING
+            ----------------------------------------------------
+            */
+
+            setButtonLoading(
+                loginButton,
+                "Verifying...",
+                "Secure Login"
+            );
+
 
             try {
-                let html = "";
-                for (let stat of stats) {
-                    const snapshot = await getDocs(collection(db, stat.key));
-                    html += `
-                        <div class="stat-card">
-                            <div class="stat-icon">${stat.icon}</div>
-                            <div class="stat-info">
-                                <h4>${stat.title}</h4>
-                                <div class="stat-value">${snapshot.size}</div>
-                            </div>
-                        </div>
-                    `;
-                }
-                container.innerHTML = html;
+
+                /*
+                ------------------------------------------------
+                   FIREBASE AUTH LOGIN
+                ------------------------------------------------
+                */
+
+                await signInWithEmailAndPassword(
+                    auth,
+                    email,
+                    password
+                );
+
+
+                /*
+                ------------------------------------------------
+                   DO NOT MANUALLY OPEN DASHBOARD HERE.
+
+                   onAuthStateChanged() will verify:
+                   Firebase user
+                   +
+                   Firestore role
+                   +
+                   admin access
+                ------------------------------------------------
+                */
+
+
             } catch (error) {
-                container.innerHTML = `<div style="color:var(--danger)">Error loading dashboard stats. Check security rules.</div>`;
+
+                console.error(
+                    "Admin login error:",
+                    error
+                );
+
+
+                showToast(
+                    getFirebaseErrorMessage(
+                        error
+                    ),
+                    "error"
+                );
+
+
+                restoreButton(
+                    loginButton
+                );
+
             }
+
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   ADMIN LOGOUT
+============================================================
+*/
+
+window.doLogout =
+    async () => {
+
+        try {
+
+            await signOut(
+                auth
+            );
+
+
+            /*
+            ----------------------------------------------------
+               CLEAR LOCAL ADMIN STATE
+            ----------------------------------------------------
+            */
+
+            state.user =
+                null;
+
+
+            state.adminProfile =
+                null;
+
+
+            state.currentConfigKey =
+                null;
+
+
+            state.currentEditId =
+                null;
+
+
+            /*
+            ----------------------------------------------------
+               RETURN TO LOGIN SCREEN
+            ----------------------------------------------------
+            */
+
+            showScreen(
+                "login-screen"
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                "Admin logout error:",
+                error
+            );
+
+
+            showToast(
+                getFirebaseErrorMessage(
+                    error
+                ),
+                "error"
+            );
+
         }
 
-        /* =======================================
-           GENERIC CMS ENGINE (The core logic)
-        ======================================= */
-        async function loadGenericTable(configKey) {
-            state.currentConfigKey = configKey;
-            const config = CMS_CONFIG[configKey];
-            
-            document.getElementById('generic-title').textContent = `${config.icon} ${config.title}`;
-            
-            const addBtn = document.getElementById('generic-add-btn');
-            if (config.readonly) {
-                addBtn.style.display = 'none';
-            } else {
-                addBtn.style.display = 'flex';
-                addBtn.onclick = () => openFormModal();
-            }
+    };
+    /*
+============================================================
+   PART 4 — NAVIGATION & SIDEBAR
+============================================================
+*/
 
-            // Setup headers
-            let theadHtml = "<tr>";
-            config.columns.forEach(col => {
-                theadHtml += `<th>${col}</th>`;
-            });
-            theadHtml += config.readonly ? "" : `<th>Actions</th>`;
-            theadHtml += "</tr>";
-            document.getElementById('generic-thead').innerHTML = theadHtml;
-            const tbody = document.getElementById('generic-tbody');
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>`;
 
-            try {
-                const snapshot = await getDocs(collection(db, config.collection));
-                if (snapshot.empty) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No data found.</td></tr>`;
-                    return;
-                }
+/*
+============================================================
+   NAVIGATION LINKS
+============================================================
+*/
 
-                let rowsHtml = "";
-                // Save data in memory for edit buttons
-                window.currentTableData = {};
+document
+    .querySelectorAll(
+        ".nav-link"
+    )
+    .forEach(
+        (link) => {
 
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    window.currentTableData[docSnap.id] = data;
-                    
-                    rowsHtml += "<tr>";
-                    config.columns.forEach(col => {
-                        let val = data[col] !== undefined ? data[col] : '-';
-                        if (typeof val === 'boolean') {
-                            val = val ? `<span class="badge success">Yes</span>` : `<span class="badge warning">No</span>`;
-                        } else if (col === 'icon') {
-                            val = `<span style="font-size:20px">${val}</span>`;
-                        }
-                        rowsHtml += `<td>${val}</td>`;
-                    });
+            link.addEventListener(
+                "click",
+                (event) => {
 
-                    if (!config.readonly) {
-                        rowsHtml += `
-                            <td>
-                                <div class="action-btns">
-                                    <button class="btn-icon edit" onclick="openFormModal('${docSnap.id}')">✎</button>
-                                    <button class="btn-icon delete" onclick="confirmDelete('${docSnap.id}')">🗑️</button>
-                                </div>
-                            </td>
-                        `;
+                    event.preventDefault();
+
+
+                    /*
+                    ------------------------------------------------
+                       REMOVE ACTIVE FROM ALL LINKS
+                    ------------------------------------------------
+                    */
+
+                    document
+                        .querySelectorAll(
+                            ".nav-link"
+                        )
+                        .forEach(
+                            (item) => {
+
+                                item.classList.remove(
+                                    "active"
+                                );
+
+                            }
+                        );
+
+
+                    /*
+                    ------------------------------------------------
+                       ADD ACTIVE TO CLICKED LINK
+                    ------------------------------------------------
+                    */
+
+                    event.currentTarget.classList.add(
+                        "active"
+                    );
+
+
+                    /*
+                    ------------------------------------------------
+                       GET VIEW NAME
+                    ------------------------------------------------
+                    */
+
+                    const viewKey =
+                        event.currentTarget.dataset.view;
+
+
+                    if (!viewKey) {
+
+                        return;
+
                     }
-                    rowsHtml += "</tr>";
-                });
-                tbody.innerHTML = rowsHtml;
-            } catch (error) {
-                console.error(error);
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--danger)">Error fetching data. Check Firebase Rules.</td></tr>`;
-            }
+
+
+                    /*
+                    ------------------------------------------------
+                       OPEN REQUESTED VIEW
+                    ------------------------------------------------
+                    */
+
+                    openAdminView(
+                        viewKey
+                    );
+
+
+                    /*
+                    ------------------------------------------------
+                       CLOSE MOBILE SIDEBAR
+                    ------------------------------------------------
+                    */
+
+                    if (
+                        window.innerWidth <=
+                        768
+                    ) {
+
+                        closeSidebar();
+
+                    }
+
+                }
+            );
+
+        }
+    );
+
+
+/*
+============================================================
+   OPEN ADMIN VIEW
+============================================================
+*/
+
+async function openAdminView(
+    viewKey
+) {
+
+    /*
+    ------------------------------------------------------------
+       Store current view
+    ------------------------------------------------------------
+    */
+
+    state.currentConfigKey =
+        viewKey;
+
+
+    /*
+    ------------------------------------------------------------
+       Dashboard
+    ------------------------------------------------------------
+    */
+
+    if (
+        viewKey ===
+        "dashboard"
+    ) {
+
+        showAdminSection(
+            "dashboard-section"
+        );
+
+
+        if (
+            typeof loadDashboard ===
+            "function"
+        ) {
+
+            await loadDashboard();
+
         }
 
-        /* =======================================
-           DYNAMIC FORM BUILDER
-        ======================================= */
-        window.openFormModal = (id = null) => {
-            const config = CMS_CONFIG[state.currentConfigKey];
-            state.currentEditId = id;
-            
-            document.getElementById('modal-title').textContent = id ? `Edit ${config.title}` : `Add New ${config.title}`;
-            
-            const existingData = id ? window.currentTableData[id] : {};
-            let formHtml = "";
 
-            config.fields.forEach(f => {
-                const val = existingData[f.id] !== undefined ? existingData[f.id] : (f.default || '');
-                
-                formHtml += `<div class="form-group" style="margin-bottom:0;">
-                    <label class="form-label">${f.label}</label>`;
-                
-                if (f.type === 'textarea') {
-                    formHtml += `<textarea id="field_${f.id}" class="form-input" rows="3" ${f.required?'required':''} placeholder="${f.placeholder||''}">${val}</textarea>`;
-                } else if (f.type === 'select') {
-                    formHtml += `<select id="field_${f.id}" class="form-input">`;
-                    f.options.forEach(opt => {
-                        formHtml += `<option value="${opt}" ${val === opt ? 'selected' : ''}>${opt}</option>`;
-                    });
-                    formHtml += `</select>`;
-                } else if (f.type === 'checkbox') {
-                    formHtml += `<input type="checkbox" id="field_${f.id}" ${val ? 'checked' : ''} style="width:20px;height:20px;accent-color:var(--primary);">`;
-                } else {
-                    formHtml += `<input type="${f.type}" id="field_${f.id}" class="form-input" value="${val}" ${f.required?'required':''}>`;
-                }
-                formHtml += `</div>`;
-            });
+        return;
 
-            document.getElementById('modal-form-fields').innerHTML = formHtml;
-            openModal('form-modal');
-        };
+    }
 
-        document.getElementById('modal-save-btn').addEventListener('click', async (e) => {
-            const config = CMS_CONFIG[state.currentConfigKey];
-            const btn = e.currentTarget;
-            btn.textContent = "Saving...";
-            btn.disabled = true;
 
-            const payload = {
-                updatedAt: serverTimestamp()
-            };
+    /*
+    ------------------------------------------------------------
+       Homepage
+    ------------------------------------------------------------
+    */
 
-            // Gather inputs
-            for (let f of config.fields) {
-                const el = document.getElementById(`field_${f.id}`);
-                if (!el) continue;
-                if (f.type === 'checkbox') {
-                    payload[f.id] = el.checked;
-                } else if (f.type === 'number') {
-                    payload[f.id] = Number(el.value);
-                } else {
-                    payload[f.id] = el.value;
-                }
+    if (
+        viewKey ===
+        "homepage"
+    ) {
+
+        showAdminSection(
+            "homepage-section"
+        );
+
+
+        if (
+            typeof loadHomepageManagement ===
+            "function"
+        ) {
+
+            await loadHomepageManagement();
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+    ------------------------------------------------------------
+       Generic CMS Sections
+    ------------------------------------------------------------
+    */
+
+    if (
+        CMS_CONFIG[
+            viewKey
+        ]
+    ) {
+
+        showAdminSection(
+            "generic-section"
+        );
+
+
+        if (
+            typeof loadGenericTable ===
+            "function"
+        ) {
+
+            await loadGenericTable(
+                viewKey
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+    ------------------------------------------------------------
+       Unknown View
+    ------------------------------------------------------------
+    */
+
+    console.warn(
+        "Unknown admin view:",
+        viewKey
+    );
+
+
+    showToast(
+        "This admin section is not available yet.",
+        "error"
+    );
+
+}
+
+
+/*
+============================================================
+   SHOW ADMIN SECTION
+============================================================
+*/
+
+function showAdminSection(
+    sectionId
+) {
+
+    /*
+    ------------------------------------------------------------
+       Hide all admin sections
+    ------------------------------------------------------------
+    */
+
+    document
+        .querySelectorAll(
+            ".admin-section"
+        )
+        .forEach(
+            (section) => {
+
+                section.classList.remove(
+                    "active"
+                );
+
             }
+        );
+
+
+    /*
+    ------------------------------------------------------------
+       Show requested section
+    ------------------------------------------------------------
+    */
+
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+
+    if (section) {
+
+        section.classList.add(
+            "active"
+        );
+
+    }
+
+}
+
+
+/*
+============================================================
+   SIDEBAR ELEMENTS
+============================================================
+*/
+
+const sidebar =
+    document.getElementById(
+        "sidebar"
+    );
+
+
+const sidebarOverlay =
+    document.getElementById(
+        "sidebar-overlay"
+    );
+
+
+/*
+============================================================
+   OPEN SIDEBAR
+============================================================
+*/
+
+function openSidebar() {
+
+    if (sidebar) {
+
+        sidebar.classList.add(
+            "open"
+        );
+
+    }
+
+
+    if (sidebarOverlay) {
+
+        sidebarOverlay.classList.add(
+            "active"
+        );
+
+    }
+
+}
+
+
+/*
+============================================================
+   CLOSE SIDEBAR
+============================================================
+*/
+
+function closeSidebar() {
+
+    if (sidebar) {
+
+        sidebar.classList.remove(
+            "open"
+        );
+
+    }
+
+
+    if (sidebarOverlay) {
+
+        sidebarOverlay.classList.remove(
+            "active"
+        );
+
+    }
+
+}
+
+
+/*
+============================================================
+   GLOBAL SIDEBAR FUNCTIONS
+============================================================
+*/
+
+window.openSidebar =
+    openSidebar;
+
+
+window.closeSidebar =
+    closeSidebar;
+
+
+/*
+============================================================
+   SIDEBAR TOGGLE BUTTON
+============================================================
+*/
+
+const menuButton =
+    document.getElementById(
+        "menu-toggle"
+    );
+
+
+if (menuButton) {
+
+    menuButton.addEventListener(
+        "click",
+        () => {
+
+            if (
+                sidebar &&
+                sidebar.classList.contains(
+                    "open"
+                )
+            ) {
+
+                closeSidebar();
+
+            } else {
+
+                openSidebar();
+
+            }
+
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   SIDEBAR OVERLAY CLICK
+============================================================
+*/
+
+if (sidebarOverlay) {
+
+    sidebarOverlay.addEventListener(
+        "click",
+        () => {
+
+            closeSidebar();
+
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   WINDOW RESIZE
+============================================================
+*/
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        /*
+        Close mobile sidebar when
+        switching to desktop.
+        */
+
+        if (
+            window.innerWidth >
+            768
+        ) {
+
+            closeSidebar();
+
+        }
+
+    }
+);
+
+
+/*
+============================================================
+   ESCAPE KEY — CLOSE SIDEBAR
+============================================================
+*/
+
+document.addEventListener(
+    "keydown",
+    (event) => {
+
+        if (
+            event.key ===
+            "Escape"
+        ) {
+
+            closeSidebar();
+
+        }
+
+    }
+);
+    /*
+============================================================
+   PART 5 — DASHBOARD + FIRESTORE CRUD
+============================================================
+*/
+
+
+/*
+============================================================
+   DASHBOARD STATISTICS
+============================================================
+*/
+
+async function loadDashboard() {
+
+    const statistics = [
+
+        {
+            collection: "content",
+            element: "stat-content"
+        },
+
+        {
+            collection: "games",
+            element: "stat-games"
+        },
+
+        {
+            collection: "stories",
+            element: "stat-stories"
+        },
+
+        {
+            collection: "videos",
+            element: "stat-videos"
+        },
+
+        {
+            collection: "quizzes",
+            element: "stat-quizzes"
+        },
+
+        {
+            collection: "folders",
+            element: "stat-folders"
+        },
+
+        {
+            collection: "notices",
+            element: "stat-notices"
+        },
+
+        {
+            collection: "users",
+            element: "stat-users"
+        }
+
+    ];
+
+
+    /*
+    ------------------------------------------------------------
+       Show loading state
+    ------------------------------------------------------------
+    */
+
+    statistics.forEach(
+        (item) => {
+
+            const element =
+                document.getElementById(
+                    item.element
+                );
+
+
+            if (element) {
+
+                element.textContent =
+                    "...";
+
+            }
+
+        }
+    );
+
+
+    /*
+    ------------------------------------------------------------
+       Load every collection
+    ------------------------------------------------------------
+    */
+
+    await Promise.all(
+
+        statistics.map(
+            async (item) => {
+
+                try {
+
+                    const snapshot =
+                        await getDocs(
+                            collection(
+                                db,
+                                item.collection
+                            )
+                        );
+
+
+                    const element =
+                        document.getElementById(
+                            item.element
+                        );
+
+
+                    if (element) {
+
+                        element.textContent =
+                            snapshot.size;
+
+                    }
+
+                } catch (error) {
+
+                    console.error(
+                        `Unable to load ${item.collection} count:`,
+                        error
+                    );
+
+
+                    const element =
+                        document.getElementById(
+                            item.element
+                        );
+
+
+                    if (element) {
+
+                        element.textContent =
+                            "—";
+
+                    }
+
+                }
+
+            }
+        )
+
+    );
+
+}
+
+
+/*
+============================================================
+   LOAD GENERIC CMS TABLE
+============================================================
+*/
+
+async function loadGenericTable(
+    configKey
+) {
+
+    const config =
+        CMS_CONFIG[
+            configKey
+        ];
+
+
+    if (!config) {
+
+        showToast(
+            "Invalid CMS section.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    state.currentConfigKey =
+        configKey;
+
+
+    /*
+    ------------------------------------------------------------
+       Update section title
+    ------------------------------------------------------------
+    */
+
+    const titleElement =
+        document.getElementById(
+            "generic-title"
+        );
+
+
+    if (titleElement) {
+
+        titleElement.textContent =
+            config.icon +
+            " " +
+            config.title;
+
+    }
+
+
+    /*
+    ------------------------------------------------------------
+       Clear previous table
+    ------------------------------------------------------------
+    */
+
+    const thead =
+        document.getElementById(
+            "generic-thead"
+        );
+
+
+    const tbody =
+        document.getElementById(
+            "generic-tbody"
+        );
+
+
+    if (
+        !thead ||
+        !tbody
+    ) {
+
+        console.error(
+            "Generic table elements not found."
+        );
+
+        return;
+
+    }
+
+
+    thead.innerHTML =
+        "";
+
+
+    tbody.innerHTML =
+        "";
+
+
+    /*
+    ------------------------------------------------------------
+       Build table headings
+    ------------------------------------------------------------
+    */
+
+    const headerRow =
+        document.createElement(
+            "tr"
+        );
+
+
+    config.columns.forEach(
+        (column) => {
+
+            const th =
+                document.createElement(
+                    "th"
+                );
+
+
+            th.textContent =
+                formatFieldName(
+                    column
+                );
+
+
+            headerRow.appendChild(
+                th
+            );
+
+        }
+    );
+
+
+    /*
+    Add Actions column
+    only when section is editable.
+    */
+
+    if (!config.readonly) {
+
+        const actionHeader =
+            document.createElement(
+                "th"
+            );
+
+
+        actionHeader.textContent =
+            "Actions";
+
+
+        headerRow.appendChild(
+            actionHeader
+        );
+
+    }
+
+
+    thead.appendChild(
+        headerRow
+    );
+
+
+    /*
+    ------------------------------------------------------------
+       Load Firestore documents
+    ------------------------------------------------------------
+    */
+
+    try {
+
+        const collectionRef =
+            collection(
+                db,
+                config.collection
+            );
+
+
+        let snapshot;
+
+
+        /*
+        Try ordered query first.
+        If the collection does not have
+        updatedAt fields, fall back to
+        normal getDocs().
+        */
+
+        try {
+
+            const orderedQuery =
+                query(
+                    collectionRef,
+                    orderBy(
+                        "updatedAt",
+                        "desc"
+                    )
+                );
+
+
+            snapshot =
+                await getDocs(
+                    orderedQuery
+                );
+
+
+        } catch (orderError) {
+
+            snapshot =
+                await getDocs(
+                    collectionRef
+                );
+
+        }
+
+
+        /*
+        --------------------------------------------------------
+           Empty state
+        --------------------------------------------------------
+        */
+
+        if (
+            snapshot.empty
+        ) {
+
+            const emptyRow =
+                document.createElement(
+                    "tr"
+                );
+
+
+            const emptyCell =
+                document.createElement(
+                    "td"
+                );
+
+
+            emptyCell.colSpan =
+                config.columns.length +
+                (
+                    config.readonly
+                        ? 0
+                        : 1
+                );
+
+
+            emptyCell.textContent =
+                "No records found.";
+
+
+            emptyRow.appendChild(
+                emptyCell
+            );
+
+
+            tbody.appendChild(
+                emptyRow
+            );
+
+
+            return;
+
+        }
+
+
+        /*
+        --------------------------------------------------------
+           Render records
+        --------------------------------------------------------
+        */
+
+        snapshot.forEach(
+            (documentSnapshot) => {
+
+                const data =
+                    documentSnapshot.data();
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                config.columns.forEach(
+                    (column) => {
+
+                        const cell =
+                            document.createElement(
+                                "td"
+                            );
+
+
+                        cell.textContent =
+                            formatCellValue(
+                                data[
+                                    column
+                                ]
+                            );
+
+
+                        row.appendChild(
+                            cell
+                        );
+
+                    }
+                );
+
+
+                /*
+                ------------------------------------------------
+                   ACTIONS
+                ------------------------------------------------
+                */
+
+                if (!config.readonly) {
+
+                    const actionCell =
+                        document.createElement(
+                            "td"
+                        );
+
+
+                    /*
+                    Edit button
+                    */
+
+                    const editButton =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    editButton.type =
+                        "button";
+
+
+                    editButton.className =
+                        "action-btn edit";
+
+
+                    editButton.textContent =
+                        "Edit";
+
+
+                    editButton.addEventListener(
+                        "click",
+                        () => {
+
+                            openEditModal(
+                                configKey,
+                                documentSnapshot.id,
+                                data
+                            );
+
+                        }
+                    );
+
+
+                    /*
+                    Delete button
+                    */
+
+                    const deleteButton =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    deleteButton.type =
+                        "button";
+
+
+                    deleteButton.className =
+                        "action-btn delete";
+
+
+                    deleteButton.textContent =
+                        "Delete";
+
+
+                    deleteButton.addEventListener(
+                        "click",
+                        () => {
+
+                            openDeleteConfirmation(
+                                configKey,
+                                documentSnapshot.id
+                            );
+
+                        }
+                    );
+
+
+                    actionCell.appendChild(
+                        editButton
+                    );
+
+
+                    actionCell.appendChild(
+                        deleteButton
+                    );
+
+
+                    row.appendChild(
+                        actionCell
+                    );
+
+                }
+
+
+                tbody.appendChild(
+                    row
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Generic table error:",
+            error
+        );
+
+
+        showToast(
+            getFirebaseErrorMessage(
+                error
+            ),
+            "error"
+        );
+
+    }
+
+}
+
+
+/*
+============================================================
+   FORMAT FIELD NAME
+============================================================
+*/
+
+function formatFieldName(
+    fieldName
+) {
+
+    if (!fieldName) {
+
+        return "";
+
+    }
+
+
+    return fieldName
+        .replace(
+            /([A-Z])/g,
+            " $1"
+        )
+        .replace(
+            /^./,
+            (letter) =>
+                letter.toUpperCase()
+        );
+
+}
+
+
+/*
+============================================================
+   FORMAT FIRESTORE VALUE
+============================================================
+*/
+
+function formatCellValue(
+    value
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "—";
+
+    }
+
+
+    if (
+        typeof value ===
+        "boolean"
+    ) {
+
+        return value
+            ? "Yes"
+            : "No";
+
+    }
+
+
+    if (
+        typeof value ===
+        "object"
+    ) {
+
+        /*
+        Handle Firestore Timestamp
+        */
+
+        if (
+            typeof value.toDate ===
+            "function"
+        ) {
+
+            return value
+                .toDate()
+                .toLocaleString();
+
+        }
+
+
+        return JSON.stringify(
+            value
+        );
+
+    }
+
+
+    return String(
+        value
+    );
+
+}
+
+
+/*
+============================================================
+   OPEN ADD MODAL
+============================================================
+*/
+
+function openAddModal(
+    configKey
+) {
+
+    const config =
+        CMS_CONFIG[
+            configKey
+        ];
+
+
+    if (
+        !config ||
+        config.readonly
+    ) {
+
+        return;
+
+    }
+
+
+    state.currentConfigKey =
+        configKey;
+
+
+    state.currentEditId =
+        null;
+
+
+    buildCMSForm(
+        config,
+        {}
+    );
+
+
+    const modalTitle =
+        document.getElementById(
+            "generic-modal-title"
+        );
+
+
+    if (modalTitle) {
+
+        modalTitle.textContent =
+            "Add " +
+            config.title;
+
+    }
+
+
+    openModal(
+        "generic-modal"
+    );
+
+}
+
+
+/*
+============================================================
+   OPEN EDIT MODAL
+============================================================
+*/
+
+function openEditModal(
+    configKey,
+    documentId,
+    data
+) {
+
+    const config =
+        CMS_CONFIG[
+            configKey
+        ];
+
+
+    if (
+        !config ||
+        config.readonly
+    ) {
+
+        return;
+
+    }
+
+
+    state.currentConfigKey =
+        configKey;
+
+
+    state.currentEditId =
+        documentId;
+
+
+    buildCMSForm(
+        config,
+        data
+    );
+
+
+    const modalTitle =
+        document.getElementById(
+            "generic-modal-title"
+        );
+
+
+    if (modalTitle) {
+
+        modalTitle.textContent =
+            "Edit " +
+            config.title;
+
+    }
+
+
+    openModal(
+        "generic-modal"
+    );
+
+}
+
+
+/*
+============================================================
+   BUILD CMS FORM
+============================================================
+*/
+
+function buildCMSForm(
+    config,
+    data
+) {
+
+    const formContainer =
+        document.getElementById(
+            "generic-form"
+        );
+
+
+    if (!formContainer) {
+
+        console.error(
+            "Generic form container not found."
+        );
+
+        return;
+
+    }
+
+
+    formContainer.innerHTML =
+        "";
+
+
+    config.fields.forEach(
+        (field) => {
+
+            const wrapper =
+                document.createElement(
+                    "div"
+                );
+
+
+            wrapper.className =
+                "form-group";
+
+
+            const label =
+                document.createElement(
+                    "label"
+                );
+
+
+            label.textContent =
+                field.label;
+
+
+            wrapper.appendChild(
+                label
+            );
+
+
+            let input;
+
+
+            /*
+            ----------------------------------------------------
+               TEXTAREA
+            ----------------------------------------------------
+            */
+
+            if (
+                field.type ===
+                "textarea"
+            ) {
+
+                input =
+                    document.createElement(
+                        "textarea"
+                    );
+
+
+                input.rows =
+                    5;
+
+
+                if (
+                    field.placeholder
+                ) {
+
+                    input.placeholder =
+                        field.placeholder;
+
+                }
+
+            }
+
+
+            /*
+            ----------------------------------------------------
+               SELECT
+            ----------------------------------------------------
+            */
+
+            else if (
+                field.type ===
+                "select"
+            ) {
+
+                input =
+                    document.createElement(
+                        "select"
+                    );
+
+
+                field.options.forEach(
+                    (option) => {
+
+                        const optionElement =
+                            document.createElement(
+                                "option"
+                            );
+
+
+                        optionElement.value =
+                            option;
+
+
+                        optionElement.textContent =
+                            option;
+
+
+                        input.appendChild(
+                            optionElement
+                        );
+
+                    }
+                );
+
+            }
+
+
+            /*
+            ----------------------------------------------------
+               CHECKBOX
+            ----------------------------------------------------
+            */
+
+            else if (
+                field.type ===
+                "checkbox"
+            ) {
+
+                input =
+                    document.createElement(
+                        "input"
+                    );
+
+
+                input.type =
+                    "checkbox";
+
+
+                input.checked =
+                    data[
+                        field.id
+                    ] !== undefined
+                        ? Boolean(
+                            data[
+                                field.id
+                            ]
+                        )
+                        : Boolean(
+                            field.default
+                        );
+
+            }
+
+
+            /*
+            ----------------------------------------------------
+               NORMAL INPUT
+            ----------------------------------------------------
+            */
+
+            else {
+
+                input =
+                    document.createElement(
+                        "input"
+                    );
+
+
+                input.type =
+                    field.type ||
+                    "text";
+
+
+                if (
+                    field.placeholder
+                ) {
+
+                    input.placeholder =
+                        field.placeholder;
+
+                }
+
+            }
+
+
+            input.id =
+                "cms-field-" +
+                field.id;
+
+
+            input.name =
+                field.id;
+
+
+            if (
+                field.required
+            ) {
+
+                input.required =
+                    true;
+
+            }
+
+
+            /*
+            ----------------------------------------------------
+               Fill existing value
+            ----------------------------------------------------
+            */
+
+            if (
+                field.type !==
+                "checkbox"
+            ) {
+
+                input.value =
+                    data[
+                        field.id
+                    ] !== undefined
+                        ? data[
+                            field.id
+                        ]
+                        : "";
+
+            }
+
+
+            wrapper.appendChild(
+                input
+            );
+
+
+            formContainer.appendChild(
+                wrapper
+            );
+
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   SAVE CMS DOCUMENT
+============================================================
+*/
+
+async function saveCMSDocument() {
+
+    const configKey =
+        state.currentConfigKey;
+
+
+    const config =
+        CMS_CONFIG[
+            configKey
+        ];
+
+
+    if (
+        !config ||
+        config.readonly
+    ) {
+
+        return;
+
+    }
+
+
+    const formContainer =
+        document.getElementById(
+            "generic-form"
+        );
+
+
+    if (!formContainer) {
+
+        return;
+
+    }
+
+
+    const data =
+        {};
+
+
+    /*
+    ------------------------------------------------------------
+       Collect fields
+    ------------------------------------------------------------
+    */
+
+    for (
+        const field of
+        config.fields
+    ) {
+
+        const 
+         /*
+============================================================
+   PART 6 — HOMEPAGE + FINAL ADMIN FUNCTIONS
+============================================================
+*/
+
+
+/*
+============================================================
+   HOMEPAGE MANAGEMENT
+============================================================
+*/
+
+async function loadHomepageManagement() {
+
+    const titleElement =
+        document.getElementById(
+            "homepage-title"
+        );
+
+
+    if (titleElement) {
+
+        titleElement.textContent =
+            "🏠 Homepage Management";
+
+    }
+
+
+    try {
+
+        const homepageRef =
+            doc(
+                db,
+                "homepage",
+                "main"
+            );
+
+
+        const snapshot =
+            await getDoc(
+                homepageRef
+            );
+
+
+        const data =
+            snapshot.exists()
+                ? snapshot.data()
+                : {};
+
+
+        /*
+        --------------------------------------------------------
+           Fill homepage fields
+        --------------------------------------------------------
+        */
+
+        const heroTitle =
+            document.getElementById(
+                "homepage-hero-title"
+            );
+
+
+        const heroSubtitle =
+            document.getElementById(
+                "homepage-hero-subtitle"
+            );
+
+
+        const heroImage =
+            document.getElementById(
+                "homepage-hero-image"
+            );
+
+
+        if (heroTitle) {
+
+            heroTitle.value =
+                data.heroTitle ||
+                "";
+
+        }
+
+
+        if (heroSubtitle) {
+
+            heroSubtitle.value =
+                data.heroSubtitle ||
+                "";
+
+        }
+
+
+        if (heroImage) {
+
+            heroImage.value =
+                data.heroImage ||
+                "";
+
+        }
+
+
+    } catch (error) {
+
+        console.error(
+            "Homepage load error:",
+            error
+        );
+
+
+        showToast(
+            getFirebaseErrorMessage(
+                error
+            ),
+            "error"
+        );
+
+    }
+
+}
+
+
+/*
+============================================================
+   SAVE HOMEPAGE
+============================================================
+*/
+
+async function saveHomepage() {
+
+    if (
+        !state.user ||
+        !state.adminProfile
+    ) {
+
+        showToast(
+            "Admin authentication required.",
+            "error"
+        );
+
+
+        return;
+
+    }
+
+
+    const heroTitle =
+        document.getElementById(
+            "homepage-hero-title"
+        );
+
+
+    const heroSubtitle =
+        document.getElementById(
+            "homepage-hero-subtitle"
+        );
+
+
+    const heroImage =
+        document.getElementById(
+            "homepage-hero-image"
+        );
+
+
+    const homepageData = {
+
+        heroTitle:
+            heroTitle
+                ? heroTitle.value.trim()
+                : "",
+
+        heroSubtitle:
+            heroSubtitle
+                ? heroSubtitle.value.trim()
+                : "",
+
+        heroImage:
+            heroImage
+                ? heroImage.value.trim()
+                : "",
+
+        updatedAt:
+            serverTimestamp(),
+
+        updatedBy:
+            state.user.uid
+
+    };
+
+
+    try {
+
+        await setDoc(
+            doc(
+                db,
+                "homepage",
+                "main"
+            ),
+            homepageData,
+            {
+                merge: true
+            }
+        );
+
+
+        showToast(
+            "Homepage settings saved successfully.",
+            "success"
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Homepage save error:",
+            error
+        );
+
+
+        showToast(
+            getFirebaseErrorMessage(
+                error
+            ),
+            "error"
+        );
+
+    }
+
+}
+
+
+/*
+============================================================
+   GLOBAL HOMEPAGE FUNCTION
+============================================================
+*/
+
+window.saveHomepage =
+    saveHomepage;
+
+
+/*
+============================================================
+   ADMIN SEARCH
+============================================================
+*/
+
+function setupAdminSearch() {
+
+    const searchInput =
+        document.getElementById(
+            "admin-search"
+        );
+
+
+    if (!searchInput) {
+
+        return;
+
+    }
+
+
+    searchInput.addEventListener(
+        "input",
+        () => {
+
+            const searchTerm =
+                searchInput.value
+                    .trim()
+                    .toLowerCase();
+
+
+            document
+                .querySelectorAll(
+                    "#generic-tbody tr"
+                )
+                .forEach(
+                    (row) => {
+
+                        const rowText =
+                            row.textContent
+                                .toLowerCase();
+
+
+                        row.style.display =
+                            rowText.includes(
+                                searchTerm
+                            )
+                                ? ""
+                                : "none";
+
+                    }
+                );
+
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   ADD BUTTON
+============================================================
+*/
+
+const addButton =
+    document.getElementById(
+        "add-content-button"
+    );
+
+
+if (addButton) {
+
+    addButton.addEventListener(
+        "click",
+        () => {
+
+            if (
+                !state.currentConfigKey
+            ) {
+
+                showToast(
+                    "Please select a section first.",
+                    "error"
+                );
+
+
+                return;
+
+            }
+
+
+            openAddModal(
+                state.currentConfigKey
+            );
+
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   DELETE CONFIRM BUTTON
+============================================================
+*/
+
+const confirmDeleteButton =
+    document.getElementById(
+        "confirm-delete-button"
+    );
+
+
+if (confirmDeleteButton) {
+
+    confirmDeleteButton.addEventListener(
+        "click",
+        async () => {
+
+            setButtonLoading(
+                confirmDeleteButton,
+                "Deleting...",
+                "Delete"
+            );
+
 
             try {
-                if (state.currentEditId) {
-                    await updateDoc(doc(db, config.collection, state.currentEditId), payload);
-                    showToast("Updated successfully");
-                } else {
-                    payload.createdAt = serverTimestamp();
-                    payload.createdBy = state.user.uid;
-                    await addDoc(collection(db, config.collection), payload);
-                    showToast("Added successfully");
-                }
-                closeModal('form-modal');
-                loadGenericTable(state.currentConfigKey); // Refresh table
-            } catch (error) {
-                console.error(error);
-                showToast("Failed to save data. Check rules.", "error");
+
+                await deleteCMSDocument();
+
+
             } finally {
-                btn.textContent = "Save Changes";
-                btn.disabled = false;
+
+                restoreButton(
+                    confirmDeleteButton
+                );
+
             }
-        });
 
-        /* =======================================
-           DELETE LOGIC
-        ======================================= */
-        let deleteTargetId = null;
-        window.confirmDelete = (id) => {
-            deleteTargetId = id;
-            openModal('confirm-modal');
-        };
+        }
+    );
 
-        document.getElementById('confirm-delete-btn').addEventListener('click', async (e) => {
-            if (!deleteTargetId) return;
-            const btn = e.currentTarget;
-            btn.textContent = "Deleting...";
-            btn.disabled = true;
-            
-            const config = CMS_CONFIG[state.currentConfigKey];
-            
+}
+
+
+/*
+============================================================
+   SAVE CMS BUTTON
+============================================================
+*/
+
+const saveCMSButton =
+    document.getElementById(
+        "save-cms-button"
+    );
+
+
+if (saveCMSButton) {
+
+    saveCMSButton.addEventListener(
+        "click",
+        async () => {
+
+            setButtonLoading(
+                saveCMSButton,
+                "Saving...",
+                "Save"
+            );
+
+
             try {
-                await deleteDoc(doc(db, config.collection, deleteTargetId));
-                showToast("Item deleted successfully");
-                closeModal('confirm-modal');
-                loadGenericTable(state.currentConfigKey); // Refresh table
-            } catch (error) {
-                showToast("Failed to delete item", "error");
-            } finally {
-                btn.textContent = "Yes, Delete";
-                btn.disabled = false;
-                deleteTargetId = null;
-            }
-        });
 
-    </script>
+                await saveCMSDocument();
+
+
+            } finally {
+
+                restoreButton(
+                    saveCMSButton
+                );
+
+            }
+
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   PASSWORD SHOW / HIDE
+============================================================
+*/
+
+const passwordToggle =
+    document.getElementById(
+        "password-toggle"
+    );
+
+
+if (passwordToggle) {
+
+    passwordToggle.addEventListener(
+        "click",
+        () => {
+
+            const passwordInput =
+                document.getElementById(
+                    "login-password"
+                );
+
+
+            if (!passwordInput) {
+
+                return;
+
+            }
+
+
+            if (
+                passwordInput.type ===
+                "password"
+            ) {
+
+                passwordInput.type =
+                    "text";
+
+
+                passwordToggle.textContent =
+                    "Hide";
+
+            } else {
+
+                passwordInput.type =
+                    "password";
+
+
+                passwordToggle.textContent =
+                    "Show";
+
+            }
+
+        }
+    );
+
+}
+
+
+/*
+============================================================
+   INITIALIZE ADMIN SEARCH
+============================================================
+*/
+
+setupAdminSearch();
+
+
+/*
+============================================================
+   INITIAL DEFAULT VIEW
+============================================================
+*/
+
+if (
+    !state.currentConfigKey
+) {
+
+    state.currentConfigKey =
+        "dashboard";
+
+}
+
+
+/*
+============================================================
+   PREVENT ACCIDENTAL MODAL SUBMISSION
+============================================================
+*/
+
+document.addEventListener(
+    "submit",
+    (event) => {
+
+        /*
+        Generic CMS form is handled
+        manually by saveCMSDocument().
+        */
+
+        if (
+            event.target.id ===
+            "generic-form-element"
+        ) {
+
+            event.preventDefault();
+
+        }
+
+    }
+);
+
+
+/*
+============================================================
+   FINAL ADMIN LOG
+============================================================
+*/
+
+console.log(
+    "Nanhi Pathshala Admin Panel initialized."
+);
+
+</script>
 </body>
 </html>
+    
