@@ -748,36 +748,17 @@
 
     <!-- TOAST CONTAINER -->
     <div class="toast-container" id="toast-container"></div>
-
 <script type="module">
-
-/*
-============================================================
-   FIREBASE & LOGIC
-   PART 1 — IMPORTS + STATE + CMS CONFIGURATION
-============================================================
-*/
-
-
-/*
-============================================================
-   FIREBASE IMPORTS
-============================================================
-*/
-
 import {
     auth,
     db
 } from "./firebase.js";
 
-
 import {
     signInWithEmailAndPassword,
     onAuthStateChanged,
     signOut
-} from
-"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 import {
     doc,
@@ -787,616 +768,466 @@ import {
     addDoc,
     updateDoc,
     deleteDoc,
+    setDoc,
     serverTimestamp,
     query,
     orderBy
-} from
-"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
-/*
-============================================================
-   APPLICATION STATE
-============================================================
-*/
-
-let state = {
-
+const state = {
     user: null,
-
     adminProfile: null,
-
     currentConfigKey: null,
-
-    currentEditId: null
-
+    currentEditId: null,
+    deleteConfigKey: null,
+    deleteDocumentId: null
 };
 
 
-/*
-============================================================
-   CMS CONFIGURATION
-============================================================
-*/
-
 const CMS_CONFIG = {
 
-    /*
-    ========================================================
-       LEARN CONTENT
-    ========================================================
-    */
-
     content: {
-
-        title:
-            "Learn Content",
-
-        collection:
-            "content",
-
-        icon:
-            "📚",
-
+        title: "Learn Content",
+        collection: "content",
+        icon: "📚",
         fields: [
-
             {
                 id: "title",
                 label: "Title",
                 type: "text",
                 required: true
             },
-
             {
                 id: "description",
                 label: "Description",
                 type: "textarea"
             },
-
             {
                 id: "type",
                 label: "Content Type",
                 type: "select",
-                options: [
-                    "PDF",
-                    "Video",
-                    "HTML",
-                    "Link"
-                ]
+                options: ["PDF", "Video", "HTML", "Link"]
             },
-
             {
                 id: "category",
                 label: "Category / Subject",
                 type: "text"
             },
-
             {
                 id: "url",
                 label: "Media URL",
                 type: "text",
                 required: true
             },
-
             {
                 id: "folderId",
-                label: "Folder ID (optional)",
+                label: "Folder ID",
                 type: "text"
             },
-
             {
                 id: "published",
                 label: "Published",
                 type: "checkbox",
                 default: true
             }
-
         ],
-
         columns: [
             "title",
             "type",
             "category",
             "published"
         ]
-
     },
 
 
-    /*
-    ========================================================
-       GAMES
-    ========================================================
-    */
-
     games: {
-
-        title:
-            "Games Management",
-
-        collection:
-            "games",
-
-        icon:
-            "🎮",
-
+        title: "Games Management",
+        collection: "games",
+        icon: "🎮",
         fields: [
-
             {
                 id: "name",
                 label: "Game Name",
                 type: "text",
                 required: true
             },
-
             {
                 id: "description",
                 label: "Description",
                 type: "textarea"
             },
-
             {
                 id: "category",
                 label: "Category",
                 type: "text"
             },
-
             {
                 id: "icon",
-                label: "Icon Emoji",
+                label: "Icon",
                 type: "text"
             },
-
             {
                 id: "gameUrl",
-                label: "Game URL (.html file)",
+                label: "Game URL",
                 type: "text",
                 required: true
             },
-
             {
                 id: "published",
                 label: "Published",
                 type: "checkbox",
                 default: true
             }
-
         ],
-
         columns: [
             "icon",
             "name",
             "category",
             "published"
         ]
-
     },
 
 
-    /*
-    ========================================================
-       STORIES
-    ========================================================
-    */
-
     stories: {
-
-        title:
-            "Stories Management",
-
-        collection:
-            "stories",
-
-        icon:
-            "📖",
-
+        title: "Stories Management",
+        collection: "stories",
+        icon: "📖",
         fields: [
-
             {
                 id: "title",
                 label: "Story Title",
                 type: "text",
                 required: true
             },
-
             {
                 id: "description",
                 label: "Description",
                 type: "textarea"
             },
-
             {
                 id: "category",
                 label: "Category",
                 type: "text"
             },
-
             {
                 id: "coverUrl",
                 label: "Cover Image URL",
                 type: "text"
             },
-
             {
                 id: "storyUrl",
-                label: "Story HTML URL",
+                label: "Story URL",
                 type: "text",
                 required: true
             },
-
             {
                 id: "featured",
-                label: "Featured on Home",
+                label: "Featured",
                 type: "checkbox"
             },
-
             {
                 id: "published",
                 label: "Published",
                 type: "checkbox",
                 default: true
             }
-
         ],
-
         columns: [
             "title",
             "category",
             "featured",
             "published"
         ]
-
     },
 
 
-    /*
-    ========================================================
-       VIDEOS
-    ========================================================
-    */
-
     videos: {
-
-        title:
-            "Videos Management",
-
-        collection:
-            "videos",
-
-        icon:
-            "🎥",
-
+        title: "Videos Management",
+        collection: "videos",
+        icon: "🎥",
         fields: [
-
             {
                 id: "title",
                 label: "Video Title",
                 type: "text",
                 required: true
             },
-
             {
                 id: "youtubeUrl",
                 label: "YouTube URL",
                 type: "text",
                 required: true
             },
-
             {
                 id: "category",
                 label: "Category",
                 type: "text"
             },
-
             {
                 id: "published",
                 label: "Published",
                 type: "checkbox",
                 default: true
             }
-
         ],
-
         columns: [
             "title",
             "category",
             "published"
         ]
-
-    },
-
-
-    /*
-    ========================================================
-       QUIZZES
-    ========================================================
-    */
-
-    quizzes: {
-
-        title:
-            "Quiz Management",
-
-        collection:
-            "quizzes",
-
-        icon:
-            "📝",
-
-        fields: [
-
-            {
-                id: "title",
-                label: "Quiz Title",
-                type: "text",
-                required: true
-            },
-
-            {
-                id: "subject",
-                label: "Subject",
-                type: "text"
-            },
-
-            {
-                id: "difficulty",
-                label: "Difficulty",
-                type: "select",
-
-                options: [
-                    "Easy",
-                    "Medium",
-                    "Hard"
-                ]
-
-            },
-
-            {
-                id: "questionsJson",
-                label: "Questions (JSON Array format)",
-                type: "textarea",
-
-                placeholder:
-                    '[{"q":"2+2?","options":["3","4"],"answer":"4"}]'
-
-            },
-
-            {
-                id: "published",
-                label: "Published",
-                type: "checkbox",
-                default: true
-            }
-
-        ],
-
-        columns: [
-            "title",
-            "subject",
-            "difficulty",
-            "published"
-        ]
-
-    },
-
-
-    /*
-    ========================================================
-       FOLDERS
-    ========================================================
-    */
-
-    folders: {
-
-        title:
-            "Folder Manager",
-
-        collection:
-            "folders",
-
-        icon:
-            "📁",
-
-        fields: [
-
-            {
-                id: "name",
-                label: "Folder Name",
-                type: "text",
-                required: true
-            },
-
-            {
-                id: "parentId",
-                label:
-                    "Parent Folder ID (Leave blank for root)",
-
-                type:
-                    "text"
-            },
-
-            {
-                id: "sortOrder",
-                label:
-                    "Sort Order (Number)",
-
-                type:
-                    "number"
-            }
-
-        ],
-
-        columns: [
-            "name",
-            "parentId",
-            "sortOrder"
-        ]
-
-    },
-
-
-    /*
-    ========================================================
-       NOTICES
-    ========================================================
-    */
-
-    notices: {
-
-        title:
-            "Notice Board",
-
-        collection:
-            "notices",
-
-        icon:
-            "📢",
-
-        fields: [
-
-            {
-                id: "title",
-                label: "Notice Title",
-                type: "text",
-                required: true
-            },
-
-            {
-                id: "description",
-                label: "Notice Details",
-                type: "textarea",
-                required: true
-            },
-
-            {
-                id: "priority",
-                label: "Priority",
-                type: "select",
-
-                options: [
-                    "Normal",
-                    "Important",
-                    "Urgent"
-                ]
-
-            },
-
-            {
-                id: "link",
-                label: "External Link (Optional)",
-                type: "text"
-            },
-
-            {
-                id: "published",
-                label: "Published",
-                type: "checkbox",
-                default: true
-            }
-
-        ],
-
-        columns: [
-            "title",
-            "priority",
-            "published"
-        ]
-
-    },
-
-
-    /*
-    ========================================================
-       STUDENTS / USERS
-       READ ONLY
-    ========================================================
-    */
-
-    users: {
-
-        title:
-            "Student Roster",
-
-        collection:
-            "users",
-
-        icon:
-            "👨‍🎓",
-
-        readonly:
-            true,
-
-        fields:
-            [],
-
-        columns: [
-            "name",
-            "email",
-            "role"
-        ]
-
     }
 
 };
-    /*
-============================================================
-   PART 2 — UI HELPERS
-============================================================
-*/
+CMS_CONFIG.quizzes = {
+
+    title: "Quiz Management",
+    collection: "quizzes",
+    icon: "📝",
+
+    fields: [
+
+        {
+            id: "title",
+            label: "Quiz Title",
+            type: "text",
+            required: true
+        },
+
+        {
+            id: "subject",
+            label: "Subject",
+            type: "text"
+        },
+
+        {
+            id: "difficulty",
+            label: "Difficulty",
+            type: "select",
+            options: [
+                "Easy",
+                "Medium",
+                "Hard"
+            ]
+        },
+
+        {
+            id: "questionsJson",
+            label: "Questions JSON",
+            type: "textarea",
+            placeholder:
+                '[{"q":"2+2?","options":["3","4"],"answer":"4"}]'
+        },
+
+        {
+            id: "published",
+            label: "Published",
+            type: "checkbox",
+            default: true
+        }
+
+    ],
+
+    columns: [
+        "title",
+        "subject",
+        "difficulty",
+        "published"
+    ]
+
+};
 
 
-/*
-============================================================
-   SHOW SCREEN
-============================================================
-*/
+CMS_CONFIG.folders = {
 
-const showScreen = (
-    screenId
-) => {
+    title: "Folder Manager",
+    collection: "folders",
+    icon: "📁",
+
+    fields: [
+
+        {
+            id: "name",
+            label: "Folder Name",
+            type: "text",
+            required: true
+        },
+
+        {
+            id: "parentId",
+            label: "Parent Folder ID",
+            type: "text"
+        },
+
+        {
+            id: "sortOrder",
+            label: "Sort Order",
+            type: "number"
+        }
+
+    ],
+
+    columns: [
+        "name",
+        "parentId",
+        "sortOrder"
+    ]
+
+};
+
+
+CMS_CONFIG.notices = {
+
+    title: "Notice Board",
+    collection: "notices",
+    icon: "📢",
+
+    fields: [
+
+        {
+            id: "title",
+            label: "Notice Title",
+            type: "text",
+            required: true
+        },
+
+        {
+            id: "description",
+            label: "Notice Details",
+            type: "textarea",
+            required: true
+        },
+
+        {
+            id: "priority",
+            label: "Priority",
+            type: "select",
+            options: [
+                "Normal",
+                "Important",
+                "Urgent"
+            ]
+        },
+
+        {
+            id: "link",
+            label: "External Link",
+            type: "text"
+        },
+
+        {
+            id: "published",
+            label: "Published",
+            type: "checkbox",
+            default: true
+        }
+
+    ],
+
+    columns: [
+        "title",
+        "priority",
+        "published"
+    ]
+
+};
+
+
+CMS_CONFIG.users = {
+
+    title: "Student Roster",
+    collection: "users",
+    icon: "👨‍🎓",
+    readonly: true,
+
+    fields: [],
+
+    columns: [
+        "name",
+        "email",
+        "role"
+    ]
+
+};
+function safeText(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+        return "";
+    }
+
+    return String(value);
+}
+
+
+function getFirebaseErrorMessage(error) {
+
+    if (!error) {
+        return "Something went wrong.";
+    }
+
+    switch (error.code) {
+
+        case "permission-denied":
+            return "Permission denied. Check Firestore Rules.";
+
+        case "unauthenticated":
+            return "Please sign in again.";
+
+        case "unavailable":
+            return "Firebase is temporarily unavailable.";
+
+        case "network-request-failed":
+            return "Network error. Check your internet.";
+
+        case "auth/invalid-credential":
+            return "Invalid email or password.";
+
+        case "auth/user-not-found":
+            return "No account found with this email.";
+
+        case "auth/wrong-password":
+            return "Incorrect password.";
+
+        case "auth/too-many-requests":
+            return "Too many attempts. Try again later.";
+
+        default:
+            return error.message ||
+                "Something went wrong.";
+    }
+}
+
+
+function showScreen(screenId) {
 
     document
-        .querySelectorAll(
-            ".screen"
-        )
-        .forEach(
-            (screen) => {
+        .querySelectorAll(".screen")
+        .forEach(screen => {
 
-                screen.classList.remove(
-                    "active"
-                );
+            screen.classList.remove("active");
 
-            }
-        );
+        });
 
 
     const target =
-        document.getElementById(
-            screenId
-        );
+        document.getElementById(screenId);
 
 
     if (target) {
 
-        target.classList.add(
-            "active"
-        );
+        target.classList.add("active");
 
     }
+}
 
-};
 
-
-/*
-============================================================
-   SHOW TOAST MESSAGE
-============================================================
-*/
-
-const showToast = (
+function showToast(
     message,
     type = "success"
-) => {
+) {
 
     const container =
         document.getElementById(
@@ -1404,37 +1235,19 @@ const showToast = (
         );
 
 
-    if (!container) {
-
-        console.error(
-            "Toast container not found."
-        );
-
-        return;
-
-    }
+    if (!container) return;
 
 
     const toast =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     toast.className =
-        "toast " +
-        type;
+        "toast " + type;
 
-
-    /*
-    Use textContent instead of
-    innerHTML for Firebase/user data.
-    */
 
     const icon =
-        document.createElement(
-            "span"
-        );
+        document.createElement("span");
 
 
     icon.textContent =
@@ -1444,120 +1257,65 @@ const showToast = (
 
 
     const text =
-        document.createElement(
-            "span"
-        );
+        document.createElement("span");
 
 
     text.textContent =
-        message;
+        safeText(message);
 
 
-    toast.appendChild(
-        icon
-    );
+    toast.appendChild(icon);
+    toast.appendChild(text);
 
 
-    toast.appendChild(
-        text
-    );
+    container.appendChild(toast);
 
 
-    container.appendChild(
-        toast
-    );
+    setTimeout(() => {
+
+        toast.remove();
+
+    }, 4000);
+
+}
 
 
-    setTimeout(
-        () => {
-
-            toast.remove();
-
-        },
-        4000
-    );
-
-};
-
-
-/*
-============================================================
-   OPEN MODAL
-============================================================
-*/
-
-const openModal = (
-    modalId
-) => {
+function openModal(modalId) {
 
     const modal =
-        document.getElementById(
-            modalId
-        );
+        document.getElementById(modalId);
 
 
-    if (!modal) {
-
-        console.error(
-            "Modal not found:",
-            modalId
-        );
-
-        return;
-
-    }
+    if (!modal) return;
 
 
-    modal.classList.add(
-        "active"
-    );
+    modal.classList.add("active");
 
-};
+}
 
 
-/*
-============================================================
-   CLOSE MODAL
-============================================================
-*/
+window.closeModal =
+    function(modalId) {
 
-window.closeModal = (
-    modalId
-) => {
-
-    const modal =
-        document.getElementById(
-            modalId
-        );
+        const modal =
+            document.getElementById(modalId);
 
 
-    if (!modal) {
-
-        return;
-
-    }
+        if (!modal) return;
 
 
-    modal.classList.remove(
-        "active"
-    );
+        modal.classList.remove("active");
 
-};
+    };
 
-
-/*
-============================================================
-   CLOSE MODAL WHEN CLICKING BACKDROP
-============================================================
-*/
 
 document.addEventListener(
     "click",
-    (event) => {
+    event => {
 
         if (
             event.target.classList.contains(
-                "modal"
+                "modal-overlay"
             )
         ) {
 
@@ -1571,264 +1329,97 @@ document.addEventListener(
 );
 
 
-/*
-============================================================
-   ESC KEY — CLOSE MODAL
-============================================================
-*/
-
 document.addEventListener(
     "keydown",
-    (event) => {
+    event => {
 
-        if (
-            event.key !== "Escape"
-        ) {
+        if (event.key === "Escape") {
 
-            return;
-
-        }
-
-
-        document
-            .querySelectorAll(
-                ".modal.active"
-            )
-            .forEach(
-                (modal) => {
+            document
+                .querySelectorAll(
+                    ".modal-overlay.active"
+                )
+                .forEach(modal => {
 
                     modal.classList.remove(
                         "active"
                     );
 
-                }
-            );
+                });
+
+        }
 
     }
 );
-
-
-/*
-============================================================
-   SAFE TEXT HELPER
-============================================================
-*/
-
-const safeText = (
-    value
-) => {
-
-    if (
-        value === null ||
-        value === undefined
-    ) {
-
-        return "";
-
-    }
-
-
-    return String(
-        value
-    );
-
-};
-
-
-/*
-============================================================
-   FIREBASE ERROR MESSAGE
-============================================================
-*/
-
-const getFirebaseErrorMessage = (
-    error
-) => {
-
-    if (!error) {
-
-        return "Something went wrong.";
-
-    }
-
-
-    switch (
-        error.code
-    ) {
-
-        case "permission-denied":
-
-            return "You do not have permission to perform this action.";
-
-
-        case "unauthenticated":
-
-            return "Please sign in again.";
-
-
-        case "unavailable":
-
-            return "Firebase is temporarily unavailable. Please try again.";
-
-
-        case "network-request-failed":
-
-            return "Network error. Please check your internet connection.";
-
-
-        case "auth/invalid-credential":
-
-            return "Invalid email or password.";
-
-
-        case "auth/user-not-found":
-
-            return "No account was found with this email.";
-
-
-        case "auth/wrong-password":
-
-            return "Incorrect password.";
-
-
-        case "auth/too-many-requests":
-
-            return "Too many attempts. Please try again later.";
-
-
-        default:
-
-            return (
-                error.message ||
-                "Something went wrong. Please try again."
-            );
-
-    }
-
-};
-
-
-/*
-============================================================
-   DISABLE / ENABLE BUTTON
-============================================================
-*/
-
-const setButtonLoading = (
+function setButtonLoading(
     button,
     loadingText,
     normalText
-) => {
+) {
 
-    if (!button) {
-
-        return;
-
-    }
+    if (!button) return;
 
 
-    if (loadingText) {
-
-        button.textContent =
-            loadingText;
-
-    }
-
-
-    button.disabled =
-        true;
+    button.disabled = true;
 
 
     button.dataset.normalText =
-        normalText || "";
-
-};
-
-
-const restoreButton = (
-    button
-) => {
-
-    if (!button) {
-
-        return;
-
-    }
+        normalText ||
+        button.textContent;
 
 
-    button.disabled =
-        false;
+    button.textContent =
+        loadingText;
+
+}
 
 
-    if (
-        button.dataset.normalText
-    ) {
+function restoreButton(button) {
+
+    if (!button) return;
+
+
+    button.disabled = false;
+
+
+    if (button.dataset.normalText) {
 
         button.textContent =
             button.dataset.normalText;
 
     }
 
-};
-    /*
-============================================================
-   PART 3 — AUTHENTICATION & ADMIN SECURITY
-============================================================
-*/
+}
 
 
 /*
 ============================================================
-   FIREBASE AUTH STATE CHECK
+   ADMIN AUTHENTICATION
 ============================================================
 */
 
 onAuthStateChanged(
     auth,
-    async (user) => {
-
-        /*
-        --------------------------------------------------------
-           USER NOT LOGGED IN
-        --------------------------------------------------------
-        */
+    async user => {
 
         if (!user) {
 
-            state.user =
-                null;
-
-            state.adminProfile =
-                null;
-
+            state.user = null;
+            state.adminProfile = null;
 
             showScreen(
                 "login-screen"
             );
-
 
             return;
 
         }
 
 
-        /*
-        --------------------------------------------------------
-           TEMPORARILY STORE AUTH USER
-        --------------------------------------------------------
-        */
-
-        state.user =
-            user;
+        state.user = user;
 
 
         try {
-
-            /*
-            ----------------------------------------------------
-               GET USER PROFILE FROM FIRESTORE
-            ----------------------------------------------------
-            */
 
             const userRef =
                 doc(
@@ -1844,83 +1435,42 @@ onAuthStateChanged(
                 );
 
 
-            /*
-            ----------------------------------------------------
-               USER DOCUMENT DOES NOT EXIST
-            ----------------------------------------------------
-            */
+            if (!userSnap.exists()) {
 
-            if (
-                !userSnap.exists()
-            ) {
-
-                state.user =
-                    null;
-
-                state.adminProfile =
-                    null;
-
+                state.adminProfile = null;
 
                 showScreen(
                     "denied-screen"
                 );
-
 
                 return;
 
             }
 
 
-            /*
-            ----------------------------------------------------
-               GET USER DATA
-            ----------------------------------------------------
-            */
-
             const userData =
                 userSnap.data();
 
-
-            /*
-            ----------------------------------------------------
-               ADMIN ROLE CHECK
-            ----------------------------------------------------
-            */
 
             if (
                 userData.role !==
                 "admin"
             ) {
 
-                state.adminProfile =
-                    null;
-
+                state.adminProfile = null;
 
                 showScreen(
                     "denied-screen"
                 );
-
 
                 return;
 
             }
 
 
-            /*
-            ----------------------------------------------------
-               ADMIN VERIFIED
-            ----------------------------------------------------
-            */
-
             state.adminProfile =
                 userData;
 
-
-            /*
-            ----------------------------------------------------
-               ADMIN NAME
-            ----------------------------------------------------
-            */
 
             const adminName =
                 document.getElementById(
@@ -1937,12 +1487,6 @@ onAuthStateChanged(
 
             }
 
-
-            /*
-            ----------------------------------------------------
-               ADMIN AVATAR
-            ----------------------------------------------------
-            */
 
             const adminAvatar =
                 document.getElementById(
@@ -1967,52 +1511,25 @@ onAuthStateChanged(
             }
 
 
-            /*
-            ----------------------------------------------------
-               SHOW ADMIN APPLICATION
-            ----------------------------------------------------
-            */
-
             showScreen(
                 "app-screen"
             );
 
 
-            /*
-            ----------------------------------------------------
-               LOAD DASHBOARD
-               Function will be created in
-               the following parts.
-            ----------------------------------------------------
-            */
+            state.currentConfigKey =
+                "dashboard";
 
-            if (
-                typeof loadDashboard ===
-                "function"
-            ) {
 
-                await loadDashboard();
-
-            }
+            await loadDashboard();
 
 
         } catch (error) {
 
             console.error(
-                "Admin authentication check error:",
+                "Admin authentication error:",
                 error
             );
 
-
-            state.adminProfile =
-                null;
-
-
-            /*
-            ----------------------------------------------------
-               PERMISSION / FIREBASE ERROR
-            ----------------------------------------------------
-            */
 
             showToast(
                 getFirebaseErrorMessage(
@@ -2034,7 +1551,7 @@ onAuthStateChanged(
 
 /*
 ============================================================
-   ADMIN LOGIN FORM
+   LOGIN FORM
 ============================================================
 */
 
@@ -2048,16 +1565,10 @@ if (loginForm) {
 
     loginForm.addEventListener(
         "submit",
-        async (event) => {
+        async event => {
 
             event.preventDefault();
 
-
-            /*
-            ----------------------------------------------------
-               GET LOGIN INPUTS
-            ----------------------------------------------------
-            */
 
             const emailInput =
                 document.getElementById(
@@ -2087,26 +1598,18 @@ if (loginForm) {
                     "error"
                 );
 
-
                 return;
 
             }
 
 
             const email =
-                emailInput.value
-                    .trim();
+                emailInput.value.trim();
 
 
             const password =
                 passwordInput.value;
 
-
-            /*
-            ----------------------------------------------------
-               BASIC VALIDATION
-            ----------------------------------------------------
-            */
 
             if (!email) {
 
@@ -2115,9 +1618,7 @@ if (loginForm) {
                     "error"
                 );
 
-
                 emailInput.focus();
-
 
                 return;
 
@@ -2131,20 +1632,12 @@ if (loginForm) {
                     "error"
                 );
 
-
                 passwordInput.focus();
-
 
                 return;
 
             }
 
-
-            /*
-            ----------------------------------------------------
-               LOGIN BUTTON LOADING
-            ----------------------------------------------------
-            */
 
             setButtonLoading(
                 loginButton,
@@ -2155,37 +1648,16 @@ if (loginForm) {
 
             try {
 
-                /*
-                ------------------------------------------------
-                   FIREBASE AUTH LOGIN
-                ------------------------------------------------
-                */
-
                 await signInWithEmailAndPassword(
                     auth,
                     email,
                     password
                 );
 
-
-                /*
-                ------------------------------------------------
-                   DO NOT MANUALLY OPEN DASHBOARD HERE.
-
-                   onAuthStateChanged() will verify:
-                   Firebase user
-                   +
-                   Firestore role
-                   +
-                   admin access
-                ------------------------------------------------
-                */
-
-
             } catch (error) {
 
                 console.error(
-                    "Admin login error:",
+                    "Login error:",
                     error
                 );
 
@@ -2208,51 +1680,19 @@ if (loginForm) {
     );
 
 }
-
-
-/*
-============================================================
-   ADMIN LOGOUT
-============================================================
-*/
-
 window.doLogout =
-    async () => {
+    async function() {
 
         try {
 
-            await signOut(
-                auth
-            );
+            await signOut(auth);
 
 
-            /*
-            ----------------------------------------------------
-               CLEAR LOCAL ADMIN STATE
-            ----------------------------------------------------
-            */
+            state.user = null;
+            state.adminProfile = null;
+            state.currentConfigKey = null;
+            state.currentEditId = null;
 
-            state.user =
-                null;
-
-
-            state.adminProfile =
-                null;
-
-
-            state.currentConfigKey =
-                null;
-
-
-            state.currentEditId =
-                null;
-
-
-            /*
-            ----------------------------------------------------
-               RETURN TO LOGIN SCREEN
-            ----------------------------------------------------
-            */
 
             showScreen(
                 "login-screen"
@@ -2262,7 +1702,7 @@ window.doLogout =
         } catch (error) {
 
             console.error(
-                "Admin logout error:",
+                "Logout error:",
                 error
             );
 
@@ -2277,308 +1717,70 @@ window.doLogout =
         }
 
     };
-    /*
-============================================================
-   PART 4 — NAVIGATION & SIDEBAR
-============================================================
-*/
 
 
 /*
 ============================================================
-   NAVIGATION LINKS
+   NAVIGATION
 ============================================================
 */
 
 document
-    .querySelectorAll(
-        ".nav-link"
-    )
-    .forEach(
-        (link) => {
+    .querySelectorAll(".nav-link")
+    .forEach(link => {
 
-            link.addEventListener(
-                "click",
-                (event) => {
+        link.addEventListener(
+            "click",
+            async () => {
 
-                    event.preventDefault();
+                document
+                    .querySelectorAll(
+                        ".nav-link"
+                    )
+                    .forEach(item => {
 
-
-                    /*
-                    ------------------------------------------------
-                       REMOVE ACTIVE FROM ALL LINKS
-                    ------------------------------------------------
-                    */
-
-                    document
-                        .querySelectorAll(
-                            ".nav-link"
-                        )
-                        .forEach(
-                            (item) => {
-
-                                item.classList.remove(
-                                    "active"
-                                );
-
-                            }
+                        item.classList.remove(
+                            "active"
                         );
 
+                    });
 
-                    /*
-                    ------------------------------------------------
-                       ADD ACTIVE TO CLICKED LINK
-                    ------------------------------------------------
-                    */
 
-                    event.currentTarget.classList.add(
-                        "active"
-                    );
-
-
-                    /*
-                    ------------------------------------------------
-                       GET VIEW NAME
-                    ------------------------------------------------
-                    */
-
-                    const viewKey =
-                        event.currentTarget.dataset.view;
-
-
-                    if (!viewKey) {
-
-                        return;
-
-                    }
-
-
-                    /*
-                    ------------------------------------------------
-                       OPEN REQUESTED VIEW
-                    ------------------------------------------------
-                    */
-
-                    openAdminView(
-                        viewKey
-                    );
-
-
-                    /*
-                    ------------------------------------------------
-                       CLOSE MOBILE SIDEBAR
-                    ------------------------------------------------
-                    */
-
-                    if (
-                        window.innerWidth <=
-                        768
-                    ) {
-
-                        closeSidebar();
-
-                    }
-
-                }
-            );
-
-        }
-    );
-
-
-/*
-============================================================
-   OPEN ADMIN VIEW
-============================================================
-*/
-
-async function openAdminView(
-    viewKey
-) {
-
-    /*
-    ------------------------------------------------------------
-       Store current view
-    ------------------------------------------------------------
-    */
-
-    state.currentConfigKey =
-        viewKey;
-
-
-    /*
-    ------------------------------------------------------------
-       Dashboard
-    ------------------------------------------------------------
-    */
-
-    if (
-        viewKey ===
-        "dashboard"
-    ) {
-
-        showAdminSection(
-            "dashboard-section"
-        );
-
-
-        if (
-            typeof loadDashboard ===
-            "function"
-        ) {
-
-            await loadDashboard();
-
-        }
-
-
-        return;
-
-    }
-
-
-    /*
-    ------------------------------------------------------------
-       Homepage
-    ------------------------------------------------------------
-    */
-
-    if (
-        viewKey ===
-        "homepage"
-    ) {
-
-        showAdminSection(
-            "homepage-section"
-        );
-
-
-        if (
-            typeof loadHomepageManagement ===
-            "function"
-        ) {
-
-            await loadHomepageManagement();
-
-        }
-
-
-        return;
-
-    }
-
-
-    /*
-    ------------------------------------------------------------
-       Generic CMS Sections
-    ------------------------------------------------------------
-    */
-
-    if (
-        CMS_CONFIG[
-            viewKey
-        ]
-    ) {
-
-        showAdminSection(
-            "generic-section"
-        );
-
-
-        if (
-            typeof loadGenericTable ===
-            "function"
-        ) {
-
-            await loadGenericTable(
-                viewKey
-            );
-
-        }
-
-
-        return;
-
-    }
-
-
-    /*
-    ------------------------------------------------------------
-       Unknown View
-    ------------------------------------------------------------
-    */
-
-    console.warn(
-        "Unknown admin view:",
-        viewKey
-    );
-
-
-    showToast(
-        "This admin section is not available yet.",
-        "error"
-    );
-
-}
-
-
-/*
-============================================================
-   SHOW ADMIN SECTION
-============================================================
-*/
-
-function showAdminSection(
-    sectionId
-) {
-
-    /*
-    ------------------------------------------------------------
-       Hide all admin sections
-    ------------------------------------------------------------
-    */
-
-    document
-        .querySelectorAll(
-            ".admin-section"
-        )
-        .forEach(
-            (section) => {
-
-                section.classList.remove(
+                link.classList.add(
                     "active"
                 );
+
+
+                const viewKey =
+                    link.dataset.view;
+
+
+                if (!viewKey) return;
+
+
+                await openAdminView(
+                    viewKey
+                );
+
+
+                if (
+                    window.innerWidth <=
+                    768
+                ) {
+
+                    closeSidebar();
+
+                }
 
             }
         );
 
-
-    /*
-    ------------------------------------------------------------
-       Show requested section
-    ------------------------------------------------------------
-    */
-
-    const section =
-        document.getElementById(
-            sectionId
-        );
-
-
-    if (section) {
-
-        section.classList.add(
-            "active"
-        );
-
-    }
-
-}
+    });
 
 
 /*
 ============================================================
-   SIDEBAR ELEMENTS
+   SIDEBAR
 ============================================================
 */
 
@@ -2588,17 +1790,11 @@ const sidebar =
     );
 
 
-const sidebarOverlay =
+const menuButton =
     document.getElementById(
-        "sidebar-overlay"
+        "menu-toggle"
     );
 
-
-/*
-============================================================
-   OPEN SIDEBAR
-============================================================
-*/
 
 function openSidebar() {
 
@@ -2610,23 +1806,8 @@ function openSidebar() {
 
     }
 
-
-    if (sidebarOverlay) {
-
-        sidebarOverlay.classList.add(
-            "active"
-        );
-
-    }
-
 }
 
-
-/*
-============================================================
-   CLOSE SIDEBAR
-============================================================
-*/
 
 function closeSidebar() {
 
@@ -2638,23 +1819,8 @@ function closeSidebar() {
 
     }
 
-
-    if (sidebarOverlay) {
-
-        sidebarOverlay.classList.remove(
-            "active"
-        );
-
-    }
-
 }
 
-
-/*
-============================================================
-   GLOBAL SIDEBAR FUNCTIONS
-============================================================
-*/
 
 window.openSidebar =
     openSidebar;
@@ -2662,18 +1828,6 @@ window.openSidebar =
 
 window.closeSidebar =
     closeSidebar;
-
-
-/*
-============================================================
-   SIDEBAR TOGGLE BUTTON
-============================================================
-*/
-
-const menuButton =
-    document.getElementById(
-        "menu-toggle"
-    );
 
 
 if (menuButton) {
@@ -2703,40 +1857,9 @@ if (menuButton) {
 }
 
 
-/*
-============================================================
-   SIDEBAR OVERLAY CLICK
-============================================================
-*/
-
-if (sidebarOverlay) {
-
-    sidebarOverlay.addEventListener(
-        "click",
-        () => {
-
-            closeSidebar();
-
-        }
-    );
-
-}
-
-
-/*
-============================================================
-   WINDOW RESIZE
-============================================================
-*/
-
 window.addEventListener(
     "resize",
     () => {
-
-        /*
-        Close mobile sidebar when
-        switching to desktop.
-        */
 
         if (
             window.innerWidth >
@@ -2749,609 +1872,184 @@ window.addEventListener(
 
     }
 );
-
-
-/*
-============================================================
-   ESCAPE KEY — CLOSE SIDEBAR
-============================================================
-*/
-
-document.addEventListener(
-    "keydown",
-    (event) => {
-
-        if (
-            event.key ===
-            "Escape"
-        ) {
-
-            closeSidebar();
-
-        }
-
-    }
-);
-    /*
-============================================================
-   PART 5 — DASHBOARD + FIRESTORE CRUD
-============================================================
-*/
-
-
-/*
-============================================================
-   DASHBOARD STATISTICS
-============================================================
-*/
-
-async function loadDashboard() {
-
-    const statistics = [
-
-        {
-            collection: "content",
-            element: "stat-content"
-        },
-
-        {
-            collection: "games",
-            element: "stat-games"
-        },
-
-        {
-            collection: "stories",
-            element: "stat-stories"
-        },
-
-        {
-            collection: "videos",
-            element: "stat-videos"
-        },
-
-        {
-            collection: "quizzes",
-            element: "stat-quizzes"
-        },
-
-        {
-            collection: "folders",
-            element: "stat-folders"
-        },
-
-        {
-            collection: "notices",
-            element: "stat-notices"
-        },
-
-        {
-            collection: "users",
-            element: "stat-users"
-        }
-
-    ];
-
-
-    /*
-    ------------------------------------------------------------
-       Show loading state
-    ------------------------------------------------------------
-    */
-
-    statistics.forEach(
-        (item) => {
-
-            const element =
-                document.getElementById(
-                    item.element
-                );
-
-
-            if (element) {
-
-                element.textContent =
-                    "...";
-
-            }
-
-        }
-    );
-
-
-    /*
-    ------------------------------------------------------------
-       Load every collection
-    ------------------------------------------------------------
-    */
-
-    await Promise.all(
-
-        statistics.map(
-            async (item) => {
-
-                try {
-
-                    const snapshot =
-                        await getDocs(
-                            collection(
-                                db,
-                                item.collection
-                            )
-                        );
-
-
-                    const element =
-                        document.getElementById(
-                            item.element
-                        );
-
-
-                    if (element) {
-
-                        element.textContent =
-                            snapshot.size;
-
-                    }
-
-                } catch (error) {
-
-                    console.error(
-                        `Unable to load ${item.collection} count:`,
-                        error
-                    );
-
-
-                    const element =
-                        document.getElementById(
-                            item.element
-                        );
-
-
-                    if (element) {
-
-                        element.textContent =
-                            "—";
-
-                    }
-
-                }
-
-            }
-        )
-
-    );
-
-}
-
-
-/*
-============================================================
-   LOAD GENERIC CMS TABLE
-============================================================
-*/
-
-async function loadGenericTable(
-    configKey
+async function openAdminView(
+    viewKey
 ) {
 
-    const config =
-        CMS_CONFIG[
-            configKey
-        ];
-
-
-    if (!config) {
-
-        showToast(
-            "Invalid CMS section.",
-            "error"
-        );
-
-        return;
-
-    }
-
-
     state.currentConfigKey =
-        configKey;
-
-
-    /*
-    ------------------------------------------------------------
-       Update section title
-    ------------------------------------------------------------
-    */
-
-    const titleElement =
-        document.getElementById(
-            "generic-title"
-        );
-
-
-    if (titleElement) {
-
-        titleElement.textContent =
-            config.icon +
-            " " +
-            config.title;
-
-    }
-
-
-    /*
-    ------------------------------------------------------------
-       Clear previous table
-    ------------------------------------------------------------
-    */
-
-    const thead =
-        document.getElementById(
-            "generic-thead"
-        );
-
-
-    const tbody =
-        document.getElementById(
-            "generic-tbody"
-        );
+        viewKey;
 
 
     if (
-        !thead ||
-        !tbody
+        viewKey ===
+        "dashboard"
     ) {
 
-        console.error(
-            "Generic table elements not found."
+        showAdminSection(
+            "view-dashboard"
         );
+
+
+        await loadDashboard();
+
 
         return;
 
     }
 
 
-    thead.innerHTML =
-        "";
+    if (
+        viewKey ===
+        "settings"
+    ) {
 
-
-    tbody.innerHTML =
-        "";
-
-
-    /*
-    ------------------------------------------------------------
-       Build table headings
-    ------------------------------------------------------------
-    */
-
-    const headerRow =
-        document.createElement(
-            "tr"
+        showAdminSection(
+            "view-settings"
         );
 
 
-    config.columns.forEach(
-        (column) => {
-
-            const th =
-                document.createElement(
-                    "th"
-                );
-
-
-            th.textContent =
-                formatFieldName(
-                    column
-                );
-
-
-            headerRow.appendChild(
-                th
-            );
-
-        }
-    );
-
-
-    /*
-    Add Actions column
-    only when section is editable.
-    */
-
-    if (!config.readonly) {
-
-        const actionHeader =
-            document.createElement(
-                "th"
-            );
-
-
-        actionHeader.textContent =
-            "Actions";
-
-
-        headerRow.appendChild(
-            actionHeader
-        );
+        return;
 
     }
 
 
-    thead.appendChild(
-        headerRow
-    );
+    if (
+        viewKey ===
+        "homepage"
+    ) {
+
+        showAdminSection(
+            "view-generic"
+        );
 
 
-    /*
-    ------------------------------------------------------------
-       Load Firestore documents
-    ------------------------------------------------------------
-    */
-
-    try {
-
-        const collectionRef =
-            collection(
-                db,
-                config.collection
+        const title =
+            document.getElementById(
+                "generic-title"
             );
 
 
-        let snapshot;
+        if (title) {
 
-
-        /*
-        Try ordered query first.
-        If the collection does not have
-        updatedAt fields, fall back to
-        normal getDocs().
-        */
-
-        try {
-
-            const orderedQuery =
-                query(
-                    collectionRef,
-                    orderBy(
-                        "updatedAt",
-                        "desc"
-                    )
-                );
-
-
-            snapshot =
-                await getDocs(
-                    orderedQuery
-                );
-
-
-        } catch (orderError) {
-
-            snapshot =
-                await getDocs(
-                    collectionRef
-                );
+            title.textContent =
+                "🏠 Home Management";
 
         }
 
 
-        /*
-        --------------------------------------------------------
-           Empty state
-        --------------------------------------------------------
-        */
+        const tbody =
+            document.getElementById(
+                "generic-tbody"
+            );
 
-        if (
-            snapshot.empty
-        ) {
 
-            const emptyRow =
+        if (tbody) {
+
+            tbody.innerHTML = "";
+
+
+            const row =
                 document.createElement(
                     "tr"
                 );
 
 
-            const emptyCell =
+            const cell =
                 document.createElement(
                     "td"
                 );
 
 
-            emptyCell.colSpan =
-                config.columns.length +
-                (
-                    config.readonly
-                        ? 0
-                        : 1
-                );
+            cell.colSpan = 1;
 
 
-            emptyCell.textContent =
-                "No records found.";
+            cell.textContent =
+                "Homepage management UI is not available yet.";
 
 
-            emptyRow.appendChild(
-                emptyCell
-            );
-
-
-            tbody.appendChild(
-                emptyRow
-            );
-
-
-            return;
+            row.appendChild(cell);
+            tbody.appendChild(row);
 
         }
 
 
-        /*
-        --------------------------------------------------------
-           Render records
-        --------------------------------------------------------
-        */
+        return;
 
-        snapshot.forEach(
-            (documentSnapshot) => {
-
-                const data =
-                    documentSnapshot.data();
+    }
 
 
-                const row =
-                    document.createElement(
-                        "tr"
-                    );
+    if (
+        CMS_CONFIG[viewKey]
+    ) {
 
-
-                config.columns.forEach(
-                    (column) => {
-
-                        const cell =
-                            document.createElement(
-                                "td"
-                            );
-
-
-                        cell.textContent =
-                            formatCellValue(
-                                data[
-                                    column
-                                ]
-                            );
-
-
-                        row.appendChild(
-                            cell
-                        );
-
-                    }
-                );
-
-
-                /*
-                ------------------------------------------------
-                   ACTIONS
-                ------------------------------------------------
-                */
-
-                if (!config.readonly) {
-
-                    const actionCell =
-                        document.createElement(
-                            "td"
-                        );
-
-
-                    /*
-                    Edit button
-                    */
-
-                    const editButton =
-                        document.createElement(
-                            "button"
-                        );
-
-
-                    editButton.type =
-                        "button";
-
-
-                    editButton.className =
-                        "action-btn edit";
-
-
-                    editButton.textContent =
-                        "Edit";
-
-
-                    editButton.addEventListener(
-                        "click",
-                        () => {
-
-                            openEditModal(
-                                configKey,
-                                documentSnapshot.id,
-                                data
-                            );
-
-                        }
-                    );
-
-
-                    /*
-                    Delete button
-                    */
-
-                    const deleteButton =
-                        document.createElement(
-                            "button"
-                        );
-
-
-                    deleteButton.type =
-                        "button";
-
-
-                    deleteButton.className =
-                        "action-btn delete";
-
-
-                    deleteButton.textContent =
-                        "Delete";
-
-
-                    deleteButton.addEventListener(
-                        "click",
-                        () => {
-
-                            openDeleteConfirmation(
-                                configKey,
-                                documentSnapshot.id
-                            );
-
-                        }
-                    );
-
-
-                    actionCell.appendChild(
-                        editButton
-                    );
-
-
-                    actionCell.appendChild(
-                        deleteButton
-                    );
-
-
-                    row.appendChild(
-                        actionCell
-                    );
-
-                }
-
-
-                tbody.appendChild(
-                    row
-                );
-
-            }
+        showAdminSection(
+            "view-generic"
         );
 
 
-    } catch (error) {
+        const addButton =
+            document.getElementById(
+                "generic-add-btn"
+            );
 
-        console.error(
-            "Generic table error:",
-            error
+
+        if (addButton) {
+
+            addButton.style.display =
+                CMS_CONFIG[
+                    viewKey
+                ].readonly
+                    ? "none"
+                    : "flex";
+
+        }
+
+
+        await loadGenericTable(
+            viewKey
         );
 
 
-        showToast(
-            getFirebaseErrorMessage(
-                error
-            ),
-            "error"
+        return;
+
+    }
+
+
+    showToast(
+        "This admin section is not available.",
+        "error"
+    );
+
+}
+
+
+function showAdminSection(
+    sectionId
+) {
+
+    document
+        .querySelectorAll(
+            ".view-section"
+        )
+        .forEach(section => {
+
+            section.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    const section =
+        document.getElementById(
+            sectionId
+        );
+
+
+    if (section) {
+
+        section.classList.add(
+            "active"
         );
 
     }
@@ -3361,40 +2059,176 @@ async function loadGenericTable(
 
 /*
 ============================================================
-   FORMAT FIELD NAME
+   DASHBOARD
 ============================================================
 */
 
-function formatFieldName(
-    fieldName
-) {
+async function loadDashboard() {
 
-    if (!fieldName) {
+    const dashboard =
+        document.getElementById(
+            "dashboard-stats"
+        );
 
-        return "";
+
+    if (!dashboard) return;
+
+
+    dashboard.innerHTML = "";
+
+
+    const statistics = [
+
+        ["content", "📚", "Learn Content"],
+        ["games", "🎮", "Games"],
+        ["stories", "📖", "Stories"],
+        ["videos", "🎥", "Videos"],
+        ["quizzes", "📝", "Quizzes"],
+        ["folders", "📁", "Folders"],
+        ["notices", "📢", "Notices"],
+        ["users", "👨‍🎓", "Students"]
+
+    ];
+
+
+    for (
+        const [collectionName, icon, title]
+        of statistics
+    ) {
+
+        const card =
+            document.createElement(
+                "div"
+            );
+
+
+        card.className =
+            "stat-card";
+
+
+        const iconBox =
+            document.createElement(
+                "div"
+            );
+
+
+        iconBox.className =
+            "stat-icon";
+
+
+        iconBox.textContent =
+            icon;
+
+
+        const info =
+            document.createElement(
+                "div"
+            );
+
+
+        info.className =
+            "stat-info";
+
+
+        const heading =
+            document.createElement(
+                "h4"
+            );
+
+
+        heading.textContent =
+            title;
+
+
+        const value =
+            document.createElement(
+                "div"
+            );
+
+
+        value.className =
+            "stat-value";
+
+
+        value.textContent =
+            "...";
+
+
+        info.appendChild(
+            heading
+        );
+
+
+        info.appendChild(
+            value
+        );
+
+
+        card.appendChild(
+            iconBox
+        );
+
+
+        card.appendChild(
+            info
+        );
+
+
+        dashboard.appendChild(
+            card
+        );
+
+
+        try {
+
+            const snapshot =
+                await getDocs(
+                    collection(
+                        db,
+                        collectionName
+                    )
+                );
+
+
+            value.textContent =
+                snapshot.size;
+
+        } catch (error) {
+
+            console.error(
+                collectionName,
+                error
+            );
+
+
+            value.textContent =
+                "—";
+
+        }
 
     }
 
+}
 
-    return fieldName
+function formatFieldName(
+    field
+) {
+
+    return safeText(field)
+
         .replace(
             /([A-Z])/g,
             " $1"
         )
+
         .replace(
             /^./,
-            (letter) =>
+            letter =>
                 letter.toUpperCase()
         );
 
 }
 
-
-/*
-============================================================
-   FORMAT FIRESTORE VALUE
-============================================================
-*/
 
 function formatCellValue(
     value
@@ -3427,10 +2261,6 @@ function formatCellValue(
         "object"
     ) {
 
-        /*
-        Handle Firestore Timestamp
-        */
-
         if (
             typeof value.toDate ===
             "function"
@@ -3443,9 +2273,19 @@ function formatCellValue(
         }
 
 
-        return JSON.stringify(
-            value
-        );
+        try {
+
+            return JSON.stringify(
+                value
+            );
+
+        } catch {
+
+            return String(
+                value
+            );
+
+        }
 
     }
 
@@ -3459,10 +2299,361 @@ function formatCellValue(
 
 /*
 ============================================================
-   OPEN ADD MODAL
+   LOAD GENERIC TABLE
 ============================================================
 */
 
+async function loadGenericTable(
+    configKey
+) {
+
+    const config =
+        CMS_CONFIG[
+            configKey
+        ];
+
+
+    if (!config) {
+
+        showToast(
+            "Invalid CMS section.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    state.currentConfigKey =
+        configKey;
+
+
+    const titleElement =
+        document.getElementById(
+            "generic-title"
+        );
+
+
+    if (titleElement) {
+
+        titleElement.textContent =
+            config.icon +
+            " " +
+            config.title;
+
+    }
+
+
+    const thead =
+        document.getElementById(
+            "generic-thead"
+        );
+
+
+    const tbody =
+        document.getElementById(
+            "generic-tbody"
+        );
+
+
+    if (
+        !thead ||
+        !tbody
+    ) {
+
+        showToast(
+            "Generic table is missing.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    thead.innerHTML = "";
+    tbody.innerHTML = "";
+
+
+    const headerRow =
+        document.createElement(
+            "tr"
+        );
+
+
+    config.columns.forEach(
+        column => {
+
+            const th =
+                document.createElement(
+                    "th"
+                );
+
+
+            th.textContent =
+                formatFieldName(
+                    column
+                );
+
+
+            headerRow.appendChild(
+                th
+            );
+
+        }
+    );
+
+
+    if (!config.readonly) {
+
+        const th =
+            document.createElement(
+                "th"
+            );
+
+
+        th.textContent =
+            "Actions";
+
+
+        headerRow.appendChild(th);
+
+    }
+
+
+    thead.appendChild(
+        headerRow
+    );
+
+
+    try {
+
+        const collectionRef =
+            collection(
+                db,
+                config.collection
+            );
+
+
+        let snapshot;
+
+
+        try {
+
+            snapshot =
+                await getDocs(
+                    query(
+                        collectionRef,
+                        orderBy(
+                            "updatedAt",
+                            "desc"
+                        )
+                    )
+                );
+
+        } catch {
+
+            snapshot =
+                await getDocs(
+                    collectionRef
+                );
+
+        }
+
+
+        if (snapshot.empty) {
+
+            const row =
+                document.createElement(
+                    "tr"
+                );
+
+
+            const cell =
+                document.createElement(
+                    "td"
+                );
+
+
+            cell.colSpan =
+                config.columns.length +
+                (
+                    config.readonly
+                        ? 0
+                        : 1
+                );
+
+
+            cell.textContent =
+                "No records found.";
+
+
+            row.appendChild(cell);
+            tbody.appendChild(row);
+
+
+            return;
+
+        }
+
+
+        snapshot.forEach(
+            documentSnapshot => {
+
+                const data =
+                    documentSnapshot.data();
+
+
+                const row =
+                    document.createElement(
+                        "tr"
+                    );
+
+
+                config.columns.forEach(
+                    column => {
+
+                        const cell =
+                            document.createElement(
+                                "td"
+                            );
+
+
+                        cell.textContent =
+                            formatCellValue(
+                                data[
+                                    column
+                                ]
+                            );
+
+
+                        row.appendChild(
+                            cell
+                        );
+
+                    }
+                );
+
+
+                if (!config.readonly) {
+
+                    const actionCell =
+                        document.createElement(
+                            "td"
+                        );
+
+
+                    const editButton =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    editButton.type =
+                        "button";
+
+
+                    editButton.className =
+                        "btn-icon edit";
+
+
+                    editButton.textContent =
+                        "✏️";
+
+
+                    editButton.title =
+                        "Edit";
+
+
+                    editButton.onclick =
+                        () => {
+
+                            openEditModal(
+                                configKey,
+                                documentSnapshot.id,
+                                data
+                            );
+
+                        };
+
+
+                    const deleteButton =
+                        document.createElement(
+                            "button"
+                        );
+
+
+                    deleteButton.type =
+                        "button";
+
+
+                    deleteButton.className =
+                        "btn-icon delete";
+
+
+                    deleteButton.textContent =
+                        "🗑️";
+
+
+                    deleteButton.title =
+                        "Delete";
+
+
+                    deleteButton.onclick =
+                        () => {
+
+                            openDeleteConfirmation(
+                                configKey,
+                                documentSnapshot.id
+                            );
+
+                        };
+
+
+                    actionCell.appendChild(
+                        editButton
+                    );
+
+
+                    actionCell.appendChild(
+                        deleteButton
+                    );
+
+
+                    row.appendChild(
+                        actionCell
+                    );
+
+                }
+
+
+                tbody.appendChild(
+                    row
+                );
+
+            }
+        );
+
+
+    } catch (error) {
+
+        console.error(
+            "Table error:",
+            error
+        );
+
+
+        showToast(
+            getFirebaseErrorMessage(
+                error
+            ),
+            "error"
+        );
+
+    }
+
+}
 function openAddModal(
     configKey
 ) {
@@ -3476,11 +2667,7 @@ function openAddModal(
     if (
         !config ||
         config.readonly
-    ) {
-
-        return;
-
-    }
+    ) return;
 
 
     state.currentConfigKey =
@@ -3497,15 +2684,15 @@ function openAddModal(
     );
 
 
-    const modalTitle =
+    const title =
         document.getElementById(
-            "generic-modal-title"
+            "modal-title"
         );
 
 
-    if (modalTitle) {
+    if (title) {
 
-        modalTitle.textContent =
+        title.textContent =
             "Add " +
             config.title;
 
@@ -3513,17 +2700,11 @@ function openAddModal(
 
 
     openModal(
-        "generic-modal"
+        "form-modal"
     );
 
 }
 
-
-/*
-============================================================
-   OPEN EDIT MODAL
-============================================================
-*/
 
 function openEditModal(
     configKey,
@@ -3540,11 +2721,7 @@ function openEditModal(
     if (
         !config ||
         config.readonly
-    ) {
-
-        return;
-
-    }
+    ) return;
 
 
     state.currentConfigKey =
@@ -3561,15 +2738,15 @@ function openEditModal(
     );
 
 
-    const modalTitle =
+    const title =
         document.getElementById(
-            "generic-modal-title"
+            "modal-title"
         );
 
 
-    if (modalTitle) {
+    if (title) {
 
-        modalTitle.textContent =
+        title.textContent =
             "Edit " +
             config.title;
 
@@ -3577,33 +2754,28 @@ function openEditModal(
 
 
     openModal(
-        "generic-modal"
+        "form-modal"
     );
 
 }
 
-
-/*
-============================================================
-   BUILD CMS FORM
-============================================================
-*/
 
 function buildCMSForm(
     config,
     data
 ) {
 
-    const formContainer =
+    const container =
         document.getElementById(
-            "generic-form"
+            "modal-form-fields"
         );
 
 
-    if (!formContainer) {
+    if (!container) {
 
-        console.error(
-            "Generic form container not found."
+        showToast(
+            "Form container is missing.",
+            "error"
         );
 
         return;
@@ -3611,12 +2783,11 @@ function buildCMSForm(
     }
 
 
-    formContainer.innerHTML =
-        "";
+    container.innerHTML = "";
 
 
     config.fields.forEach(
-        (field) => {
+        field => {
 
             const wrapper =
                 document.createElement(
@@ -3646,12 +2817,6 @@ function buildCMSForm(
             let input;
 
 
-            /*
-            ----------------------------------------------------
-               TEXTAREA
-            ----------------------------------------------------
-            */
-
             if (
                 field.type ===
                 "textarea"
@@ -3663,8 +2828,7 @@ function buildCMSForm(
                     );
 
 
-                input.rows =
-                    5;
+                input.rows = 5;
 
 
                 if (
@@ -3678,13 +2842,6 @@ function buildCMSForm(
 
             }
 
-
-            /*
-            ----------------------------------------------------
-               SELECT
-            ----------------------------------------------------
-            */
-
             else if (
                 field.type ===
                 "select"
@@ -3697,7 +2854,7 @@ function buildCMSForm(
 
 
                 field.options.forEach(
-                    (option) => {
+                    option => {
 
                         const optionElement =
                             document.createElement(
@@ -3722,13 +2879,6 @@ function buildCMSForm(
 
             }
 
-
-            /*
-            ----------------------------------------------------
-               CHECKBOX
-            ----------------------------------------------------
-            */
-
             else if (
                 field.type ===
                 "checkbox"
@@ -3745,26 +2895,15 @@ function buildCMSForm(
 
 
                 input.checked =
-                    data[
-                        field.id
-                    ] !== undefined
+                    data[field.id] !== undefined
                         ? Boolean(
-                            data[
-                                field.id
-                            ]
+                            data[field.id]
                         )
                         : Boolean(
                             field.default
                         );
 
             }
-
-
-            /*
-            ----------------------------------------------------
-               NORMAL INPUT
-            ----------------------------------------------------
-            */
 
             else {
 
@@ -3810,24 +2949,14 @@ function buildCMSForm(
             }
 
 
-            /*
-            ----------------------------------------------------
-               Fill existing value
-            ----------------------------------------------------
-            */
-
             if (
                 field.type !==
                 "checkbox"
             ) {
 
                 input.value =
-                    data[
-                        field.id
-                    ] !== undefined
-                        ? data[
-                            field.id
-                        ]
+                    data[field.id] !== undefined
+                        ? data[field.id]
                         : "";
 
             }
@@ -3838,7 +2967,7 @@ function buildCMSForm(
             );
 
 
-            formContainer.appendChild(
+            container.appendChild(
                 wrapper
             );
 
@@ -3846,14 +2975,6 @@ function buildCMSForm(
     );
 
 }
-
-
-/*
-============================================================
-   SAVE CMS DOCUMENT
-============================================================
-*/
-
 async function saveCMSDocument() {
 
     const configKey =
@@ -3869,257 +2990,199 @@ async function saveCMSDocument() {
     if (
         !config ||
         config.readonly
-    ) {
-
-        return;
-
-    }
+    ) return;
 
 
-    const formContainer =
-        document.getElementById(
-            "generic-form"
-        );
+    const data = {};
 
-
-    if (!formContainer) {
-
-        return;
-
-    }
-
-
-    const data =
-        {};
-
-
-    /*
-    ------------------------------------------------------------
-       Collect fields
-    ------------------------------------------------------------
-    */
 
     for (
         const field of
         config.fields
     ) {
 
-        const 
-         /*
-============================================================
-   PART 6 — HOMEPAGE + FINAL ADMIN FUNCTIONS
-============================================================
-*/
+        const input =
+            document.getElementById(
+                "cms-field-" +
+                field.id
+            );
 
 
-/*
-============================================================
-   HOMEPAGE MANAGEMENT
-============================================================
-*/
-
-async function loadHomepageManagement() {
-
-    const titleElement =
-        document.getElementById(
-            "homepage-title"
-        );
+        if (!input) continue;
 
 
-    if (titleElement) {
+        if (
+            field.type ===
+            "checkbox"
+        ) {
 
-        titleElement.textContent =
-            "🏠 Homepage Management";
+            data[field.id] =
+                input.checked;
+
+        }
+
+        else if (
+            field.type ===
+            "number"
+        ) {
+
+            data[field.id] =
+                input.value === ""
+                    ? 0
+                    : Number(
+                        input.value
+                    );
+
+        }
+
+        else {
+
+            data[field.id] =
+                input.value.trim();
+
+        }
+
+
+        if (
+            field.required &&
+            !data[field.id]
+        ) {
+
+            showToast(
+                field.label +
+                " is required.",
+                "error"
+            );
+
+
+            input.focus();
+
+
+            return;
+
+        }
 
     }
 
-
-    try {
-
-        const homepageRef =
-            doc(
-                db,
-                "homepage",
-                "main"
-            );
-
-
-        const snapshot =
-            await getDoc(
-                homepageRef
-            );
-
-
-        const data =
-            snapshot.exists()
-                ? snapshot.data()
-                : {};
-
-
-        /*
-        --------------------------------------------------------
-           Fill homepage fields
-        --------------------------------------------------------
-        */
-
-        const heroTitle =
-            document.getElementById(
-                "homepage-hero-title"
-            );
-
-
-        const heroSubtitle =
-            document.getElementById(
-                "homepage-hero-subtitle"
-            );
-
-
-        const heroImage =
-            document.getElementById(
-                "homepage-hero-image"
-            );
-
-
-        if (heroTitle) {
-
-            heroTitle.value =
-                data.heroTitle ||
-                "";
-
-        }
-
-
-        if (heroSubtitle) {
-
-            heroSubtitle.value =
-                data.heroSubtitle ||
-                "";
-
-        }
-
-
-        if (heroImage) {
-
-            heroImage.value =
-                data.heroImage ||
-                "";
-
-        }
-
-
-    } catch (error) {
-
-        console.error(
-            "Homepage load error:",
-            error
-        );
-
-
-        showToast(
-            getFirebaseErrorMessage(
-                error
-            ),
-            "error"
-        );
-
-    }
-
-}
-
-
-/*
-============================================================
-   SAVE HOMEPAGE
-============================================================
-*/
-
-async function saveHomepage() {
 
     if (
-        !state.user ||
-        !state.adminProfile
+        configKey ===
+        "quizzes" &&
+        data.questionsJson
     ) {
 
-        showToast(
-            "Admin authentication required.",
-            "error"
-        );
+        try {
+
+            const parsed =
+                JSON.parse(
+                    data.questionsJson
+                );
 
 
-        return;
+            if (
+                !Array.isArray(parsed)
+            ) {
+
+                throw new Error();
+
+            }
+
+        } catch {
+
+            showToast(
+                "Invalid Questions JSON.",
+                "error"
+            );
+
+
+            return;
+
+        }
 
     }
 
 
-    const heroTitle =
-        document.getElementById(
-            "homepage-hero-title"
-        );
-
-
-    const heroSubtitle =
-        document.getElementById(
-            "homepage-hero-subtitle"
-        );
-
-
-    const heroImage =
-        document.getElementById(
-            "homepage-hero-image"
-        );
-
-
-    const homepageData = {
-
-        heroTitle:
-            heroTitle
-                ? heroTitle.value.trim()
-                : "",
-
-        heroSubtitle:
-            heroSubtitle
-                ? heroSubtitle.value.trim()
-                : "",
-
-        heroImage:
-            heroImage
-                ? heroImage.value.trim()
-                : "",
-
-        updatedAt:
-            serverTimestamp(),
-
-        updatedBy:
-            state.user.uid
-
-    };
-
-
     try {
 
-        await setDoc(
-            doc(
-                db,
-                "homepage",
-                "main"
-            ),
-            homepageData,
-            {
-                merge: true
-            }
+        if (
+            state.currentEditId
+        ) {
+
+            await updateDoc(
+                doc(
+                    db,
+                    config.collection,
+                    state.currentEditId
+                ),
+                {
+                    ...data,
+                    updatedAt:
+                        serverTimestamp(),
+                    updatedBy:
+                        state.user
+                            ? state.user.uid
+                            : null
+                }
+            );
+
+
+            showToast(
+                "Updated successfully.",
+                "success"
+            );
+
+        }
+
+        else {
+
+            await addDoc(
+                collection(
+                    db,
+                    config.collection
+                ),
+                {
+                    ...data,
+                    createdAt:
+                        serverTimestamp(),
+                    updatedAt:
+                        serverTimestamp(),
+                    createdBy:
+                        state.user
+                            ? state.user.uid
+                            : null
+                }
+            );
+
+
+            showToast(
+                "Added successfully.",
+                "success"
+            );
+
+        }
+
+
+        closeModal(
+            "form-modal"
         );
 
 
-        showToast(
-            "Homepage settings saved successfully.",
-            "success"
+        state.currentEditId =
+            null;
+
+
+        await loadGenericTable(
+            configKey
         );
+
+
+        await loadDashboard();
 
 
     } catch (error) {
 
         console.error(
-            "Homepage save error:",
+            "Save error:",
             error
         );
 
@@ -4136,102 +3199,146 @@ async function saveHomepage() {
 }
 
 
-/*
-============================================================
-   GLOBAL HOMEPAGE FUNCTION
-============================================================
-*/
+function openDeleteConfirmation(
+    configKey,
+    documentId
+) {
 
-window.saveHomepage =
-    saveHomepage;
-
-
-/*
-============================================================
-   ADMIN SEARCH
-============================================================
-*/
-
-function setupAdminSearch() {
-
-    const searchInput =
-        document.getElementById(
-            "admin-search"
-        );
+    const config =
+        CMS_CONFIG[
+            configKey
+        ];
 
 
-    if (!searchInput) {
-
-        return;
-
-    }
-
-
-    searchInput.addEventListener(
-        "input",
-        () => {
-
-            const searchTerm =
-                searchInput.value
-                    .trim()
-                    .toLowerCase();
+    if (
+        !config ||
+        config.readonly
+    ) return;
 
 
-            document
-                .querySelectorAll(
-                    "#generic-tbody tr"
-                )
-                .forEach(
-                    (row) => {
-
-                        const rowText =
-                            row.textContent
-                                .toLowerCase();
+    state.deleteConfigKey =
+        configKey;
 
 
-                        row.style.display =
-                            rowText.includes(
-                                searchTerm
-                            )
-                                ? ""
-                                : "none";
+    state.deleteDocumentId =
+        documentId;
 
-                    }
-                );
 
-        }
+    openModal(
+        "confirm-modal"
     );
 
 }
 
 
+async function deleteCMSDocument() {
+
+    const configKey =
+        state.deleteConfigKey;
+
+
+    const documentId =
+        state.deleteDocumentId;
+
+
+    const config =
+        CMS_CONFIG[
+            configKey
+        ];
+
+
+    if (
+        !config ||
+        !documentId ||
+        config.readonly
+    ) return;
+
+
+    try {
+
+        await deleteDoc(
+            doc(
+                db,
+                config.collection,
+                documentId
+            )
+        );
+
+
+        closeModal(
+            "confirm-modal"
+        );
+
+
+        showToast(
+            "Deleted successfully.",
+            "success"
+        );
+
+
+        state.deleteConfigKey =
+            null;
+
+
+        state.deleteDocumentId =
+            null;
+
+
+        await loadGenericTable(
+            configKey
+        );
+
+
+        await loadDashboard();
+
+
+    } catch (error) {
+
+        console.error(
+            "Delete error:",
+            error
+        );
+
+
+        showToast(
+            getFirebaseErrorMessage(
+                error
+            ),
+            "error"
+        );
+
+    }
+
+}
 /*
 ============================================================
    ADD BUTTON
 ============================================================
 */
 
-const addButton =
+const genericAddButton =
     document.getElementById(
-        "add-content-button"
+        "generic-add-btn"
     );
 
 
-if (addButton) {
+if (genericAddButton) {
 
-    addButton.addEventListener(
+    genericAddButton.addEventListener(
         "click",
         () => {
 
             if (
-                !state.currentConfigKey
+                !state.currentConfigKey ||
+                !CMS_CONFIG[
+                    state.currentConfigKey
+                ]
             ) {
 
                 showToast(
                     "Please select a section first.",
                     "error"
                 );
-
 
                 return;
 
@@ -4250,38 +3357,39 @@ if (addButton) {
 
 /*
 ============================================================
-   DELETE CONFIRM BUTTON
+   SAVE BUTTON
 ============================================================
 */
 
-const confirmDeleteButton =
+const modalSaveButton =
     document.getElementById(
-        "confirm-delete-button"
+        "modal-save-btn"
     );
 
 
-if (confirmDeleteButton) {
+if (modalSaveButton) {
 
-    confirmDeleteButton.addEventListener(
+    modalSaveButton.addEventListener(
         "click",
         async () => {
 
             setButtonLoading(
-                confirmDeleteButton,
-                "Deleting...",
-                "Delete"
+                modalSaveButton,
+                "Saving...",
+                "Save Changes"
             );
 
 
             try {
 
-                await deleteCMSDocument();
+                await saveCMSDocument();
 
+            }
 
-            } finally {
+            finally {
 
                 restoreButton(
-                    confirmDeleteButton
+                    modalSaveButton
                 );
 
             }
@@ -4294,38 +3402,39 @@ if (confirmDeleteButton) {
 
 /*
 ============================================================
-   SAVE CMS BUTTON
+   DELETE BUTTON
 ============================================================
 */
 
-const saveCMSButton =
+const confirmDeleteButton =
     document.getElementById(
-        "save-cms-button"
+        "confirm-delete-btn"
     );
 
 
-if (saveCMSButton) {
+if (confirmDeleteButton) {
 
-    saveCMSButton.addEventListener(
+    confirmDeleteButton.addEventListener(
         "click",
         async () => {
 
             setButtonLoading(
-                saveCMSButton,
-                "Saving...",
-                "Save"
+                confirmDeleteButton,
+                "Deleting...",
+                "Yes, Delete"
             );
 
 
             try {
 
-                await saveCMSDocument();
+                await deleteCMSDocument();
 
+            }
 
-            } finally {
+            finally {
 
                 restoreButton(
-                    saveCMSButton
+                    confirmDeleteButton
                 );
 
             }
@@ -4360,11 +3469,7 @@ if (passwordToggle) {
                 );
 
 
-            if (!passwordInput) {
-
-                return;
-
-            }
+            if (!passwordInput) return;
 
 
             if (
@@ -4379,7 +3484,9 @@ if (passwordToggle) {
                 passwordToggle.textContent =
                     "Hide";
 
-            } else {
+            }
+
+            else {
 
                 passwordInput.type =
                     "password";
@@ -4398,43 +3505,23 @@ if (passwordToggle) {
 
 /*
 ============================================================
-   INITIALIZE ADMIN SEARCH
+   DEFAULT VIEW
 ============================================================
 */
 
-setupAdminSearch();
+state.currentConfigKey =
+    "dashboard";
 
 
 /*
 ============================================================
-   INITIAL DEFAULT VIEW
-============================================================
-*/
-
-if (
-    !state.currentConfigKey
-) {
-
-    state.currentConfigKey =
-        "dashboard";
-
-}
-
-
-/*
-============================================================
-   PREVENT ACCIDENTAL MODAL SUBMISSION
+   PREVENT FORM SUBMIT
 ============================================================
 */
 
 document.addEventListener(
     "submit",
-    (event) => {
-
-        /*
-        Generic CMS form is handled
-        manually by saveCMSDocument().
-        */
+    event => {
 
         if (
             event.target.id ===
@@ -4451,15 +3538,14 @@ document.addEventListener(
 
 /*
 ============================================================
-   FINAL ADMIN LOG
+   FINAL
 ============================================================
 */
 
 console.log(
-    "Nanhi Pathshala Admin Panel initialized."
+    "Nanhi Pathshala Admin Panel initialized successfully."
 );
-
 </script>
+
 </body>
 </html>
-    
