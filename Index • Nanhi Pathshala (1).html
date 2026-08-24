@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link
+    rel="manifest"
+    href="./manifest.json"
+>
+
+    <title>Nanhi Pathshala</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            background: #f0fdfa;
+            color: #134e4a;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button {
+            font-family: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* =========================
+           APP
+        ========================== */
+
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 15% 15%, #ccfbf1 0%, transparent 28%),
+                radial-gradient(circle at 85% 20%, #fef3c7 0%, transparent 25%),
+                radial-gradient(circle at 50% 100%, #dbeafe 0%, transparent 32%),
+                #ffffff;
+        }
+
+        /* =========================
+           DECORATIVE BLOBS
+        ========================== */
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .blob-one {
+            width: 180px;
+            height: 180px;
+            background: #99f6e4;
+            top: -70px;
+            left: -60px;
+            animation: blobMove 7s ease-in-out infinite;
+        }
+
+        .blob-two {
+            width: 150px;
+            height: 150px;
+            background: #fde68a;
+            right: -45px;
+            top: 100px;
+            animation: blobMove 8s ease-in-out infinite reverse;
+        }
+
+        .blob-three {
+            width: 210px;
+            height: 210px;
+            background: #bfdbfe;
+            bottom: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: blobMove 9s ease-in-out infinite;
+        }
+
+        @keyframes blobMove {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-15px) scale(1.05);
+            }
+        }
+
+        .blob-three {
+            animation-name: blobBottom;
+        }
+
+        @keyframes blobBottom {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-15px) scale(1.05);
+            }
+        }
+
+        /* =========================
+           FLOATING OBJECTS
+        ========================== */
+
+        .floating {
+            position: absolute;
+            font-size: 28px;
+            user-select: none;
+            pointer-events: none;
+            animation: floating 4s ease-in-out infinite;
+        }
+
+        .float-book {
+            top: 17%;
+            left: 10%;
+        }
+
+        .float-star {
+            top: 25%;
+            right: 12%;
+            animation-delay: 0.8s;
+        }
+
+        .float-pencil {
+            bottom: 24%;
+            left: 12%;
+            animation-delay: 1.3s;
+        }
+
+        .float-ball {
+            bottom: 19%;
+            right: 12%;
+            animation-delay: 1.8s;
+        }
+
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
+        }
+
+        /* =========================
+           MAIN SCREEN
+        ========================== */
+
+        .welcome-screen {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        /* =========================
+           LOGO
+        ========================== */
+
+        .logo-wrapper {
+            width: 112px;
+            height: 112px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation:
+                logoEntrance 0.9s ease-out,
+                logoFloat 4s ease-in-out 1s infinite;
+        }
+
+        .logo {
+            width: 112px;
+            height: 112px;
+            border-radius: 34px;
+            background: linear-gradient(145deg, #2dd4bf, #0d9488);
+            box-shadow:
+                0 20px 40px rgba(13, 148, 136, 0.25),
+                inset 0 2px 4px rgba(255,255,255,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo::before {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+        }
+
+        .book {
+            width: 58px;
+            height: 45px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .book-left,
+        .book-right {
+            position: absolute;
+            top: 5px;
+            width: 29px;
+            height: 36px;
+            background: white;
+        }
+
+        .book-left {
+            left: 0;
+            border-radius: 5px 2px 2px 5px;
+            transform: skewY(4deg);
+        }
+
+        .book-right {
+            right: 0;
+            border-radius: 2px 5px 5px 2px;
+            transform: skewY(-4deg);
+        }
+
+        .book-line {
+            position: absolute;
+            width: 18px;
+            height: 3px;
+            background: #5eead4;
+            border-radius: 5px;
+            z-index: 3;
+        }
+
+        .line-one {
+            left: 5px;
+            top: 15px;
+        }
+
+        .line-two {
+            left: 35px;
+            top: 15px;
+        }
+
+        .line-three {
+            left: 5px;
+            top: 24px;
+        }
+
+        .line-four {
+            left: 35px;
+            top: 24px;
+        }
+
+        @keyframes logoEntrance {
+            from {
+                opacity: 0;
+                transform: scale(0.4) rotate(-15deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+
+        /* =========================
+           TEXT
+        ========================== */
+
+        .welcome-text {
+            animation: textEntrance 0.8s ease-out 0.2s both;
+        }
+
+        .small-title {
+            font-size: clamp(17px, 4vw, 21px);
+            font-weight: 800;
+            color: #0d9488;
+            margin-bottom: 5px;
+            letter-spacing: 0.4px;
+        }
+
+        .main-title {
+            font-family: "Quicksand", sans-serif;
+            font-size: clamp(38px, 10vw, 62px);
+            line-height: 1;
+            font-weight: 800;
+            color: #134e4a;
+            letter-spacing: -1.5px;
+        }
+
+        .tagline {
+            margin-top: 14px;
+            font-size: clamp(15px, 4vw, 19px);
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.8px;
+        }
+
+        @keyframes textEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =========================
+           BUTTON
+        ========================== */
+
+        .start-area {
+            margin-top: 42px;
+            animation: buttonEntrance 0.8s ease-out 0.5s both;
+        }
+
+        .start-button {
+            min-width: 190px;
+            padding: 15px 30px;
+            border-radius: 18px;
+            background: linear-gradient(
+                135deg,
+                #fbbf24,
+                #f59e0b
+            );
+            color: #172554;
+            font-size: 17px;
+            font-weight: 900;
+            box-shadow:
+                0 12px 25px rgba(245, 158, 11, 0.25);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 16px 30px rgba(245, 158, 11, 0.32);
+        }
+
+        .start-button:active {
+            transform: scale(0.96);
+        }
+
+        .arrow {
+            display: inline-block;
+            margin-left: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .start-button:hover .arrow {
+            transform: translateX(5px);
+        }
+
+        @keyframes buttonEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(25px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* =========================
+           PREMIUM INSTALL MODAL 
+        ========================== */
+
+        .install-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            
+            /* Premium Overlay Backdrop */
+            background: rgba(13, 78, 74, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .install-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .install-modal-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            width: 92%;
+            max-width: 420px;
+            border-radius: 32px;
+            padding: 40px 28px 32px;
+            
+            /* Elevated shadow & elegant border */
+            box-shadow: 0 35px 60px -15px rgba(13, 148, 136, 0.4), inset 0 2px 20px rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            
+            transform: scale(0.9) translateY(15px);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .install-modal-overlay.show .install-modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Background glows inside card */
+        .install-modal-card::before,
+        .install-modal-card::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(40px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .install-modal-card::before {
+            top: -40px; left: -40px;
+            width: 140px; height: 140px;
+            background: rgba(153, 246, 228, 0.6); /* Soft blue/teal highlight */
+        }
+
+        .install-modal-card::after {
+            bottom: -50px; right: -50px;
+            width: 160px; height: 160px;
+            background: rgba(253, 230, 138, 0.5); /* Subtle yellow accent */
+        }
+
+        /* Elevate contents above glowing backdrops */
+        .install-modal-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .install-modal-icon {
+            width: 82px;
+            height: 82px;
+            margin: 0 auto 20px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: subtleFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes subtleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* Reusing exact logo HTML/CSS for premium brand consistency */
+        .install-modal-icon .logo {
+            width: 100%; height: 100%;
+            border-radius: 26px;
+            box-shadow: 0 15px 30px rgba(13, 148, 136, 0.25), inset 0 2px 4px rgba(255,255,255,0.4);
+        }
+        
+        .install-modal-icon .book {
+            transform: scale(0.75);
+        }
+
+        .install-modal-title {
+            font-family: "Quicksand", sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            color: #0f766e;
+            margin-bottom: 6px;
+        }
+        
+        .install-modal-subtitle {
+            font-family: "Quicksand", sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: #134e4a;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .install-modal-desc {
+            font-size: 15.5px;
+            color: #475569;
+            line-height: 1.5;
+            margin-bottom: 32px;
+            font-weight: 700;
+            padding: 0 12px;
+        }
+
+        .install-fallback-msg {
+            display: none;
+            background: rgba(254, 242, 242, 0.9);
+            color: #991b1b;
+            border: 1px solid rgba(254, 202, 202, 0.8);
+            padding: 14px 18px;
+            border-radius: 16px;
+            font-size: 14.5px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            animation: fadeInMsg 0.4s ease;
+        }
+
+        @keyframes fadeInMsg {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .install-modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .install-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 17px;
+            border-radius: 20px;
+            font-size: 16.5px;
+            font-weight: 800;
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .install-btn:active {
+            transform: scale(0.96);
+        }
+
+        .install-btn.primary {
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            color: #ffffff;
+            box-shadow: 0 12px 25px -5px rgba(13, 148, 136, 0.4), inset 0 2px 4px rgba(255,255,255,0.25);
+            border: 1px solid rgba(20, 184, 166, 0.4);
+        }
+        
+        @media (hover: hover) {
+            .install-btn.primary:hover {
+                box-shadow: 0 16px 30px -5px rgba(13, 148, 136, 0.5), inset 0 2px 4px rgba(255,255,255,0.3);
+                background: linear-gradient(135deg, #0d9488, #0f766e);
+                transform: translateY(-2px);
+            }
+        }
+
+        .install-btn.secondary {
+            background: rgba(241, 245, 249, 0.65);
+            color: #0f766e;
+            padding: 15px;
+            border: 1px solid rgba(20, 184, 166, 0.15);
+        }
+        
+        @media (hover: hover) {
+            .install-btn.secondary:hover {
+                background: rgba(226, 232, 240, 0.9);
+            }
+        }
+
+        .btn-icon {
+            font-size: 20px;
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        .footer-text {
+            position: absolute;
+            bottom: 22px;
+            left: 0;
+            width: 100%;
+            padding: 0 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            animation: fadeIn 1s ease 0.8s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* =========================
+           TRANSITION
+        ========================== */
+
+        .welcome-screen.exit {
+            animation: pageExit 0.65s ease forwards;
+        }
+
+        @keyframes pageExit {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.08);
+                filter: blur(8px);
+            }
+        }
+
+        /* =========================
+           DESKTOP
+        ========================== */
+
+        @media (min-width: 768px) {
+
+            .floating {
+                font-size: 34px;
+            }
+
+            .float-book {
+                left: 20%;
+            }
+
+            .float-star {
+                right: 20%;
+            }
+
+            .float-pencil {
+                left: 20%;
+            }
+
+            .float-ball {
+                right: 20%;
+            }
+
+        }
+
+        /* =========================
+           SMALL PHONES
+        ========================== */
+
+        @media (max-height: 650px) {
+
+            .logo-wrapper,
+            .logo {
+                width: 85px;
+                height: 85px;
+            }
+
+            .book {
+                transform: scale(0.75);
+            }
+
+            .main-title {
+                font-size: 38px;
+            }
+
+            .start-area {
+                margin-top: 25px;
+            }
+            
+            .install-modal-card {
+                padding: 30px 22px 24px;
+            }
+            
+            .install-modal-icon {
+                width: 70px;
+                height: 70px;
+                margin-bottom: 14px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="app">
+
+    <div class="blob blob-one"></div>
+    <div class="blob blob-two"></div>
+    <div class="blob blob-three"></div>
+
+    <div class="floating float-book">📚</div>
+    <div class="floating float-star">⭐</div>
+    <div class="floating float-pencil">✏️</div>
+    <div class="floating float-ball">🎨</div>
+
+    <main class="welcome-screen" id="welcomeScreen">
+
+        <div class="logo-wrapper">
+
+            <div class="logo">
+
+                <div class="book">
+                    <div class="book-left"></div>
+                    <div class="book-right"></div>
+
+                    <div class="book-line line-one"></div>
+                    <div class="book-line line-two"></div>
+                    <div class="book-line line-three"></div>
+                    <div class="book-line line-four"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="welcome-text">
+
+            <div class="small-title">
+                Welcome to
+            </div>
+
+            <h1 class="main-title">
+                Nanhi Pathshala
+            </h1>
+
+            <p class="tagline">
+                Learn • Play • Grow
+            </p>
+
+        </div>
+
+
+        <div class="start-area">
+
+            <button
+                class="start-button"
+                id="startButton"
+            >
+                Get Started
+                <span class="arrow">→</span>
+            </button>
+
+        </div>
+
+
+        <p class="footer-text">
+            A happy place to learn, play and discover
+        </p>
+
+    </main>
+
+</div>
+
+<!-- Premium App Install Modal -->
+<div class="install-modal-overlay" id="installModal">
+    <div class="install-modal-card">
+        <div class="install-modal-content">
+            
+            <div class="install-modal-icon">
+                <div class="logo">
+                    <div class="book">
+                        <div class="book-left"></div>
+                        <div class="book-right"></div>
+                        <div class="book-line line-one"></div>
+                        <div class="book-line line-two"></div>
+                        <div class="book-line line-three"></div>
+                        <div class="book-line line-four"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3 class="install-modal-title">Nanhi Pathshala</h3>
+            <h4 class="install-modal-subtitle">Install the App</h4>
+            
+            <p class="install-modal-desc">
+                Get a better learning experience with Nanhi Pathshala.
+            </p>
+
+            <div id="installFallbackMsg" class="install-fallback-msg">
+                Install isn't available right now. You can use your browser's install option.
+            </div>
+
+            <div class="install-modal-actions">
+                <button class="install-btn primary" id="btnInstallApp">
+                    <span class="btn-icon">📲</span> Install App
+                </button>
+                <button class="install-btn secondary" id="btnContinueBrowser">
+                    <span class="btn-icon">🌐</span> Continue with Browser
+                </button>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script type="module">
+
+import { auth } from "./firebase.js";
+
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+const startButton =
+    document.getElementById("startButton");
+
+const welcomeScreen =
+    document.getElementById("welcomeScreen");
+
+
+startButton.addEventListener("click", () => {
+
+    startButton.disabled = true;
+
+    welcomeScreen.classList.add("exit");
+
+    setTimeout(() => {
+
+        onAuthStateChanged(auth, (user) => {
+
+            if (user) {
+
+                window.location.href = "home.html";
+
+            } else {
+
+                window.location.href = "login.html";
+
+            }
+
+        });
+
+    }, 650);
+
+});
+
+</script>
+<script>
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            navigator.serviceWorker.register(
+                "./sw.js"
+            );
+
+        }
+    );
+
+}
+
+</script>
+<script>
+
+    /* =========================
+       PREMIUM APP INSTALL LOGIC
+    ========================= */
+
+    let deferredInstallPrompt = null;
+    const installModal = document.getElementById("installModal");
+    const btnInstallApp = document.getElementById("btnInstallApp");
+    const btnContinueBrowser = document.getElementById("btnContinueBrowser");
+    const installFallbackMsg = document.getElementById("installFallbackMsg");
+
+    // 1. Listen for the native browser install prompt (fires quickly, silently handled)
+    window.addEventListener(
+        "beforeinstallprompt",
+        (event) => {
+            // Prevent default browser mini-infobar prompt
+            event.preventDefault();
+            // Stash the event so it can be triggered from our custom UI
+            deferredInstallPrompt = event;
+            
+            // If the fallback message was showing, hide it since prompt is now ready
+            if (installFallbackMsg) {
+                installFallbackMsg.style.display = "none";
+                btnInstallApp.style.display = "flex";
+            }
+        }
+    );
+
+    // 2. Immediate presentation logic (No Delay)
+    // Verify if already installed / running in standalone mode
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+                         || window.navigator.standalone 
+                         || document.referrer.includes('android-app://');
+    
+    // Check if user dismissed the invitation during this browser session
+    const isDismissed = sessionStorage.getItem('indexInstallPromptDismissed');
+    
+    // Immediately display the installation card if appropriate
+    if (!isStandalone && !isDismissed) {
+        // Slight tick required to allow CSS transitions to execute properly on fresh load
+        setTimeout(() => {
+            if (installModal) {
+                installModal.classList.add("show");
+            }
+        }, 50);
+    }
+
+    // Helper to gracefully close the custom UI
+    const closeInstallModal = () => {
+        if (installModal) {
+            installModal.classList.remove("show");
+        }
+    };
+
+    // 3. Primary action: Install App button listener
+    if (btnInstallApp) {
+        btnInstallApp.addEventListener("click", async () => {
+            // Guard: If browser hasn't fired the prompt or doesn't support it
+            if (!deferredInstallPrompt) {
+                installFallbackMsg.style.display = "block";
+                btnInstallApp.style.display = "none";
+                return;
+            }
+
+            // Show the native browser installation confirmation popup
+            deferredInstallPrompt.prompt();
+
+            // Wait for the user to make a choice on the native prompt
+            const result = await deferredInstallPrompt.userChoice;
+
+            if (result.outcome === "accepted") {
+                console.log("Nanhi Pathshala installed successfully.");
+            }
+
+            // Clear prompt as it can only be used once per page session
+            deferredInstallPrompt = null;
+            closeInstallModal();
+        });
+    }
+
+    // 4. Secondary action: Continue with Browser button listener
+    if (btnContinueBrowser) {
+        btnContinueBrowser.addEventListener("click", () => {
+            // Store session dismissal to prevent re-triggering this flow while browsing
+            sessionStorage.setItem('indexInstallPromptDismissed', 'true');
+            closeInstallModal();
+        });
+    }
+
+    // 5. Successful native app installation completion listener
+    window.addEventListener(
+        "appinstalled",
+        () => {
+            deferredInstallPrompt = null;
+            closeInstallModal(); // Gracefully fade out UI
+        }
+    );
+
+</script>
+
+</body>
+</html>
