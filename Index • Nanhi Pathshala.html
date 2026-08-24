@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link
+    rel="manifest"
+    href="./manifest.json"
+>
+
+    <title>Nanhi Pathshala</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            background: #f0fdfa;
+            color: #134e4a;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button {
+            font-family: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* =========================
+           APP
+        ========================== */
+
+        #app {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 15% 15%, #ccfbf1 0%, transparent 28%),
+                radial-gradient(circle at 85% 20%, #fef3c7 0%, transparent 25%),
+                radial-gradient(circle at 50% 100%, #dbeafe 0%, transparent 32%),
+                #ffffff;
+        }
+
+        /* =========================
+           DECORATIVE BLOBS
+        ========================== */
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .blob-one {
+            width: 180px;
+            height: 180px;
+            background: #99f6e4;
+            top: -70px;
+            left: -60px;
+            animation: blobMove 7s ease-in-out infinite;
+        }
+
+        .blob-two {
+            width: 150px;
+            height: 150px;
+            background: #fde68a;
+            right: -45px;
+            top: 100px;
+            animation: blobMove 8s ease-in-out infinite reverse;
+        }
+
+        .blob-three {
+            width: 210px;
+            height: 210px;
+            background: #bfdbfe;
+            bottom: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: blobMove 9s ease-in-out infinite;
+        }
+
+        @keyframes blobMove {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-15px) scale(1.05);
+            }
+        }
+
+        .blob-three {
+            animation-name: blobBottom;
+        }
+
+        @keyframes blobBottom {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateX(-50%) translateY(-15px) scale(1.05);
+            }
+        }
+
+        /* =========================
+           FLOATING OBJECTS
+        ========================== */
+
+        .floating {
+            position: absolute;
+            font-size: 28px;
+            user-select: none;
+            pointer-events: none;
+            animation: floating 4s ease-in-out infinite;
+        }
+
+        .float-book {
+            top: 17%;
+            left: 10%;
+        }
+
+        .float-star {
+            top: 25%;
+            right: 12%;
+            animation-delay: 0.8s;
+        }
+
+        .float-pencil {
+            bottom: 24%;
+            left: 12%;
+            animation-delay: 1.3s;
+        }
+
+        .float-ball {
+            bottom: 19%;
+            right: 12%;
+            animation-delay: 1.8s;
+        }
+
+        @keyframes floating {
+            0%, 100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
+        }
+
+        /* =========================
+           MAIN SCREEN
+        ========================== */
+
+        .welcome-screen {
+            position: relative;
+            z-index: 5;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+
+        /* =========================
+           LOGO
+        ========================== */
+
+        .logo-wrapper {
+            width: 112px;
+            height: 112px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            animation:
+                logoEntrance 0.9s ease-out,
+                logoFloat 4s ease-in-out 1s infinite;
+        }
+
+        .logo {
+            width: 112px;
+            height: 112px;
+            border-radius: 34px;
+            background: linear-gradient(145deg, #2dd4bf, #0d9488);
+            box-shadow:
+                0 20px 40px rgba(13, 148, 136, 0.25),
+                inset 0 2px 4px rgba(255,255,255,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .logo::before {
+            content: "";
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+        }
+
+        .book {
+            width: 58px;
+            height: 45px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .book-left,
+        .book-right {
+            position: absolute;
+            top: 5px;
+            width: 29px;
+            height: 36px;
+            background: white;
+        }
+
+        .book-left {
+            left: 0;
+            border-radius: 5px 2px 2px 5px;
+            transform: skewY(4deg);
+        }
+
+        .book-right {
+            right: 0;
+            border-radius: 2px 5px 5px 2px;
+            transform: skewY(-4deg);
+        }
+
+        .book-line {
+            position: absolute;
+            width: 18px;
+            height: 3px;
+            background: #5eead4;
+            border-radius: 5px;
+            z-index: 3;
+        }
+
+        .line-one {
+            left: 5px;
+            top: 15px;
+        }
+
+        .line-two {
+            left: 35px;
+            top: 15px;
+        }
+
+        .line-three {
+            left: 5px;
+            top: 24px;
+        }
+
+        .line-four {
+            left: 35px;
+            top: 24px;
+        }
+
+        @keyframes logoEntrance {
+            from {
+                opacity: 0;
+                transform: scale(0.4) rotate(-15deg);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0);
+            }
+        }
+
+        @keyframes logoFloat {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-7px);
+            }
+        }
+
+        /* =========================
+           TEXT
+        ========================== */
+
+        .welcome-text {
+            animation: textEntrance 0.8s ease-out 0.2s both;
+        }
+
+        .small-title {
+            font-size: clamp(17px, 4vw, 21px);
+            font-weight: 800;
+            color: #0d9488;
+            margin-bottom: 5px;
+            letter-spacing: 0.4px;
+        }
+
+        .main-title {
+            font-family: "Quicksand", sans-serif;
+            font-size: clamp(38px, 10vw, 62px);
+            line-height: 1;
+            font-weight: 800;
+            color: #134e4a;
+            letter-spacing: -1.5px;
+        }
+
+        .tagline {
+            margin-top: 14px;
+            font-size: clamp(15px, 4vw, 19px);
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.8px;
+        }
+
+        @keyframes textEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(25px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =========================
+           BUTTON
+        ========================== */
+
+        .start-area {
+            margin-top: 42px;
+            animation: buttonEntrance 0.8s ease-out 0.5s both;
+        }
+
+        .start-button {
+            min-width: 190px;
+            padding: 15px 30px;
+            border-radius: 18px;
+            background: linear-gradient(
+                135deg,
+                #fbbf24,
+                #f59e0b
+            );
+            color: #172554;
+            font-size: 17px;
+            font-weight: 900;
+            box-shadow:
+                0 12px 25px rgba(245, 158, 11, 0.25);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow:
+                0 16px 30px rgba(245, 158, 11, 0.32);
+        }
+
+        .start-button:active {
+            transform: scale(0.96);
+        }
+
+        .arrow {
+            display: inline-block;
+            margin-left: 8px;
+            transition: transform 0.2s ease;
+        }
+
+        .start-button:hover .arrow {
+            transform: translateX(5px);
+        }
+
+        @keyframes buttonEntrance {
+            from {
+                opacity: 0;
+                transform: translateY(25px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* =========================
+           PREMIUM INSTALL MODAL
+        ========================== */
+
+        .install-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .install-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .install-modal-card {
+            background: rgba(255, 255, 255, 0.97);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 28px;
+            padding: 36px 24px 28px;
+            
+            box-shadow: 0 25px 50px -12px rgba(13, 148, 136, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            text-align: center;
+            
+            transform: scale(0.92) translateY(15px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .install-modal-overlay.show .install-modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .install-modal-icon {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 20px;
+            
+            background: linear-gradient(135deg, #ccfbf1, #99f6e4);
+            border-radius: 22px;
+            
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            
+            box-shadow: 0 10px 20px rgba(20, 184, 166, 0.12);
+        }
+
+        .install-modal-title {
+            font-family: "Quicksand", sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #134e4a;
+            margin-bottom: 10px;
+        }
+
+        .install-modal-desc {
+            font-size: 14.5px;
+            color: #475569;
+            line-height: 1.5;
+            margin-bottom: 28px;
+            font-weight: 700;
+            padding: 0 10px;
+        }
+        
+        .install-modal-desc span {
+            display: block;
+            margin-top: 6px;
+            color: #64748b;
+            font-size: 13.5px;
+            font-weight: 600;
+        }
+
+        .install-modal-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .install-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 18px;
+            font-size: 15px;
+            font-weight: 800;
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .install-btn:active {
+            transform: scale(0.97);
+        }
+
+        .install-btn.primary {
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(13, 148, 136, 0.25);
+        }
+        
+        .install-btn.primary:hover {
+            box-shadow: 0 12px 25px rgba(13, 148, 136, 0.35);
+            background: linear-gradient(135deg, #115e59, #0f766e);
+        }
+
+        .install-btn.secondary {
+            background: transparent;
+            color: #0f766e;
+            padding: 12px;
+        }
+
+        /* =========================
+           FOOTER
+        ========================== */
+
+        .footer-text {
+            position: absolute;
+            bottom: 22px;
+            left: 0;
+            width: 100%;
+            padding: 0 20px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            animation: fadeIn 1s ease 0.8s both;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* =========================
+           TRANSITION
+        ========================== */
+
+        .welcome-screen.exit {
+            animation: pageExit 0.65s ease forwards;
+        }
+
+        @keyframes pageExit {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(1.08);
+                filter: blur(8px);
+            }
+        }
+
+        /* =========================
+           DESKTOP
+        ========================== */
+
+        @media (min-width: 768px) {
+
+            .floating {
+                font-size: 34px;
+            }
+
+            .float-book {
+                left: 20%;
+            }
+
+            .float-star {
+                right: 20%;
+            }
+
+            .float-pencil {
+                left: 20%;
+            }
+
+            .float-ball {
+                right: 20%;
+            }
+
+        }
+
+        /* =========================
+           SMALL PHONES
+        ========================== */
+
+        @media (max-height: 650px) {
+
+            .logo-wrapper,
+            .logo {
+                width: 85px;
+                height: 85px;
+            }
+
+            .book {
+                transform: scale(0.75);
+            }
+
+            .main-title {
+                font-size: 38px;
+            }
+
+            .start-area {
+                margin-top: 25px;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div id="app">
+
+    <div class="blob blob-one"></div>
+    <div class="blob blob-two"></div>
+    <div class="blob blob-three"></div>
+
+    <div class="floating float-book">📚</div>
+    <div class="floating float-star">⭐</div>
+    <div class="floating float-pencil">✏️</div>
+    <div class="floating float-ball">🎨</div>
+
+    <main class="welcome-screen" id="welcomeScreen">
+
+        <div class="logo-wrapper">
+
+            <div class="logo">
+
+                <div class="book">
+                    <div class="book-left"></div>
+                    <div class="book-right"></div>
+
+                    <div class="book-line line-one"></div>
+                    <div class="book-line line-two"></div>
+                    <div class="book-line line-three"></div>
+                    <div class="book-line line-four"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="welcome-text">
+
+            <div class="small-title">
+                Welcome to
+            </div>
+
+            <h1 class="main-title">
+                Nanhi Pathshala
+            </h1>
+
+            <p class="tagline">
+                Learn • Play • Grow
+            </p>
+
+        </div>
+
+
+        <div class="start-area">
+
+            <button
+                class="start-button"
+                id="startButton"
+            >
+                Get Started
+                <span class="arrow">→</span>
+            </button>
+
+        </div>
+
+
+        <p class="footer-text">
+            A happy place to learn, play and discover
+        </p>
+
+    </main>
+
+</div>
+
+<!-- Premium App Install Modal -->
+<div class="install-modal-overlay" id="installModal">
+    <div class="install-modal-card">
+        <div class="install-modal-icon">📚</div>
+        <h3 class="install-modal-title">Nanhi Pathshala</h3>
+        <p class="install-modal-desc">
+            Install the app for a better learning experience.
+            <span>Learn, play and explore with a faster app-like experience.</span>
+        </p>
+        <div class="install-modal-actions">
+            <button class="install-btn primary" id="btnInstallApp">Install App</button>
+            <button class="install-btn secondary" id="btnContinueBrowser">Continue with Browser</button>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+
+import { auth } from "./firebase.js";
+
+import {
+    onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
+
+const startButton =
+    document.getElementById("startButton");
+
+const welcomeScreen =
+    document.getElementById("welcomeScreen");
+
+
+startButton.addEventListener("click", () => {
+
+    startButton.disabled = true;
+
+    welcomeScreen.classList.add("exit");
+
+    setTimeout(() => {
+
+        onAuthStateChanged(auth, (user) => {
+
+            if (user) {
+
+                window.location.href = "home.html";
+
+            } else {
+
+                window.location.href = "login.html";
+
+            }
+
+        });
+
+    }, 650);
+
+});
+
+</script>
+<script>
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener(
+        "load",
+        () => {
+
+            navigator.serviceWorker.register(
+                "./sw.js"
+            );
+
+        }
+    );
+
+}
+
+</script>
+<script>
+
+    /* =========================
+       PREMIUM APP INSTALL LOGIC
+    ========================= */
+
+    let deferredInstallPrompt = null;
+    const installModal = document.getElementById("installModal");
+    const btnInstallApp = document.getElementById("btnInstallApp");
+    const btnContinueBrowser = document.getElementById("btnContinueBrowser");
+
+    // 1. Listen for the native browser install prompt
+    window.addEventListener(
+        "beforeinstallprompt",
+        (event) => {
+            // Prevent default browser prompt
+            event.preventDefault();
+            // Stash the event so it can be triggered later
+            deferredInstallPrompt = event;
+        }
+    );
+
+    // 2. Delayed presentation logic (approx 6.5s delay)
+    setTimeout(() => {
+        // Check if already installed / running in standalone mode
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches 
+                             || window.navigator.standalone 
+                             || document.referrer.includes('android-app://');
+        
+        if (isStandalone) {
+            return; // Already installed, do not show
+        }
+
+        // Check if user dismissed it during this session
+        const isDismissed = sessionStorage.getItem('indexInstallPromptDismissed');
+        if (isDismissed) {
+            return;
+        }
+
+        // Ensure browser supports installation
+        // We only show it if the browser actually fired the install prompt event
+        if (!deferredInstallPrompt) {
+            return; 
+        }
+
+        // Safe to show the premium invitation
+        if (installModal) {
+            installModal.classList.add("show");
+        }
+    }, 6500);
+
+    // Helper to close modal smoothly
+    const closeInstallModal = () => {
+        if (installModal) {
+            installModal.classList.remove("show");
+        }
+    };
+
+    // 3. Primary action: Install App
+    if (btnInstallApp) {
+        btnInstallApp.addEventListener("click", async () => {
+            if (!deferredInstallPrompt) {
+                closeInstallModal();
+                return;
+            }
+
+            // Show the native browser installation prompt
+            deferredInstallPrompt.prompt();
+
+            // Wait for the user to respond
+            const result = await deferredInstallPrompt.userChoice;
+
+            if (result.outcome === "accepted") {
+                console.log("Nanhi Pathshala installed.");
+            }
+
+            // Clear prompt as it can only be used once
+            deferredInstallPrompt = null;
+            closeInstallModal();
+        });
+    }
+
+    // 4. Secondary action: Continue with Browser
+    if (btnContinueBrowser) {
+        btnContinueBrowser.addEventListener("click", () => {
+            // Store dismissal state so it doesn't pop up again this session
+            sessionStorage.setItem('indexInstallPromptDismissed', 'true');
+            closeInstallModal();
+        });
+    }
+
+    // 5. Successful installation listener
+    window.addEventListener(
+        "appinstalled",
+        () => {
+            deferredInstallPrompt = null;
+            closeInstallModal(); // Ensure modal is closed
+        }
+    );
+
+</script>
+
+</body>
+</html>
