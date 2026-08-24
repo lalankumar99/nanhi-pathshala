@@ -416,6 +416,7 @@ button {
                 type="button"
                 id="videosButton"
             >
+                <a href="videos.html" class="feature-card" id="videosButton" style="text-decoration: none; color: inherit; display: flex;">
 
                 <div class="feature-icon">
                     🎬
@@ -1638,7 +1639,14 @@ button {
         }
     );
 
+    
 </script>
+    <script>
+  // JavaScript Event Listener
+  document.getElementById('videosButton').addEventListener('click', () => {
+    window.location.href = 'videos.html';
+  });
+    </script>
 
 </body>
 
