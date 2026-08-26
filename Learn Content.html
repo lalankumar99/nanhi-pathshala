@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#14b8a6">
+    <title>Learn • Nanhi Pathshala</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================
+           BASE & RESET
+        ========================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { width: 100%; min-height: 100%; background: #f8fafc; }
+        
+        body {
+            font-family: "Nunito", sans-serif;
+            background: radial-gradient(circle at 10% 5%, #ccfbf1 0, transparent 25%),
+                        radial-gradient(circle at 90% 10%, #fef3c7 0, transparent 25%), #f8fafc;
+            color: #0f172a;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+
+        button, input { font-family: inherit; border: none; outline: none; background: none; cursor: pointer; }
+
+        /* =========================
+           HEADER
+        ========================= */
+        .header {
+            padding: 24px 20px 24px;
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            color: white;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 12px 30px rgba(13,148,136,.18);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: headerIn .5s ease-out;
+        }
+
+        @keyframes headerIn {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn, .profile-btn {
+            width: 42px; height: 42px; border-radius: 14px; background: rgba(255,255,255,.2);
+            color: white; font-size: 20px; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px); cursor: pointer; transition: 0.2s;
+        }
+        .back-btn:active, .profile-btn:active { transform: scale(0.9); }
+        
+        .header-title-group { display: flex; flex-direction: column; }
+        .header-title { font-family: "Quicksand", sans-serif; font-size: 22px; font-weight: 900; line-height: 1.1; }
+        .header-subtitle { font-size: 11px; font-weight: 700; color: #ccfbf1; }
+
+        /* =========================
+           SEARCH & FILTERS
+        ========================= */
+        .content { width: 100%; max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+        
+        .search-container { position: relative; margin-bottom: 20px; }
+        .search-input {
+            width: 100%; padding: 16px 20px 16px 48px; border-radius: 20px; background: #ffffff;
+            border: 2px solid #e2e8f0; font-size: 16px; font-weight: 700; color: #134e4a;
+            box-shadow: 0 8px 20px rgba(15,23,42,.04); transition: 0.2s;
+        }
+        .search-input:focus { border-color: #14b8a6; box-shadow: 0 8px 25px rgba(20,184,166,.15); }
+        .search-input::placeholder { color: #94a3b8; font-weight: 700; }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; }
+
+        .categories-wrapper {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .categories-wrapper::-webkit-scrollbar { display: none; }
+        
+        .category-chip {
+            padding: 10px 20px; border-radius: 999px; background: #ffffff; color: #64748b;
+            font-weight: 800; font-size: 14px; white-space: nowrap; border: 2px solid #e2e8f0;
+            cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        .category-chip.active { background: #14b8a6; color: white; border-color: #14b8a6; box-shadow: 0 6px 15px rgba(20,184,166,.2); }
+
+        /* =========================
+           CONTENT LIST (Files/Notes)
+        ========================= */
+        .file-list { display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+
+        .file-card {
+            width: 100%; padding: 18px; display: flex; align-items: center; gap: 16px;
+            text-align: left; border-radius: 20px; background: #ffffff; border: 1px solid #e2e8f0;
+            box-shadow: 0 8px 22px rgba(15,23,42,.06); transition: transform 0.2s ease, box-shadow 0.2s ease; cursor: pointer;
+        }
+        .file-card:active { transform: scale(0.97); }
+        .file-card:hover { border-color: #14b8a6; box-shadow: 0 12px 28px rgba(20,184,166,.12); }
+
+        .file-icon {
+            width: 54px; height: 54px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            border-radius: 16px; background: #f0fdfa; font-size: 26px;
+        }
+
+        .file-info { min-width: 0; flex: 1; }
+        .file-name { color: #0f172a; font-family: "Quicksand", sans-serif; font-size: 18px; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-description { margin-top: 4px; color: #64748b; font-size: 13px; font-weight: 600; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+        .file-type {
+            flex-shrink: 0; padding: 6px 10px; border-radius: 10px; background: #f1f5f9;
+            color: #475569; font-size: 10px; font-weight: 900; text-transform: uppercase;
+        }
+
+        /* =========================
+           EMPTY & LOADING STATES
+        ========================= */
+        .empty-state { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; }
+        .empty-icon { font-size: 64px; margin-bottom: 16px; animation: bounce 2s infinite; }
+        .empty-title { font-family: "Quicksand", sans-serif; font-size: 22px; font-weight: 900; color: #0f172a; margin-bottom: 8px; }
+        .empty-desc { color: #64748b; font-size: 15px; font-weight: 600; margin-bottom: 20px; max-width: 300px; }
+        
+        .page-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
+        .loading-logo { width: 68px; height: 68px; border-radius: 22px; background: linear-gradient(145deg, #10b981, #0d9488); display: flex; align-items: center; justify-content: center; font-size: 32px; animation: float 1.5s ease-in-out infinite; margin-bottom: 16px; box-shadow: 0 10px 25px rgba(16,185,129,0.3); }
+        .loading-text { color: #0f766e; font-size: 15px; font-weight: 800; }
+        
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* =========================
+           BOTTOM NAVIGATION
+        ========================= */
+        .bottom-nav {
+            position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; height: 68px; display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; padding: 6px;
+            border-radius: 24px; background: rgba(255,255,255,.94); backdrop-filter: blur(18px); border: 1px solid rgba(226,232,240,.9); box-shadow: 0 15px 40px rgba(15,23,42,.12);
+        }
+        .nav-item { height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 18px; color: #94a3b8; cursor: pointer; transition: 0.2s; }
+        .nav-item:active { transform: scale(0.95); }
+        .nav-item span { font-size: 22px; }
+        .nav-item small { font-size: 10px; font-weight: 800; }
+        .nav-item.active { background: #f0fdfa; color: #0d9488; }
+
+        /* =========================
+           LEARNING OVERLAY (FULLSCREEN ONLY)
+        ========================= */
+        .learning-overlay { position: fixed; inset: 0; background: #0f172a; z-index: 99999; display: none; width: 100vw; height: 100vh; }
+        .learning-overlay.active { display: block; }
+        
+        /* State Screens */
+        .player-state-screen { position: absolute; inset: 0; background: linear-gradient(135deg, #0f172a, #1e293b); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100000; color: white; text-align: center; padding: 24px; transition: opacity 0.3s; }
+        .player-state-screen.hidden { display: none; opacity: 0; }
+        .state-title { font-family: "Quicksand", sans-serif; font-size: 26px; font-weight: 900; margin-bottom: 12px; color: #f8fafc; }
+        .state-desc { font-size: 16px; font-weight: 600; color: #cbd5e1; margin-bottom: 30px; max-width: 400px; line-height: 1.5; }
+        
+        .btn-action { background: #14b8a6; color: white; padding: 16px 32px; border-radius: 999px; font-size: 18px; font-weight: 900; box-shadow: 0 8px 20px rgba(20, 184, 166, 0.4); cursor: pointer; transition: 0.2s; }
+        .btn-action:active { transform: scale(0.95); background: #0d9488; }
+        
+        .player-close-btn { position: absolute; top: 20px; left: 20px; width: 48px; height: 48px; background: rgba(0,0,0,0.4); border-radius: 50%; color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); z-index: 100001; }
+
+        /* Actual Content Player Container */
+        #actualContentContainer { position: absolute; inset: 0; width: 100%; height: 100%; display: none; background: #ffffff; overflow: hidden; }
+        #actualContentContainer.visible { display: block; }
+        
+        #contentInjectionWrapper { width: 100%; height: 100%; overflow: auto; }
+        
+        /* Ensure injected iframe/videos fill the space if needed */
+        #contentInjectionWrapper iframe,
+        #contentInjectionWrapper video { width: 100%; height: 100%; border: none; }
+        
+        /* Watermark for injected content */
+        .brand-watermark { position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.6); padding: 8px 16px; border-radius: 12px; color: white; font-family: "Quicksand", sans-serif; font-weight: 900; font-size: 14px; z-index: 100005; backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); pointer-events: none; }
+        .brand-watermark span { color: #f59e0b; }
+
+    </style>
+</head>
+<body>
+
+    <!-- PAGE LOADER -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loading-logo">📚</div>
+        <div class="loading-text">Syncing Live Lessons...</div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="window.location.href='home.html'" aria-label="Go Back">←</button>
+            <div class="header-title-group">
+                <h1 class="header-title">Learn</h1>
+                <span class="header-subtitle">Explore your learning space</span>
+            </div>
+        </div>
+        <button class="profile-btn" onclick="window.location.href='profile.html'" aria-label="Profile">👤</button>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search lessons, notes or activities...">
+        </div>
+
+        <!-- Dynamic Category Chips -->
+        <div class="categories-wrapper" id="categoriesWrapper">
+            <button class="category-chip active" data-category="All">All Content</button>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">📚</div>
+            <h2 class="empty-title">No Content Yet</h2>
+            <p class="empty-desc">Learning materials will appear here when your teacher adds them.</p>
+        </div>
+
+        <!-- File List -->
+        <div class="file-list" id="contentList"></div>
+        
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='home.html'"><span>🏠</span><small>Home</small></button>
+        <button class="nav-item active"><span>📚</span><small>Learn</small></button>
+        <button class="nav-item" onclick="window.location.href='videos.html'"><span>🎬</span><small>Videos</small></button>
+        <button class="nav-item" onclick="window.location.href='quiz.html'"><span>🧠</span><small>Quiz</small></button>
+        <button class="nav-item" onclick="window.location.href='profile.html'"><span>👤</span><small>Profile</small></button>
+    </nav>
+
+
+    <!-- ==========================================
+         FULLSCREEN LEARNING PLAYER
+    =========================================== -->
+    <div class="learning-overlay" id="learningOverlay">
+        
+        <!-- Request Fullscreen -->
+        <div class="player-state-screen" id="stateFullscreenRequest">
+            <button class="player-close-btn" onclick="exitLearningEnvironment()">✕</button>
+            <div class="state-icon">📱</div>
+            <h2 class="state-title">Ready to Learn?</h2>
+            <p class="state-desc">For the best experience, lessons must be viewed in Full Screen.</p>
+            <button class="btn-action" id="btnEnterFullscreen">Enter Full Screen</button>
+        </div>
+
+        <!-- Request Landscape -->
+        <div class="player-state-screen hidden" id="stateRotateRequest">
+            <button class="player-close-btn" onclick="exitLearningEnvironment()">✕</button>
+            <div class="state-icon" style="transform: rotate(90deg);">🔄</div>
+            <h2 class="state-title">Rotate Your Device</h2>
+            <p class="state-desc">Please rotate your phone sideways (Landscape mode) to continue this lesson.</p>
+        </div>
+
+        <!-- Actual Content Viewer -->
+        <div id="actualContentContainer">
+            <button class="player-close-btn" onclick="exitLearningEnvironment()" style="background: rgba(0,0,0,0.6); top: 15px; left: 15px; width: 44px; height: 44px;">⬅</button>
+            <div class="brand-watermark">Nanhi<span>Pathshala</span></div>
+            
+            <div id="contentInjectionWrapper">
+                <!-- Admin's Raw HTML Code renders here -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         JAVASCRIPT & FIREBASE LOGIC
+    =========================================== -->
+    <script type="module">
+        import { auth, db } from "./firebase.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+        import { collection, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        // State Variables
+        let allContent = [];
+        let currentCategory = "All";
+        let searchQuery = "";
+
+        // UI References
+        const contentList = document.getElementById("contentList");
+        const emptyState = document.getElementById("emptyState");
+        const searchInput = document.getElementById("searchInput");
+        const categoriesWrapper = document.getElementById("categoriesWrapper");
+        const pageLoader = document.getElementById("pageLoader");
+
+        // 1. Authenticate Student
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.replace("login.html");
+                return;
+            }
+            fetchLiveContent();
+        });
+
+        // 2. Fetch "content" collection Real-Time from Firestore
+        function fetchLiveContent() {
+            // Only pull content that Admin marked as published
+            const contentRef = collection(db, "content");
+            const q = query(contentRef, where("published", "==", true));
+            
+            onSnapshot(q, (snapshot) => {
+                allContent = [];
+                snapshot.forEach(doc => {
+                    allContent.push({ id: doc.id, ...doc.data() });
+                });
+                
+                extractCategories();
+                renderContentList();
+                
+                // Hide Loader
+                setTimeout(() => {
+                    pageLoader.style.opacity = '0';
+                    setTimeout(() => pageLoader.style.display = 'none', 400);
+                }, 400);
+
+            }, (error) => {
+                console.error("Data Sync Error:", error);
+                pageLoader.innerHTML = `<h2 style="color: #ef4444; font-family: 'Quicksand';">Unable to sync lessons.</h2>`;
+            });
+        }
+
+        // 3. Dynamic Filtering
+        function extractCategories() {
+            const categories = new Set();
+            allContent.forEach(item => {
+                const cat = item.category || item.subject;
+                if (cat && cat.trim() !== "") categories.add(cat.trim());
+            });
+
+            let html = `<button class="category-chip ${currentCategory === 'All' ? 'active' : ''}" data-category="All">All Content</button>`;
+            Array.from(categories).sort().forEach(cat => {
+                html += `<button class="category-chip ${currentCategory === cat ? 'active' : ''}" data-category="${cat}">${cat}</button>`;
+            });
+            categoriesWrapper.innerHTML = html;
+
+            const chips = categoriesWrapper.querySelectorAll('.category-chip');
+            chips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    chips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    currentCategory = chip.getAttribute('data-category');
+                    renderContentList();
+                });
+            });
+        }
+
+        // 4. Render The Content List
+        function renderContentList() {
+            const filtered = allContent.filter(item => {
+                const searchStr = searchQuery.toLowerCase();
+                const matchesSearch = 
+                    (item.title || "").toLowerCase().includes(searchStr) || 
+                    (item.description || "").toLowerCase().includes(searchStr) ||
+                    (item.category || "").toLowerCase().includes(searchStr);
+                
+                const itemCat = item.category || item.subject || "General";
+                const matchesCategory = currentCategory === "All" || itemCat === currentCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                contentList.style.display = "none";
+                emptyState.style.display = "flex";
+                return;
+            }
+
+            contentList.style.display = "flex";
+            emptyState.style.display = "none";
+
+            let html = "";
+            filtered.forEach(item => {
+                const title = item.title || "Learning File";
+                const desc = item.description || "Read and explore this lesson.";
+                const type = item.type || "FILE";
+                const safeHtml = encodeURIComponent(item.htmlContent || "");
+
+                // Logic to set icons based on the type defined by Admin
+                let icon = "📄";
+                if(type.toLowerCase().includes("video")) icon = "🎬";
+                if(type.toLowerCase().includes("pdf")) icon = "📕";
+                if(type.toLowerCase().includes("html")) icon = "🌐";
+                if(type.toLowerCase().includes("note")) icon = "📝";
+
+                html += `
+                    <button class="file-card" onclick="openLearningViewer('${safeHtml}')">
+                        <div class="file-icon">${icon}</div>
+                        <div class="file-info">
+                            <div class="file-name">${title}</div>
+                            <div class="file-description">${desc}</div>
+                        </div>
+                        <span class="file-type">${type}</span>
+                    </button>
+                `;
+            });
+            contentList.innerHTML = html;
+        }
+
+        // Search Input Watcher
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderContentList();
+        });
+
+        // Expose function globally for the onclick handler
+        window.openLearningViewer = function(encodedHtml) {
+            const decodedHtml = decodeURIComponent(encodedHtml);
+            startViewerEngine(decodedHtml);
+        };
+    </script>
+
+
+    <!-- ==========================================
+         VIEWER ENGINE (Enforces Fullscreen + Landscape)
+    =========================================== -->
+    <script>
+        const learningOverlay = document.getElementById("learningOverlay");
+        const stateFullscreenReq = document.getElementById("stateFullscreenRequest");
+        const stateRotateReq = document.getElementById("stateRotateRequest");
+        const actualContentContainer = document.getElementById("actualContentContainer");
+        const contentInjectionWrapper = document.getElementById("contentInjectionWrapper");
+        const btnEnterFullscreen = document.getElementById("btnEnterFullscreen");
+
+        let pendingHtmlContent = "";
+        let isViewerActive = false;
+
+        // Start Viewer
+        function startViewerEngine(rawHtml) {
+            pendingHtmlContent = rawHtml;
+            isViewerActive = true;
+            learningOverlay.classList.add("active");
+            evaluateViewerState();
+        }
+
+        // Evaluate Rules
+        function evaluateViewerState() {
+            if (!isViewerActive) return;
+
+            const isFullscreen = document.fullscreenElement || document.webkitFullscreenElement || document.mozFullScreenElement;
+            const isLandscape = window.innerWidth > window.innerHeight;
+
+            stateFullscreenReq.classList.add("hidden");
+            stateRotateReq.classList.add("hidden");
+            actualContentContainer.classList.remove("visible");
+
+            if (!isFullscreen) {
+                stateFullscreenReq.classList.remove("hidden");
+                contentInjectionWrapper.innerHTML = ""; // Unload HTML
+            } else if (isFullscreen && !isLandscape) {
+                stateRotateReq.classList.remove("hidden");
+                contentInjectionWrapper.innerHTML = ""; // Unload HTML
+            } else if (isFullscreen && isLandscape) {
+                actualContentContainer.classList.add("visible");
+                if (contentInjectionWrapper.innerHTML === "") {
+                    contentInjectionWrapper.innerHTML = pendingHtmlContent;
+                }
+            }
+        }
+
+        // Fullscreen Triggers
+        btnEnterFullscreen.addEventListener("click", async () => {
+            const root = document.documentElement;
+            try {
+                if (root.requestFullscreen) await root.requestFullscreen();
+                else if (root.webkitRequestFullscreen) await root.webkitRequestFullscreen();
+                
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock("landscape").catch(() => {});
+                }
+            } catch (err) { console.log(err); }
+        });
+
+        // Close logic
+        window.exitLearningEnvironment = async function() {
+            isViewerActive = false;
+            contentInjectionWrapper.innerHTML = ""; // Destroy content
+            learningOverlay.classList.remove("active");
+            
+            try {
+                if (document.exitFullscreen && document.fullscreenElement) await document.exitFullscreen();
+                else if (document.webkitExitFullscreen && document.webkitFullscreenElement) await document.webkitExitFullscreen();
+                if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock();
+            } catch (err) {}
+        };
+
+        // Screen state watchers
+        window.addEventListener("resize", evaluateViewerState);
+        document.addEventListener("fullscreenchange", evaluateViewerState);
+        document.addEventListener("webkitfullscreenchange", evaluateViewerState);
+        
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && isViewerActive) exitLearningEnvironment();
+        });
+    </script>
+</body>
+</html>
