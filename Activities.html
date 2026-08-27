@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#14b8a6">
+    <meta name="description" content="Nanhi Pathshala Activities - Homework, Assignments, Tests">
+
+    <title>Activities • Nanhi Pathshala</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* =========================
+           BASE & RESET
+        ========================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { width: 100%; min-height: 100%; background: #f8fafc; }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            background: radial-gradient(circle at 10% 5%, #ccfbf1 0, transparent 25%),
+                        radial-gradient(circle at 90% 10%, #fef3c7 0, transparent 25%), #f8fafc;
+            color: #0f172a;
+            padding-bottom: 90px;
+            overflow-x: hidden;
+        }
+
+        button, input { font-family: inherit; border: none; outline: none; background: none; }
+        button { cursor: pointer; transition: transform 0.2s; }
+        button:active { transform: scale(0.95); }
+
+        /* =========================
+           HEADER
+        ========================= */
+        .header {
+            padding: 24px 20px 24px;
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            color: white;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 12px 30px rgba(13,148,136,.18);
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            animation: headerIn .5s ease-out;
+        }
+
+        @keyframes headerIn {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .back-btn, .profile-btn {
+            width: 42px; height: 42px; border-radius: 14px; background: rgba(255,255,255,.2);
+            color: white; font-size: 20px; display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .header-title-group { display: flex; flex-direction: column; }
+        .header-title { font-family: "Quicksand", sans-serif; font-size: 22px; font-weight: 900; line-height: 1.1; }
+        .header-subtitle { font-size: 11px; font-weight: 700; color: #ccfbf1; }
+
+        /* =========================
+           SEARCH & CATEGORIES (TABS)
+        ========================= */
+        .content { width: 100%; max-width: 900px; margin: 0 auto; padding: 24px 16px; }
+        
+        .search-container { position: relative; margin-bottom: 20px; }
+        .search-input {
+            width: 100%; padding: 16px 20px 16px 48px; border-radius: 20px; background: #ffffff;
+            border: 2px solid #e2e8f0; font-size: 16px; font-weight: 700; color: #134e4a;
+            box-shadow: 0 8px 20px rgba(15,23,42,.04); transition: 0.2s;
+        }
+        .search-input:focus { border-color: #14b8a6; box-shadow: 0 8px 25px rgba(20,184,166,.15); }
+        .search-input::placeholder { color: #94a3b8; font-weight: 700; }
+        .search-icon { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8; }
+
+        .categories-wrapper {
+            display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 10px;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .categories-wrapper::-webkit-scrollbar { display: none; }
+        
+        .category-chip {
+            padding: 10px 20px; border-radius: 999px; background: #ffffff; color: #64748b;
+            font-weight: 800; font-size: 14px; white-space: nowrap; border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02); transition: 0.2s;
+        }
+        .category-chip.active { background: #14b8a6; color: white; border-color: #14b8a6; box-shadow: 0 6px 15px rgba(20,184,166,.2); }
+
+        /* =========================
+           ACTIVITY CARDS
+        ========================= */
+        .activity-grid { display: grid; grid-template-columns: repeat(1, 1fr); gap: 16px; margin-top: 10px; }
+        @media (min-width: 550px) { .activity-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .card-item {
+            background: #ffffff; border-radius: 20px; border: 2px solid #f1f5f9;
+            box-shadow: 0 8px 22px rgba(15,23,42,.05); padding: 18px; display: flex; align-items: flex-start; gap: 16px;
+            text-align: left; transition: 0.2s; position: relative; cursor: pointer;
+        }
+        .card-item:hover { border-color: #14b8a6; box-shadow: 0 12px 30px rgba(20,184,166,.1); transform: translateY(-2px); }
+
+        .card-icon {
+            width: 54px; height: 54px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+            border-radius: 16px; font-size: 26px; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.05);
+        }
+        .icon-hw { background: linear-gradient(135deg, #e0e7ff, #c7d2fe); color: #4f46e5; }
+        .icon-assign { background: linear-gradient(135deg, #fef3c7, #fde68a); color: #d97706; }
+        .icon-test { background: linear-gradient(135deg, #fce7f3, #fbcfe8); color: #db2777; }
+
+        .card-info { flex: 1; min-width: 0; }
+        
+        .meta-tags { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+        .meta-tag { font-size: 10px; font-weight: 900; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; }
+        .tag-type { background: #f1f5f9; color: #475569; }
+        .tag-date { background: #fff1f2; color: #e11d48; }
+        .tag-score { background: #dcfce7; color: #16a34a; }
+
+        .card-title { 
+            font-family: "Quicksand", sans-serif; font-size: 17px; font-weight: 900; color: #0f172a; 
+            margin-bottom: 4px; white-space: normal; word-wrap: break-word; line-height: 1.3;
+        }
+        .card-desc { 
+            font-size: 13px; font-weight: 600; color: #64748b; 
+            white-space: normal; word-wrap: break-word; line-height: 1.4;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+
+        /* =========================
+           EMPTY & LOADING STATES
+        ========================= */
+        .empty-state { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; }
+        .empty-icon { font-size: 64px; margin-bottom: 16px; animation: float 2s infinite ease-in-out; }
+        .empty-title { font-family: "Quicksand", sans-serif; font-size: 22px; font-weight: 900; color: #0f172a; margin-bottom: 8px; }
+        .empty-desc { color: #64748b; font-size: 15px; font-weight: 600; }
+        
+        .page-loader { position: fixed; inset: 0; background: #ffffff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.4s ease; }
+        .loading-logo { width: 68px; height: 68px; border-radius: 22px; background: linear-gradient(145deg, #14b8a6, #0d9488); display: flex; align-items: center; justify-content: center; font-size: 32px; animation: float 1.5s ease-in-out infinite; margin-bottom: 16px; box-shadow: 0 10px 25px rgba(20,184,166,0.3); }
+        .loading-text { color: #0f766e; font-size: 15px; font-weight: 800; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* =========================
+           BOTTOM NAVIGATION
+        ========================= */
+        .bottom-nav {
+            position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 50; height: 68px; display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; padding: 6px;
+            border-radius: 24px; background: rgba(255,255,255,.94); backdrop-filter: blur(18px); border: 1px solid rgba(226,232,240,.9); box-shadow: 0 15px 40px rgba(15,23,42,.12);
+        }
+        .nav-item { height: 55px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 18px; color: #94a3b8; }
+        .nav-item span { font-size: 22px; }
+        .nav-item small { font-size: 10px; font-weight: 800; }
+        .nav-item.active { background: #f0fdfa; color: #0d9488; }
+
+        /* =========================
+           DETAIL OVERLAY (FULLSCREEN CONTENT)
+        ========================= */
+        .activity-overlay { position: fixed; inset: 0; background: #f8fafc; z-index: 99999; display: none; width: 100vw; height: 100vh; overflow-y: auto; overflow-x: hidden; padding-top: 80px; padding-bottom: 100px; animation: slideUp 0.3s ease-out;}
+        .activity-overlay.active { display: block; }
+        
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .overlay-header { position: fixed; top: 0; left: 0; right: 0; height: 70px; background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; padding: 0 20px; z-index: 100001; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .close-overlay { width: 40px; height: 40px; border-radius: 12px; background: #f1f5f9; color: #0f172a; font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0; }
+        .overlay-title { margin-left: 16px; font-family: "Quicksand", sans-serif; font-size: 18px; font-weight: 900; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+
+        .overlay-content-box { max-width: 700px; margin: 0 auto; padding: 20px; font-size: 16px; line-height: 1.8; color: #334155; font-family: "Nunito", sans-serif; font-weight: 600; }
+        
+        /* Elements inside Admin HTML */
+        .overlay-content-box img { max-width: 100%; border-radius: 12px; height: auto; margin-top: 10px; }
+        .overlay-content-box table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        .overlay-content-box table, .overlay-content-box th, .overlay-content-box td { border: 1px solid #cbd5e1; padding: 8px; }
+        
+        /* Submit Button (Mock) */
+        .submit-action-box { max-width: 700px; margin: 20px auto 0; padding: 0 20px; display: none; }
+        .btn-submit { width: 100%; background: linear-gradient(135deg, #14b8a6, #0d9488); color: white; padding: 16px; border-radius: 16px; font-size: 18px; font-weight: 900; text-align: center; box-shadow: 0 8px 20px rgba(20, 184, 166, 0.3); }
+    </style>
+</head>
+<body>
+
+    <!-- PAGE LOADER -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loading-logo">🎯</div>
+        <div class="loading-text">Loading Activities...</div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <button class="back-btn" onclick="window.location.href='home.html'" aria-label="Go Back">←</button>
+            <div class="header-title-group">
+                <h1 class="header-title">Activities</h1>
+                <span class="header-subtitle">Homework, Assignments & Tests</span>
+            </div>
+        </div>
+        <button class="profile-btn" onclick="window.location.href='profile.html'" aria-label="Profile">👤</button>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="searchInput" placeholder="Search tasks...">
+        </div>
+
+        <!-- Dynamic Filters -->
+        <div class="categories-wrapper" id="categoriesWrapper">
+            <button class="category-chip active" data-category="All">All</button>
+            <button class="category-chip" data-category="Homework">Homework</button>
+            <button class="category-chip" data-category="Assignment">Assignments</button>
+            <button class="category-chip" data-category="Live Test">Live Tests</button>
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-icon">🎉</div>
+            <h2 class="empty-title">All Caught Up!</h2>
+            <p class="empty-desc">No activities found in this section right now.</p>
+        </div>
+
+        <!-- Activity Grid -->
+        <div class="activity-grid" id="activityGrid"></div>
+        
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="bottom-nav">
+        <button class="nav-item" onclick="window.location.href='home.html'"><span>🏠</span><small>Home</small></button>
+        <button class="nav-item" onclick="window.location.href='content.html'"><span>📚</span><small>Learn</small></button>
+        <button class="nav-item" onclick="window.location.href='videos.html'"><span>🎬</span><small>Videos</small></button>
+        <button class="nav-item active"><span>🎯</span><small>Activity</small></button>
+        <button class="nav-item" onclick="window.location.href='profile.html'"><span>👤</span><small>Profile</small></button>
+    </nav>
+
+    <!-- ==========================================
+         DETAIL OVERLAY (Shows Homework/Test details)
+    =========================================== -->
+    <div class="activity-overlay" id="activityOverlay">
+        
+        <div class="overlay-header">
+            <button class="close-overlay" onclick="closeActivityOverlay()">⬅</button>
+            <div class="overlay-title" id="overlayTitle">Activity Details</div>
+        </div>
+        
+        <div class="overlay-content-box" id="overlayContentBox">
+            <!-- HTML Content from Admin injected here -->
+        </div>
+
+        <div class="submit-action-box" id="submitActionBox">
+            <button class="btn-submit" id="btnSubmitTask">Submit Work</button>
+        </div>
+
+    </div>
+
+    <!-- ==========================================
+         JAVASCRIPT & FIREBASE LOGIC
+    =========================================== -->
+    <script type="module">
+        import { auth, db } from "./firebase.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+        import { collection, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+        // Global Data Array
+        window.allActivitiesData = [];
+        let currentCategory = "All";
+        let searchQuery = "";
+
+        const activityGrid = document.getElementById("activityGrid");
+        const emptyState = document.getElementById("emptyState");
+        const searchInput = document.getElementById("searchInput");
+        const pageLoader = document.getElementById("pageLoader");
+        const categoriesChips = document.querySelectorAll('.category-chip');
+
+        /* --- 1. Auth Check --- */
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                // If login page exists, redirect. Otherwise stay for demo.
+                // window.location.replace("login.html");
+            }
+            fetchActivities();
+        });
+
+        /* --- 2. Fetch Activities from Firebase --- */
+        function fetchActivities() {
+            // Assuming collection is 'activities'
+            const ref = collection(db, "activities");
+            // If you have a published flag, use it. Otherwise fetch all.
+            // const q = query(ref, where("published", "==", true)); 
+            
+            onSnapshot(ref, (snapshot) => {
+                window.allActivitiesData = [];
+                snapshot.forEach(doc => {
+                    window.allActivitiesData.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // Demo Data Fallback: If database is empty, show some dummy data for preview
+                if(window.allActivitiesData.length === 0) {
+                    window.allActivitiesData = [
+                        { id: "1", type: "Homework", title: "Maths - Table of 2 to 5", description: "Write and memorize multiplication tables.", dueDate: "Tomorrow", htmlContent: "<h2>Maths Homework</h2><p>Please write tables from 2 to 5 in your notebook.</p>" },
+                        { id: "2", type: "Assignment", title: "Science Project - Solar System", description: "Draw the solar system and label all planets.", dueDate: "15 Oct", htmlContent: "<h2>Solar System</h2><p>Draw a neat diagram of the Solar System on an A4 sheet. Make sure to color it!</p>" },
+                        { id: "3", type: "Live Test", title: "Weekly Hindi Test", description: "Vyakaran and chapter 1 test.", score: "8/10", htmlContent: "<h2>Test Result</h2><p>Great job! You scored 8 out of 10.</p><ul><li>Q1: Correct</li><li>Q2: Wrong</li></ul>" }
+                    ];
+                }
+
+                renderActivityGrid();
+                
+                setTimeout(() => {
+                    pageLoader.style.opacity = '0';
+                    setTimeout(() => pageLoader.style.display = 'none', 400);
+                }, 400);
+            }, (error) => {
+                console.error("Firebase Sync Error:", error);
+                // Hide loader even on error
+                pageLoader.style.display = 'none'; 
+            });
+        }
+
+        /* --- 3. Filter Logic (Tabs) --- */
+        categoriesChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                categoriesChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                currentCategory = chip.getAttribute('data-category');
+                renderActivityGrid();
+            });
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            searchQuery = e.target.value;
+            renderActivityGrid();
+        });
+
+        /* --- 4. Render Grid --- */
+        function renderActivityGrid() {
+            const filtered = window.allActivitiesData.filter(item => {
+                // Search Match
+                const searchStr = searchQuery.toLowerCase();
+                const matchesSearch = 
+                    (item.title || "").toLowerCase().includes(searchStr) || 
+                    (item.description || "").toLowerCase().includes(searchStr);
+                
+                // Tab Match
+                const itemType = item.type || "Homework"; // Default
+                const matchesCategory = currentCategory === "All" || itemType.toLowerCase() === currentCategory.toLowerCase();
+                
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                activityGrid.style.display = "none";
+                emptyState.style.display = "flex";
+                return;
+            }
+
+            activityGrid.style.display = "grid";
+            emptyState.style.display = "none";
+
+            let html = "";
+            filtered.forEach(item => {
+                const title = item.title || "Activity";
+                const desc = item.description || "Tap to view details.";
+                const type = item.type || "Homework";
+                const dateText = item.dueDate || item.date || "";
+                const scoreText = item.score || item.result || "";
+
+                // Determine Icon and Styling based on Type
+                let iconHtml = "📝";
+                let iconClass = "icon-hw";
+                if(type.toLowerCase().includes("assignment")) {
+                    iconHtml = "📋";
+                    iconClass = "icon-assign";
+                } else if(type.toLowerCase().includes("test")) {
+                    iconHtml = "⏱️";
+                    iconClass = "icon-test";
+                }
+
+                html += `
+                    <div class="card-item activity-card" data-id="${item.id}">
+                        <div class="card-icon ${iconClass}">${iconHtml}</div>
+                        <div class="card-info">
+                            <div class="meta-tags">
+                                <span class="meta-tag tag-type">${type}</span>
+                                ${dateText ? `<span class="meta-tag tag-date">📅 Due: ${dateText}</span>` : ''}
+                                ${scoreText ? `<span class="meta-tag tag-score">🎯 Score: ${scoreText}</span>` : ''}
+                            </div>
+                            <h3 class="card-title">${title}</h3>
+                            <p class="card-desc">${desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            activityGrid.innerHTML = html;
+
+            // ATTACH CLICK EVENTS SAFELY
+            document.querySelectorAll('.activity-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const activityId = card.getAttribute('data-id');
+                    const activityData = window.allActivitiesData.find(a => a.id === activityId);
+                    
+                    if (activityData && window.openActivityDetails) {
+                        window.openActivityDetails(activityData);
+                    }
+                });
+            });
+        }
+    </script>
+
+    <!-- ==========================================
+         OVERLAY LOGIC (Details Viewer)
+    =========================================== -->
+    <script>
+        const activityOverlay = document.getElementById("activityOverlay");
+        const overlayTitle = document.getElementById("overlayTitle");
+        const overlayContentBox = document.getElementById("overlayContentBox");
+        const submitActionBox = document.getElementById("submitActionBox");
+        const btnSubmitTask = document.getElementById("btnSubmitTask");
+
+        window.openActivityDetails = function(data) {
+            // Set Header
+            overlayTitle.textContent = data.title || "Details";
+            
+            // Set Content (HTML from Admin)
+            let rawHtml = data.htmlContent || `<p>${data.description || 'No detailed content available.'}</p>`;
+            overlayContentBox.innerHTML = rawHtml;
+
+            // Show Submit Button for Assignments/Homework that don't have a score yet
+            if ((data.type === "Homework" || data.type === "Assignment") && !data.score) {
+                submitActionBox.style.display = "block";
+                
+                // Update button text based on context
+                btnSubmitTask.textContent = data.type === "Assignment" ? "Upload Assignment" : "Mark as Done";
+                
+                btnSubmitTask.onclick = () => {
+                    alert("This will open a file upload dialog or submission form.");
+                };
+            } else {
+                submitActionBox.style.display = "none";
+            }
+
+            // Show Overlay
+            activityOverlay.classList.add("active");
+            document.body.style.overflow = "hidden"; // Prevent background scrolling
+        };
+
+        window.closeActivityOverlay = function() {
+            activityOverlay.classList.remove("active");
+            overlayContentBox.innerHTML = "";
+            document.body.style.overflow = "auto";
+        };
+    </script>
+</body>
+</html>
