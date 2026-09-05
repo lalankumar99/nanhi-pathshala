@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- ==========================================
+         SEO & METADATA
+    =========================================== -->
+    <title>Game Zone | Nanhi Pathshala - Play & Learn Educational Games</title>
+    <meta name="description" content="Explore Nanhi Pathshala's Game Zone. Play educational and fun games like Math Master, Physics Lab, Turbo Racing, and more to learn and entertain.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://yourdomain.com/game.html">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/game.html">
+    <meta property="og:title" content="Game Zone | Nanhi Pathshala">
+    <meta property="og:description" content="Explore Nanhi Pathshala's Game Zone. Play educational and fun games to learn and entertain.">
+    <meta property="og:image" content="https://yourdomain.com/assets/og-image-games.jpg">
+    
+    <!-- JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "Game Zone | Nanhi Pathshala",
+      "description": "Educational and entertainment games for students and children.",
+      "url": "https://yourdomain.com/game.html",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Nanhi Pathshala"
+      }
+    }
+    </script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Nunito', 'sans-serif'] },
+                    colors: {
+                        np: {
+                            teal: '#14B8A6',
+                            tealDark: '#0D9488',
+                            yellow: '#FBBF24',
+                            blueDark: '#1E293B',
+                            bg: '#F8FAFC'
+                        }
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(20, 184, 166, 0.15)',
+                        'card': '0 4px 20px -2px rgba(0, 0, 0, 0.05)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* ==========================================
+           BASE STYLES & ANIMATIONS
+        =========================================== */
+        body {
+            background-color: #F8FAFC;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-pop-in { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        /* Game Fullscreen Overlay Transition */
+        #gamePlayerOverlay {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            transform: translateY(100%) scale(0.9);
+            opacity: 0;
+            visibility: hidden;
+        }
+        #gamePlayerOverlay.active {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .blob { position: fixed; border-radius: 50%; filter: blur(60px); z-index: -1; opacity: 0.4; }
+        .blob-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: #CCFBF1; }
+        .blob-2 { bottom: -10%; right: -10%; width: 250px; height: 250px; background: #FEF3C7; }
+
+
+        /* ==========================================
+           LOADING SCREEN UI (Matches Home Page)
+        =========================================== */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            transition: opacity 0.4s ease;
+        }
+
+        .loading-logo {
+            width: 68px;
+            height: 68px;
+            border-radius: 22px;
+            background: linear-gradient(145deg, #2dd4bf, #0d9488);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            animation: loadingFloat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes loadingFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-7px); }
+        }
+
+        .loading-text {
+            color: #0f766e;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        /* ==========================================
+           TIME LIMIT MODAL UI
+        =========================================== */
+        .limit-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .limit-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .limit-modal-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 380px;
+            border-radius: 28px;
+            padding: 32px 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            transform: scale(0.92) translateY(15px);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .limit-modal-overlay.show .limit-modal-card {
+            transform: scale(1) translateY(0);
+        }
+
+        .limit-modal-icon {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-radius: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .limit-modal-title {
+            font-family: "Quicksand", sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .limit-modal-desc {
+            font-size: 15px;
+            color: #475569;
+            line-height: 1.5;
+            margin-bottom: 26px;
+            font-weight: 700;
+        }
+
+        .limit-btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 18px;
+            font-size: 16px;
+            font-weight: 800;
+            transition: transform 0.2s ease, background 0.2s ease;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+        }
+
+        .limit-btn:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+<body class="text-np-blueDark pb-20">
+
+    <!-- ==========================================
+         AUTHENTICATION LOADING SCREEN
+    =========================================== -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-logo">🎮</div>
+        <div class="loading-text">Loading Game Zone...</div>
+    </div>
+
+
+    <!-- Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-100 px-4 py-3 shadow-sm flex items-center justify-between">
+        <button onclick="window.location.href='home.html'" class="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow hover:bg-gray-50 transition active:scale-95">
+            <svg class="w-6 h-6 text-np-tealDark" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <div class="text-center flex-1">
+            <h1 class="text-xl font-bold text-np-blueDark flex items-center justify-center gap-2">
+                🎮 Game Zone
+            </h1>
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Learn • Play • Explore</p>
+        </div>
+        <div class="w-10 h-10"></div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="px-4 mt-6">
+        <div class="relative rounded-3xl overflow-hidden bg-gradient-to-br from-np-blueDark to-gray-800 p-6 text-white shadow-soft flex items-center justify-between">
+            <div class="z-10 w-2/3">
+                <span class="inline-block px-3 py-1 bg-white/20 rounded-full text-xs font-bold mb-3 backdrop-blur-sm">
+                    🔥 Action & Logic
+                </span>
+                <h2 class="text-2xl font-black mb-1 leading-tight text-transparent bg-clip-text bg-gradient-to-r from-np-teal to-np-yellow">
+                    Play & Learn
+                </h2>
+                <p class="text-sm text-gray-300 opacity-90">Test your brain or just have fun!</p>
+            </div>
+            <div class="w-1/3 flex justify-end animate-float relative z-10">
+                <div class="text-6xl drop-shadow-lg">🕹️</div>
+            </div>
+            <div class="absolute top-0 right-0 w-32 h-32 bg-np-teal/20 rounded-full -mr-10 -mt-10 blur-xl"></div>
+        </div>
+    </section>
+
+    <!-- Search Section -->
+    <section class="px-4 mt-6">
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <input type="text" id="searchInput" placeholder="Search math, racing, physics..." 
+                class="w-full pl-11 pr-4 py-3.5 bg-white border border-gray-100 rounded-2xl shadow-card text-sm font-semibold placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-np-teal transition-all">
+        </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="mt-6">
+        <nav class="flex px-4 gap-3 overflow-x-auto hide-scrollbar pb-2" id="categoryContainer">
+            <!-- Categories injected via JS -->
+        </nav>
+    </section>
+
+    <!-- Main Game List -->
+    <main class="px-4 mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-black text-np-blueDark" id="gameListTitle">All Challenges 🎯</h3>
+        </div>
+        
+        <div id="gameGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <!-- Game cards injected via JS -->
+        </div>
+        
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-10">
+            <div class="text-5xl mb-3">🕵️‍♂️</div>
+            <h4 class="text-lg font-bold text-gray-700">No games found</h4>
+            <p class="text-gray-500 text-sm">Try a different search term.</p>
+        </div>
+    </main>
+
+    <!-- FULLSCREEN GAME PLAYER OVERLAY -->
+    <div id="gamePlayerOverlay" class="fixed inset-0 z-50 bg-black flex flex-col">
+        <div id="gamePlayerHeader" class="bg-gray-900 px-4 py-3 flex items-center justify-between text-white shadow-md z-10">
+            <div class="flex items-center gap-3">
+                <button onclick="closeGame()" class="p-2 bg-gray-800 rounded-full hover:bg-red-500 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+                <span id="playingGameTitle" class="font-bold text-sm tracking-wide">Game Title</span>
+            </div>
+            
+            <button onclick="requestBrowserFullscreen()" class="p-2 bg-gray-800 rounded-lg text-xs font-bold flex items-center gap-2 hover:bg-gray-700 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                Fullscreen
+            </button>
+        </div>
+        <iframe id="gameIframe" src="" class="w-full flex-1 border-none bg-black" allowfullscreen></iframe>
+    </div>
+
+
+    <!-- ==========================================
+         TIME LIMIT EXCEEDED MODAL
+    =========================================== -->
+    <div class="limit-modal-overlay" id="timeLimitModal">
+        <div class="limit-modal-card">
+            <div class="limit-modal-icon">⏳</div>
+            <h3 class="limit-modal-title">Time's Up!</h3>
+            <p class="limit-modal-desc">
+                Great job playing today! You have reached your daily play limit of 30 minutes. It's time to learn something new! 📚
+            </p>
+            <button class="limit-btn" onclick="window.location.href='home.html'">
+                Go to Learning Space
+            </button>
+        </div>
+    </div>
+
+
+    <!-- ==========================================
+         MAIN JAVASCRIPT LOGIC
+    =========================================== -->
+    <script>
+        const gamesDB = [
+            { id: "math-challenge", name: "Math Master", description: "Test your speed in addition and subtraction.", category: "Math", difficulty: "Medium", icon: "🧮", bgGradient: "from-blue-500 to-blue-700", gameUrl: "math-challenge.html" },
+            { id: "advanced-calc", name: "Calculus Pro", description: "Heavy math: Integrals, derivatives & limits.", category: "Math", difficulty: "Hard", icon: "➗", bgGradient: "from-slate-700 to-slate-900", gameUrl: "advanced-calc.html" },
+            { id: "physics-engine", name: "Physics Lab", description: "Experiment with gravity and friction.", category: "Science", difficulty: "Hard", icon: "🍎", bgGradient: "from-emerald-500 to-teal-700", gameUrl: "physics-engine.html" },
+            { id: "code-breaker", name: "Code Breaker", description: "Learn Python and JS logic algorithms.", category: "Coding", difficulty: "Hard", icon: "💻", bgGradient: "from-gray-800 to-black", gameUrl: "code-breaker.html" },
+            { id: "chem-bonds", name: "Chemical Bonds", description: "Connect atoms to form molecules.", category: "Science", difficulty: "Medium", icon: "🧪", bgGradient: "from-purple-500 to-fuchsia-700", gameUrl: "chem-bonds.html" },
+            { id: "space-shooter", name: "Space Shooter", description: "Blast asteroids and save the galaxy!", category: "Arcade", difficulty: "Easy", icon: "🚀", bgGradient: "from-indigo-600 to-purple-800", gameUrl: "space-shooter.html" },
+            { id: "turbo-racing", name: "Turbo Racing", description: "High-speed 3D car racing action.", category: "Action", difficulty: "Medium", icon: "🏎️", bgGradient: "from-red-500 to-orange-600", gameUrl: "turbo_racing.html" },
+            { id: "ninja-jump", name: "Ninja Jump", description: "Jump high and avoid deadly traps.", category: "Action", difficulty: "Easy", icon: "🥷", bgGradient: "from-stone-600 to-stone-800", gameUrl: "ninja-jump.html" },
+            { id: "candy-match", name: "Sweet Match", description: "Match 3 candies to clear the board.", category: "Puzzle", difficulty: "Easy", icon: "🍬", bgGradient: "from-pink-400 to-rose-500", gameUrl: "candy-match.html" },
+            { id: "brain-puzzle", name: "Logic Escape", description: "Solve the riddle to open the door.", category: "Puzzle", difficulty: "Medium", icon: "🔐", bgGradient: "from-amber-500 to-orange-600", gameUrl: "brain-puzzle.html" },
+            { id: "neon-dash", name: "Neon Dash", description: "Dodge red boxes and collect coins in this retro neon world!", category: "Action", difficulty: "Hard", icon: "⚡", bgGradient: "from-fuchsia-600 to-cyan-500", gameUrl: "neon_dash_retro_neon.html"}
+        ];
+
+        const categories = ["All", "Action", "Arcade", "Science", "Math", "Coding", "Puzzle"];
+        let currentCategory = "All";
+        let searchQuery = "";
+
+
+        /** 
+         * TIME LIMIT SYSTEM (30 Minutes)
+         */
+        const MAX_PLAY_SECONDS = 30 * 60; 
+        let playTimerInterval = null;
+        
+        window.currentUserId = "guest"; 
+        window.todayDateStr = new Date().toISOString().split('T')[0];
+        window.secondsPlayedToday = 0;
+
+        function checkAndEnforceTimeLimit() {
+            if (window.secondsPlayedToday >= MAX_PLAY_SECONDS) {
+                document.getElementById("timeLimitModal").classList.add("show");
+                return false; 
+            }
+            return true;
+        }
+
+        function startSessionTimer() {
+            if (playTimerInterval) clearInterval(playTimerInterval);
+
+            playTimerInterval = setInterval(() => {
+                window.secondsPlayedToday++;
+                
+                if (window.currentUserId !== "guest") {
+                    const storageKey = `np_gametime_${window.currentUserId}_${window.todayDateStr}`;
+                    localStorage.setItem(storageKey, window.secondsPlayedToday);
+                }
+
+                if (window.secondsPlayedToday >= MAX_PLAY_SECONDS) {
+                    closeGame();
+                    document.getElementById("timeLimitModal").classList.add("show");
+                }
+            }, 1000);
+        }
+
+        function stopSessionTimer() {
+            if (playTimerInterval) {
+                clearInterval(playTimerInterval);
+                playTimerInterval = null;
+            }
+        }
+
+
+        /** 
+         * GAME PLAYER LOGIC 
+         */
+        const playerOverlay = document.getElementById('gamePlayerOverlay');
+        const gameIframe = document.getElementById('gameIframe');
+        const playingGameTitle = document.getElementById('playingGameTitle');
+
+        function playGame(gameId) {
+            if (!checkAndEnforceTimeLimit()) return; 
+
+            const game = gamesDB.find(g => g.id === gameId);
+            if (!game) return;
+
+            startSessionTimer();
+            playingGameTitle.innerText = game.name;
+            gameIframe.src = game.gameUrl;
+            playerOverlay.classList.add('active');
+            
+            setTimeout(() => requestBrowserFullscreen(), 100);
+        }
+
+        function closeGame() {
+            stopSessionTimer();
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(err => console.log(err));
+            }
+            playerOverlay.classList.remove('active');
+            setTimeout(() => { gameIframe.src = ''; }, 400);
+        }
+
+        function requestBrowserFullscreen() {
+            const elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => console.log("Fullscreen error:", err));
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            }
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            const header = document.getElementById('gamePlayerHeader');
+            if (document.fullscreenElement) {
+                header.classList.add('hidden'); 
+            } else {
+                header.classList.remove('hidden');
+            }
+        });
+
+
+        /** 
+         * RENDERING UI
+         */
+        function getDifficultyColor(diff) {
+            if (diff === 'Easy') return 'text-green-600 bg-green-100';
+            if (diff === 'Medium') return 'text-yellow-600 bg-yellow-100';
+            return 'text-red-600 bg-red-100';
+        }
+
+        function createGameCard(game) {
+            return `
+                <div class="bg-white rounded-3xl shadow-card overflow-hidden border border-gray-100 hover:shadow-lg transition-all flex flex-col cursor-pointer animate-pop-in relative group" onclick="playGame('${game.id}')">
+                    <div class="h-36 bg-gradient-to-br ${game.bgGradient} flex items-center justify-center relative overflow-hidden">
+                        <div class="text-7xl group-hover:scale-110 transition-transform duration-300 z-10 drop-shadow-md">${game.icon}</div>
+                        <div class="absolute -bottom-4 -right-4 w-28 h-28 bg-white/20 rounded-full blur-xl"></div>
+                        <div class="absolute top-2 right-2 bg-black/30 backdrop-blur-sm text-white text-[10px] font-bold px-2 py-1 rounded-lg uppercase tracking-wider">
+                            ${game.category}
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col flex-grow">
+                        <h4 class="font-black text-lg text-gray-900 mb-1 leading-tight">${game.name}</h4>
+                        <p class="text-xs text-gray-500 mb-4 line-clamp-2 leading-relaxed">${game.description}</p>
+                        
+                        <div class="mt-auto flex items-center justify-between">
+                            <span class="px-2.5 py-1 ${getDifficultyColor(game.difficulty)} rounded-lg text-[10px] font-bold uppercase tracking-wide">${game.difficulty} Mode</span>
+                            <button class="w-8 h-8 bg-gray-900 text-white rounded-full flex items-center justify-center group-hover:bg-np-teal transition-colors shadow-md">
+                                <svg class="w-4 h-4 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoryContainer');
+            container.innerHTML = categories.map(cat => {
+                const isActive = currentCategory === cat;
+                const baseClass = "px-5 py-2 rounded-xl text-sm font-bold cursor-pointer transition-all border shrink-0";
+                const activeClass = "bg-gray-900 text-white border-gray-900 shadow-md";
+                const inactiveClass = "bg-white text-gray-600 border-gray-200 hover:bg-gray-50";
+                return `<button onclick="setCategory('${cat}')" class="${baseClass} ${isActive ? activeClass : inactiveClass}">${cat}</button>`;
+            }).join('');
+        }
+
+        function renderGameGrid() {
+            const container = document.getElementById('gameGrid');
+            const emptyState = document.getElementById('emptyState');
+            const title = document.getElementById('gameListTitle');
+
+            let filtered = gamesDB.filter(game => {
+                const matchesCat = currentCategory === "All" || game.category === currentCategory;
+                const matchesSearch = game.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                                      game.description.toLowerCase().includes(searchQuery.toLowerCase());
+                return matchesCat && matchesSearch;
+            });
+
+            if (searchQuery) title.innerText = `Search Results 🔍`;
+            else if (currentCategory !== "All") title.innerText = `${currentCategory} Games 🎲`;
+            else title.innerText = `All Challenges 🎯`;
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                container.innerHTML = filtered.map(g => createGameCard(g)).join('');
+            }
+        }
+
+        function renderAll() {
+            renderCategories();
+            renderGameGrid();
+        }
+
+        function setCategory(cat) {
+            currentCategory = cat;
+            document.getElementById('searchInput').value = '';
+            searchQuery = '';
+            renderAll();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            searchQuery = e.target.value.trim();
+            renderAll();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderAll();
+        });
+    </script>
+
+
+    <!-- ==========================================
+         FIREBASE AUTHENTICATION SCRIPT (Matches Home Page)
+    =========================================== -->
+    <script type="module">
+        import { auth } from "./firebase.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+        
+        const loadingScreen = document.getElementById("loadingScreen");
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                // If not logged in, gracefully redirect to login page
+                window.location.replace("login.html");
+                return;
+            }
+
+            // User is authenticated! Start the Game Zone session.
+            window.currentUserId = user.uid;
+            
+            // Restore play time tracker for today if they played earlier
+            const storageKey = `np_gametime_${window.currentUserId}_${window.todayDateStr}`;
+            const savedTime = localStorage.getItem(storageKey);
+            
+            if (savedTime) {
+                window.secondsPlayedToday = parseInt(savedTime, 10);
+            }
+
+            // Hide the loading screen with a smooth fade, just like Home page.
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 400);
+
+        });
+    </script>
+</body>
+</html>
