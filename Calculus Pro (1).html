@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#14b8a6">
+    <title>Calculus Pro • Nanhi Pathshala</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            font-family: "Nunito", sans-serif;
+            background: 
+                radial-gradient(circle at 10% 5%, #ccfbf1 0, transparent 25%),
+                radial-gradient(circle at 90% 10%, #fef3c7 0, transparent 25%),
+                #f8fafc;
+            color: #134e4a;
+        }
+
+        button {
+            font-family: inherit;
+            border: none;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .hidden { display: none !important; }
+        
+        .app-container {
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+        .header {
+            padding: 20px 24px 30px;
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            color: white;
+            border-radius: 0 0 30px 30px;
+            box-shadow: 0 12px 30px rgba(13,148,136,.18);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-title {
+            font-family: "Quicksand", sans-serif;
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            font-weight: 800;
+            color: #ccfbf1;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        /* =========================
+           PROGRESS BAR
+        ========================= */
+        .progress-container {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            height: 8px;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #fde047;
+            width: 0%;
+            transition: width 0.4s ease;
+            border-radius: 10px;
+        }
+
+        /* =========================
+           MAIN CONTENT
+        ========================= */
+        .main-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: -20px;
+            z-index: 1;
+        }
+
+        .np-card {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(15,23,42,.08);
+            padding: 30px 20px;
+            text-align: center;
+            animation: cardIn 0.4s ease-out;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #14b8a6, #0d9488);
+            color: #ffffff;
+            box-shadow: 0 8px 20px rgba(13, 148, 136, 0.25);
+            width: 100%;
+            padding: 16px;
+            border-radius: 18px;
+            font-size: 18px;
+            font-weight: 900;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 20px;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+
+        /* =========================
+           QUESTION UI
+        ========================= */
+        .category-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: #ccfbf1;
+            color: #0f766e;
+            font-size: 11px;
+            font-weight: 900;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .question-text {
+            font-size: 32px;
+            color: #134e4a;
+            margin-bottom: 30px;
+            word-wrap: break-word;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: 1fr 1fr; }
+            .question-text { font-size: 40px; }
+        }
+
+        .option-btn {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 18px 10px;
+            font-size: 20px;
+            color: #334155;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        /* Answer States */
+        .option-btn.interactive:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .option-btn.interactive:active {
+            transform: scale(0.97);
+        }
+        .option-btn.correct {
+            background: #ecfdf5 !important;
+            border-color: #10b981 !important;
+            color: #047857 !important;
+            box-shadow: 0 0 15px rgba(16,185,129,0.2);
+            animation: pulseCorrect 0.3s ease;
+        }
+        .option-btn.wrong {
+            background: #fef2f2 !important;
+            border-color: #ef4444 !important;
+            color: #b91c1c !important;
+            opacity: 0.8;
+            animation: shakeWrong 0.3s ease;
+        }
+        .option-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes pulseCorrect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes shakeWrong {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* =========================
+           MATH FORMATTING
+        ========================= */
+        .math-text {
+            font-family: monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .math-text sup { font-size: 0.65em; }
+        .math-text sub { font-size: 0.65em; }
+        .math-integral {
+            font-size: 1.4em;
+            vertical-align: middle;
+            margin-right: 4px;
+            color: #0d9488;
+        }
+        .math-keyword {
+            font-family: 'Times New Roman', Times, serif;
+            font-style: italic;
+            color: #0f766e;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div class="header-subtitle">Question <span id="q-current">1</span> of 50</div>
+                <h1 class="header-title" id="game-score-display">Score: 0</h1>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-fill" id="progress-bar"></div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+        
+        <!-- GAME SCREEN -->
+        <div id="screen-game" class="np-card">
+            <div class="category-badge" id="q-category">Loading...</div>
+            
+            <div class="question-text math-text" id="q-text">
+                ...
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <!-- Buttons injected via JS -->
+            </div>
+        </div>
+
+        <!-- RESULT SCREEN -->
+        <div id="screen-result" class="np-card hidden">
+            <div id="result-emoji" style="font-size: 60px; margin-bottom: 10px;">🏆</div>
+            <h2 style="font-family: 'Quicksand'; font-size: 26px; font-weight: 900; color: #134e4a; margin-bottom: 5px;">
+                Test Complete!
+            </h2>
+            <p style="color: #64748b; font-weight: 700; margin-bottom: 20px;">You answered all 50 questions.</p>
+            
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 20px; padding: 25px; margin-bottom: 20px;">
+                <div style="font-size: 12px; font-weight: 900; color: #94a3b8; text-transform: uppercase; margin-bottom: 5px;">Final Score</div>
+                <div style="font-family: 'Quicksand'; font-size: 48px; font-weight: 900; color: #0d9488;">
+                    <span id="final-score">0</span><span style="font-size: 24px; color: #cbd5e1;">/50</span>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="location.reload()">Start New Test</button>
+        </div>
+
+    </main>
+</div>
+
+<script>
+    /* =========================================================
+       AUDIO & HAPTIC FEEDBACK (NOTIFICATION STYLE)
+    ========================================================= */
+    
+    // Web Audio API context
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playFeedback(type) {
+        // Initialize Audio context on first click if not done
+        if (!audioCtx) {
+            audioCtx = new AudioContext();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        const osc = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        osc.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'correct') {
+            // Sweet Notification Ping (Sine wave, quick jump in frequency)
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(600, now);
+            osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+            
+            gainNode.gain.setValueAtTime(0.5, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            
+            osc.start(now);
+            osc.stop(now + 0.3);
+            
+        } else if (type === 'wrong') {
+            // Error Buzz Notification (Square wave, low frequency)
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(150, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+            
+            gainNode.gain.setValueAtTime(0.3, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            
+            osc.start(now);
+            osc.stop(now + 0.3);
+
+            // Trigger Mobile Vibration (Buzz, pause, Buzz)
+            if (navigator.vibrate) {
+                navigator.vibrate([150, 50, 150]); 
+            }
+        }
+    }
+
+    /* =========================================================
+       MATH ENGINE (CLEAN & PROGRESSIVE DIFFICULTY)
+    ========================================================= */
+
+    const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const shuffle = (array) => {
+        let arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    };
+    const gcd = (a, b) => b === 0 ? Math.abs(a) : gcd(b, a % b);
+    
+    const formatFraction = (n, d) => {
+        if (n === 0) return '0';
+        if (d === 0) return 'NaN';
+        let g = gcd(n, d);
+        n = n / g;
+        d = d / g;
+        if (d < 0) { n = -n; d = -d; }
+        if (d === 1) return `${n}`;
+        if (n === 1) return `1/${d}`;
+        if (n === -1) return `-1/${d}`;
+        return `${n}/${d}`;
+    };
+
+    // Cleans up math notation so it never looks wrong
+    const cleanMath = (str) => {
+        return str
+            .replace(/\b1x/g, 'x')        // 1x -> x
+            .replace(/\b-1x/g, '-x')      // -1x -> -x
+            .replace(/x\^1\b/g, 'x')      // x^1 -> x
+            .replace(/x\^0\b/g, '1')      // x^0 -> 1
+            .replace(/\+ -/g, '- ')       // + - -> -
+            .replace(/--/g, '+ ')         // -- -> +
+            .replace(/\(\+/g, '(')        // (+ -> (
+            .replace(/\b1\(/g, '(')       // 1( -> (
+            .replace(/\b1sin/g, 'sin')    // 1sin -> sin
+            .replace(/\b-1sin/g, '-sin')  // -1sin -> -sin
+            .replace(/\b1cos/g, 'cos')    // 1cos -> cos
+            .replace(/\b-1cos/g, '-cos')  // -1cos -> -cos
+            .replace(/\b1e/g, 'e')        // 1e -> e
+            .replace(/\b1ln/g, 'ln');     // 1ln -> ln
+    };
+
+    const generateProblem = (difficulty) => {
+        let type, q, a;
+        let distractors = [];
+
+        // 1: Easy, 2: Medium, 3: Hard, 4: Very Hard, 5: Expert
+        let availableTopics = [];
+        if (difficulty === 1) availableTopics = ['limit_simple', 'deriv_power_simple'];
+        else if (difficulty === 2) availableTopics = ['deriv_power_med', 'int_power_simple', 'deriv_trig_simple'];
+        else if (difficulty === 3) availableTopics = ['deriv_trig_chain', 'deriv_exp', 'int_power_med'];
+        else if (difficulty === 4) availableTopics = ['int_trig_chain', 'limit_rational', 'deriv_ln'];
+        else availableTopics = ['deriv_trig_chain_hard', 'int_exp', 'int_hard_frac', 'deriv_ln_chain'];
+
+        const topic = pick(availableTopics);
+
+        if (topic.includes('limit_simple')) {
+            const m = rand(2, 5); const c = rand(1, 10); const x = rand(1, 4);
+            q = `lim_{x→${x}} (${m}x + ${c})`;
+            a = `${(m * x) + c}`;
+            distractors = [`${(m * x) - c}`, `${(m * x) + c + 1}`, `${(m * x) + c - 2}`];
+        }
+        else if (topic.includes('limit_rational')) {
+            const val = rand(1, 5) * pick([1, -1]);
+            const valSq = val * val;
+            const sign = valSq > 0 ? '-' : '+';
+            q = `lim_{x→${val}} (x^2 ${sign} ${Math.abs(valSq)}) / (x - ${val})`;
+            a = `${2 * val}`;
+            distractors = [`${val}`, `${-2 * val}`, '0'];
+        }
+        else if (topic.includes('deriv_power')) {
+            const c = rand(2, difficulty === 1 ? 5 : 9) * pick([1, -1]);
+            const p = rand(2, difficulty === 1 ? 4 : 8) * (difficulty >= 2 ? pick([1, -1]) : 1);
+            q = `d/dx (${c}x^${p})`;
+            a = `${c * p}x^${p - 1}`;
+            distractors = [`${c * p}x^${p}`, `${c}x^${p - 1}`, `${p}x^${c}`];
+        }
+        else if (topic.includes('deriv_trig_simple')) {
+            const c = rand(2, 6);
+            const funcs = [{f:'sin(x)', a:'cos(x)'}, {f:'cos(x)', a:'-sin(x)'}];
+            const pair = pick(funcs);
+            q = `d/dx (${c}${pair.f})`;
+            a = `${c}${pair.a}`;
+            distractors = [`-${c}${pair.a}`, `${c}${pair.f}`, `-${c}${pair.f}`].map(s => s.replace('--', ''));
+        }
+        else if (topic.includes('deriv_trig_chain')) {
+            const c = rand(2, 7) * pick([1, -1]);
+            const inner = rand(2, 6);
+            const isHard = topic.includes('hard');
+            const p = isHard ? rand(2, 3) : 1; 
+            const innerStr = isHard ? `${inner}x^${p}` : `${inner}x`;
+            const innerDeriv = isHard ? inner * p : inner;
+            const innerDerivStr = isHard ? `x^${p-1}` : ``;
+            
+            const funcs = [{f:'sin', df:'cos'}, {f:'cos', df:'-sin'}];
+            const pair = pick(funcs);
+            q = `d/dx (${c}${pair.f}(${innerStr}))`;
+            
+            let coeff = c * innerDeriv;
+            if (pair.df.includes('-')) coeff = -coeff;
+            let funcName = pair.df.replace('-', '');
+            
+            a = `${coeff}${innerDerivStr}${funcName}(${innerStr})`;
+            distractors = [
+                `${c}${innerDerivStr}${funcName}(${innerStr})`,
+                `${-coeff}${innerDerivStr}${funcName}(${innerStr})`,
+                `${coeff}${innerDerivStr}${pair.f}(${innerStr})`
+            ];
+        }
+        else if (topic.includes('deriv_exp')) {
+            const c = rand(2, 5); const k = rand(2, 5) * pick([1, -1]);
+            q = `d/dx (${c}e^${k}x)`;
+            a = `${c * k}e^${k}x`;
+            distractors = [`${c}e^${k}x`, `${k}e^${c}x`, `${c/k}e^${k}x`];
+        }
+        else if (topic.includes('deriv_ln')) {
+            const c = rand(2, 8); const k = topic.includes('chain') ? rand(2, 5) : 1;
+            const inner = k === 1 ? 'x' : `${k}x`;
+            q = `d/dx (${c}ln(${inner}))`;
+            a = `${c}/x`; 
+            distractors = [`${c * k}/x`, `${c}/(${inner})`, `${c}x`];
+        }
+        else if (topic.includes('int_power')) {
+            const c = rand(2, 12) * pick([1, -1]);
+            const p = rand(1, 6);
+            q = `∫ ${c}x^${p} dx`;
+            const frac = formatFraction(c, p + 1);
+            
+            // Clean formatting for integration
+            let ansTerm = frac === '1' ? `x^${p + 1}` : (frac === '-1' ? `-x^${p + 1}` : `${frac}x^${p + 1}`);
+            a = `${ansTerm} + C`;
+            
+            distractors = [`${c * p}x^${p - 1} + C`, `${c}x^${p + 1} + C`, `${frac}x^${p} + C`];
+        }
+        else if (topic.includes('int_trig_chain')) {
+            const c = rand(2, 8); const k = rand(2, 5);
+            const funcs = [{f:'cos', int:'sin'}, {f:'sin', int:'-cos'}];
+            const pair = pick(funcs);
+            q = `∫ ${c}${pair.f}(${k}x) dx`;
+            
+            let frac = formatFraction(c, k);
+            if(pair.int.includes('-')) {
+                frac = frac.startsWith('-') ? frac.substring(1) : `-${frac}`;
+                if(frac === '-1') frac = '-';
+            }
+            if(frac === '1') frac = '';
+            
+            let funcName = pair.int.replace('-', '');
+            a = `${frac}${funcName}(${k}x) + C`;
+            distractors = [`${c * k}${funcName}(${k}x) + C`, `${frac}${pair.f}(${k}x) + C`, `-${frac}${funcName}(${k}x) + C`];
+        }
+        else if (topic.includes('int_exp')) {
+            const c = rand(2, 6); const k = rand(2, 5);
+            q = `∫ ${c}e^${k}x dx`;
+            let frac = formatFraction(c, k);
+            if(frac === '1') frac = '';
+            if(frac === '-1') frac = '-';
+            a = `${frac}e^${k}x + C`;
+            distractors = [`${c*k}e^${k}x + C`, `${c}e^${k}x + C`, `${frac}e^${c}x + C`];
+        }
+        else if (topic.includes('int_hard_frac')) {
+            const p = rand(2, 5);
+            q = `∫ x^${p} / 2 dx`;
+            let frac = formatFraction(1, 2 * (p + 1));
+            a = `${frac}x^${p + 1} + C`;
+            distractors = [`(x^${p + 1}) / 2 + C`, `${p}x^${p - 1} / 2 + C`, `${frac}x^${p} + C`];
+        }
+
+        // Cleanup Math strings
+        q = cleanMath(q);
+        a = cleanMath(a);
+        distractors = distractors.map(d => cleanMath(d));
+
+        // Ensure unique options
+        const uniqueSet = new Set([a]);
+        let i = 0;
+        while(uniqueSet.size < 4 && i < 10) {
+            if(distractors[i] && !uniqueSet.has(distractors[i]) && !distractors[i].includes('NaN')) {
+                uniqueSet.add(distractors[i]);
+            }
+            i++;
+        }
+        // Fallbacks
+        while(uniqueSet.size < 4) {
+            uniqueSet.add(cleanMath(`${rand(-10, 10)}x^${rand(1,5)}`));
+        }
+
+        let catName = "Limit";
+        if(topic.includes("deriv")) catName = "Derivative";
+        if(topic.includes("int")) catName = "Integral";
+
+        return {
+            category: catName,
+            question: q,
+            answer: a,
+            options: shuffle(Array.from(uniqueSet))
+        };
+    };
+
+    const renderMathHTML = (str) => {
+        return str
+            .replace(/\^([0-9a-zA-Z-]+|\([^)]+\))/g, '<sup>$1</sup>') 
+            .replace(/_([0-9a-zA-Z-→∞]+)/g, '<sub>$1</sub>')             
+            .replace(/∫/g, '<span class="math-integral">∫</span>')
+            .replace(/lim/g, '<span class="math-keyword">lim</span>')
+            .replace(/d\/dx/g, '<span class="math-keyword">d/dx</span>')
+            .replace(/dx/g, '<span class="math-keyword" style="margin-left:5px; color:#64748b;">dx</span>')
+            .replace(/ln/g, '<span class="math-keyword">ln</span>')
+            .replace(/sin/g, 'sin')
+            .replace(/cos/g, 'cos');
+    };
+
+
+    /* =========================================================
+       GAME STATE & UI LOGIC
+    ========================================================= */
+
+    const TOTAL_QUESTIONS = 50;
+    let currentQuestionIndex = 1;
+    let score = 0;
+    let currentProblem = null;
+    let isAnswering = false;
+
+    // UI Elements
+    const screenGame = document.getElementById('screen-game');
+    const screenResult = document.getElementById('screen-result');
+    const qCategory = document.getElementById('q-category');
+    const qText = document.getElementById('q-text');
+    const optionsContainer = document.getElementById('options-container');
+    const progressBar = document.getElementById('progress-bar');
+    const qCurrent = document.getElementById('q-current');
+    const scoreDisplay = document.getElementById('game-score-display');
+
+    function updateProgressUI() {
+        qCurrent.innerText = currentQuestionIndex;
+        scoreDisplay.innerText = `Score: ${score}`;
+        const percent = ((currentQuestionIndex - 1) / TOTAL_QUESTIONS) * 100;
+        progressBar.style.width = `${percent}%`;
+    }
+
+    function loadNextProblem() {
+        isAnswering = false;
+        
+        // Difficulty (1 to 5) increases every 10 questions
+        let difficulty = Math.ceil(currentQuestionIndex / 10);
+        if (difficulty > 5) difficulty = 5;
+
+        currentProblem = generateProblem(difficulty);
+
+        // Update UI
+        qCategory.innerText = currentProblem.category;
+        qCategory.style.background = currentProblem.category === 'Derivative' ? '#ccfbf1' : (currentProblem.category === 'Integral' ? '#e0e7ff' : '#fef3c7');
+        qCategory.style.color = currentProblem.category === 'Derivative' ? '#0f766e' : (currentProblem.category === 'Integral' ? '#4f46e5' : '#b45309');
+
+        qText.innerHTML = renderMathHTML(currentProblem.question);
+        
+        // Render Options
+        optionsContainer.innerHTML = '';
+        currentProblem.options.forEach((opt) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn interactive math-text';
+            btn.innerHTML = renderMathHTML(opt);
+            btn.onclick = () => handleAnswer(opt, btn);
+            optionsContainer.appendChild(btn);
+        });
+    }
+
+    function handleAnswer(selectedAnswer, btnElement) {
+        if (isAnswering) return;
+        isAnswering = true;
+
+        const isCorrect = selectedAnswer === currentProblem.answer;
+        const allButtons = optionsContainer.querySelectorAll('button');
+        
+        // Disable all buttons
+        allButtons.forEach(b => {
+            b.classList.remove('interactive');
+            b.classList.add('disabled');
+            b.onclick = null;
+        });
+
+        if (isCorrect) {
+            btnElement.classList.add('correct');
+            score++;
+            playFeedback('correct'); // Notification sound
+        } else {
+            btnElement.classList.add('wrong');
+            playFeedback('wrong'); // Vibration + Buzz sound
+            
+            // Highlight correct answer
+            allButtons.forEach(b => {
+                if (b.innerHTML === renderMathHTML(currentProblem.answer)) {
+                    b.classList.add('correct');
+                    b.classList.remove('disabled');
+                }
+            });
+        }
+
+        updateProgressUI();
+
+        // Auto move to next after 1 second
+        setTimeout(() => {
+            if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+                showResult();
+            } else {
+                currentQuestionIndex++;
+                updateProgressUI();
+                loadNextProblem();
+            }
+        }, 1000);
+    }
+
+    function showResult() {
+        progressBar.style.width = '100%';
+        screenGame.classList.add('hidden');
+        screenResult.classList.remove('hidden');
+        
+        document.getElementById('final-score').innerText = score;
+        
+        const emoji = document.getElementById('result-emoji');
+        if (score >= 45) emoji.innerText = '🏆';
+        else if (score >= 35) emoji.innerText = '🌟';
+        else if (score >= 20) emoji.innerText = '👍';
+        else emoji.innerText = '📚';
+    }
+
+    // START TEST IMMEDIATELY ON LOAD
+    window.onload = () => {
+        score = 0;
+        currentQuestionIndex = 1;
+        updateProgressUI();
+        loadNextProblem();
+    };
+
+</script>
+
+</body>
+</html>
