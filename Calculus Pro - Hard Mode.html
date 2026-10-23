@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Calculus Pro: Hard Mode</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,700;0,800;1,400&family=Orbitron:wght@600;800;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #030712;
+            color: #f8fafc;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .font-mono-tech {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .font-cyber {
+            font-family: 'Orbitron', sans-serif;
+        }
+        .cyber-card {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            box-shadow: 0 0 35px rgba(2, 132, 199, 0.15), inset 0 0 20px rgba(15, 23, 42, 0.9);
+        }
+        .btn-cyber {
+            background: linear-gradient(135deg, #0284c7 0%, #1e40af 100%);
+            box-shadow: 0 4px 0 #0f172a, 0 0 20px rgba(56, 189, 248, 0.4);
+            transition: all 0.12s ease;
+        }
+        .btn-cyber:hover {
+            filter: brightness(1.12);
+            box-shadow: 0 4px 0 #0f172a, 0 0 28px rgba(56, 189, 248, 0.65);
+        }
+        .btn-cyber:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #0f172a, 0 0 12px rgba(56, 189, 248, 0.4);
+        }
+        .btn-hardcore {
+            background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%);
+            box-shadow: 0 4px 0 #450a0a, 0 0 25px rgba(239, 68, 68, 0.45);
+            transition: all 0.12s ease;
+        }
+        .btn-hardcore:hover {
+            filter: brightness(1.12);
+            box-shadow: 0 4px 0 #450a0a, 0 0 35px rgba(239, 68, 68, 0.7);
+        }
+        .btn-hardcore:active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #450a0a;
+        }
+        .option-btn {
+            background: rgba(30, 41, 59, 0.75);
+            border: 1.5px solid rgba(71, 85, 105, 0.7);
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-btn:hover:not(:disabled) {
+            background: rgba(30, 58, 138, 0.5);
+            border-color: #38bdf8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px -4px rgba(56, 189, 248, 0.3);
+        }
+        .option-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+        .option-correct {
+            background: rgba(6, 95, 70, 0.85) !important;
+            border-color: #10b981 !important;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.5) !important;
+        }
+        .option-wrong {
+            background: rgba(127, 29, 29, 0.85) !important;
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.5) !important;
+        }
+        /* KaTeX Custom Sizing for Readability */
+        .math-question .katex {
+            font-size: 1.45rem;
+        }
+        @media (min-width: 640px) {
+            .math-question .katex {
+                font-size: 1.75rem;
+            }
+        }
+        .math-option .katex {
+            font-size: 1.15rem;
+        }
+        @keyframes shakeError {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .shake-anim {
+            animation: shakeError 0.4s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-2 sm:p-4 relative">
+
+    <!-- Background Interactive Calculus Graph Canvas -->
+    <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-35"></canvas>
+
+    <!-- Main Container -->
+    <div id="appContainer" class="relative z-10 w-full max-w-3xl cyber-card rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col">
+
+        <!-- Top Status Bar -->
+        <header class="bg-slate-950/90 border-b border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-amber-600 flex items-center justify-center font-cyber font-black text-xl text-white shadow-lg border border-red-400/40">
+                    ∫
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <h1 class="font-cyber font-bold text-sm sm:text-base tracking-wider text-white">CALCULUS PRO</h1>
+                        <span class="px-2 py-0.5 text-[10px] font-mono-tech font-bold uppercase bg-red-950 text-red-400 border border-red-500/40 rounded-full animate-pulse">Hard Mode</span>
+                    </div>
+                    <p id="rankBadge" class="text-xs font-mono-tech text-cyan-400">Rank: Novice Analyst</p>
+                </div>
+            </div>
+
+            <!-- Stats HUD -->
+            <div class="flex items-center space-x-3 sm:space-x-5 bg-slate-900/90 px-3.5 py-1.5 rounded-2xl border border-slate-800">
+                <!-- Stability / Lives -->
+                <div class="text-center">
+                    <div class="text-[10px] font-mono-tech uppercase text-slate-400">Core HP</div>
+                    <div id="livesDisplay" class="text-sm sm:text-base tracking-tighter">⚡⚡⚡</div>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-800"></div>
+                <!-- Streak Multiplier -->
+                <div class="text-center">
+                    <div class="text-[10px] font-mono-tech uppercase text-amber-400">Streak</div>
+                    <div class="font-mono-tech font-bold text-sm sm:text-base text-amber-300"><span id="streakDisplay">0</span>🔥</div>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-800"></div>
+                <!-- Score -->
+                <div class="text-center">
+                    <div class="text-[10px] font-mono-tech uppercase text-cyan-400">Score</div>
+                    <div id="scoreDisplay" class="font-mono-tech font-bold text-sm sm:text-lg text-white">0</div>
+                </div>
+                <div class="h-6 w-[1px] bg-slate-800 hidden sm:block"></div>
+                <!-- High Score -->
+                <div class="text-center hidden sm:block">
+                    <div class="text-[10px] font-mono-tech uppercase text-emerald-400">Best</div>
+                    <div id="bestDisplay" class="font-mono-tech font-bold text-sm sm:text-lg text-emerald-300">0</div>
+                </div>
+            </div>
+
+            <!-- Utility Controls -->
+            <div class="flex items-center space-x-1.5">
+                <button id="scratchpadToggleBtn" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-cyan-400 border border-slate-700 text-xs font-mono-tech flex items-center space-x-1 transition" title="Toggle Rough Work Scratchpad">
+                    <span>✏️</span>
+                    <span class="hidden md:inline">Rough Pad</span>
+                </button>
+                <button id="muteBtn" class="p-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-700 transition" title="Toggle Sound">
+                    <span id="soundIcon">🔊</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- ================= START MENU VIEW ================= -->
+        <div id="menuView" class="p-6 sm:p-8 flex flex-col items-center text-center">
+            <div class="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-red-950/80 border border-red-500/40 text-red-300 text-xs font-mono-tech mb-4">
+                <span>⚠️ WARNING: EXTREME MATHEMATICAL RIGOR</span>
+            </div>
+
+            <h2 class="font-cyber text-3xl sm:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-white to-red-500 tracking-tight mb-3">
+                HEAVY CALCULUS ARENA
+            </h2>
+            <p class="text-slate-300 text-sm sm:text-base max-w-xl mb-6">
+                Test your mastery of <span class="text-cyan-400 font-semibold">Integration by Parts</span>, <span class="text-amber-400 font-semibold">Chain & Quotient Derivatives</span>, <span class="text-purple-400 font-semibold">L'Hôpital's Indeterminate Limits</span>, and <span class="text-emerald-400 font-semibold">Definite Integrals</span> under extreme time pressure!
+            </p>
+
+            <!-- Topic Filter Selector -->
+            <div class="w-full max-w-lg mb-6">
+                <div class="text-xs font-mono-tech uppercase text-slate-400 mb-2">Select Combat Domain:</div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="topicButtons">
+                    <button data-topic="ALL" class="topic-select-btn py-2.5 px-3 rounded-xl font-mono-tech text-xs font-bold bg-cyan-600 text-white border border-cyan-400 shadow-lg">
+                        ALL DOMAINS
+                    </button>
+                    <button data-topic="INTEGRALS" class="topic-select-btn py-2.5 px-3 rounded-xl font-mono-tech text-xs font-bold bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-cyan-500">
+                        ∫ INTEGRALS
+                    </button>
+                    <button data-topic="DERIVATIVES" class="topic-select-btn py-2.5 px-3 rounded-xl font-mono-tech text-xs font-bold bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-cyan-500">
+                        d/dx DERIVATIVES
+                    </button>
+                    <button data-topic="LIMITS" class="topic-select-btn py-2.5 px-3 rounded-xl font-mono-tech text-xs font-bold bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-cyan-500">
+                        lim LIMITS
+                    </button>
+                </div>
+            </div>
+
+            <!-- Speed / Time Mode Selector -->
+            <div class="w-full max-w-lg bg-slate-900/80 border border-slate-800 rounded-2xl p-4 mb-6 text-left grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div class="flex items-start space-x-2.5">
+                    <span class="text-lg">⏱️</span>
+                    <div>
+                        <div class="font-bold text-white">Overclock Timer</div>
+                        <div class="text-slate-400">25 seconds per heavy problem. Fast solves yield speed bonuses!</div>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-2.5">
+                    <span class="text-lg">💡</span>
+                    <div>
+                        <div class="font-bold text-white">Lifeline Matrix</div>
+                        <div class="text-slate-400">Use 50/50 Elimination, Time Freeze, or Theorem Hint when stuck.</div>
+                    </div>
+                </div>
+                <div class="flex items-start space-x-2.5">
+                    <span class="text-lg">📐</span>
+                    <div>
+                        <div class="font-bold text-white">Step Proofs</div>
+                        <div class="text-slate-400">Every problem includes a complete step-by-step mathematical proof.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+                <button id="startHardBtn" class="btn-hardcore font-cyber text-lg font-bold text-white py-4 px-8 rounded-2xl w-full cursor-pointer tracking-wider">
+                    🔥 START HARD MODE
+                </button>
+                <button id="startZenBtn" class="btn-cyber font-cyber text-sm font-bold text-white py-4 px-5 rounded-2xl sm:w-48 cursor-pointer tracking-wider" title="No timer limit, practice heavy calculus at your own pace">
+                    ♾️ ZEN PRACTICE
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= GAMEPLAY VIEW ================= -->
+        <div id="gameView" class="hidden p-4 sm:p-6 flex flex-col space-y-4">
+
+            <!-- Timer & Question Metadata Row -->
+            <div class="flex flex-col space-y-2">
+                <div class="flex items-center justify-between text-xs font-mono-tech">
+                    <div class="flex items-center space-x-2">
+                        <span id="categoryTag" class="px-2.5 py-0.5 rounded-md bg-cyan-950 text-cyan-300 border border-cyan-500/40 font-bold">INTEGRATION</span>
+                        <span id="difficultyTag" class="px-2.5 py-0.5 rounded-md bg-red-950 text-red-300 border border-red-500/40 font-bold">TIER IV • BOSS</span>
+                    </div>
+                    <div class="flex items-center space-x-1.5">
+                        <span class="text-slate-400">TIME REMAINING:</span>
+                        <span id="timerText" class="text-base font-bold text-white">25.0s</span>
+                    </div>
+                </div>
+
+                <!-- Animated Progress Bar -->
+                <div class="w-full h-2.5 bg-slate-900 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                    <div id="timerBar" class="h-full bg-gradient-to-r from-emerald-400 via-cyan-400 to-red-500 rounded-full transition-all duration-100" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Problem Display Box -->
+            <div class="relative bg-slate-950/95 border-2 border-slate-800 rounded-2xl p-5 sm:p-7 text-center shadow-inner min-h-[155px] flex flex-col items-center justify-center overflow-x-auto">
+                <div id="questionPrompt" class="text-xs sm:text-sm font-mono-tech uppercase tracking-widest text-slate-400 mb-3">
+                    Evaluate the Exact Definite Integral:
+                </div>
+                <div id="mathQuestionBox" class="math-question text-white py-1 px-2"></div>
+
+                <!-- Hint Banner (Hidden until requested) -->
+                <div id="hintBox" class="hidden mt-4 px-3.5 py-2 rounded-xl bg-amber-950/80 border border-amber-500/50 text-amber-200 text-xs sm:text-sm font-mono-tech max-w-lg">
+                </div>
+            </div>
+
+            <!-- Lifelines / Power-ups Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-900/70 px-3.5 py-2 rounded-xl border border-slate-800/80">
+                <span class="text-[11px] font-mono-tech uppercase text-slate-400">Lifelines:</span>
+                <div class="flex items-center space-x-2">
+                    <button id="lifeline5050" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-purple-500/40 text-purple-300 font-mono-tech text-xs font-bold flex items-center space-x-1.5 transition disabled:opacity-35">
+                        <span>✂️ 50/50</span>
+                        <span id="count5050" class="px-1.5 py-0.2 bg-purple-950 rounded text-[10px]">2</span>
+                    </button>
+                    <button id="lifelineFreeze" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-cyan-500/40 text-cyan-300 font-mono-tech text-xs font-bold flex items-center space-x-1.5 transition disabled:opacity-35">
+                        <span>❄️ +15s Freeze</span>
+                        <span id="countFreeze" class="px-1.5 py-0.2 bg-cyan-950 rounded text-[10px]">2</span>
+                    </button>
+                    <button id="lifelineHint" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-amber-500/40 text-amber-300 font-mono-tech text-xs font-bold flex items-center space-x-1.5 transition disabled:opacity-35">
+                        <span>💡 Theorem Hint</span>
+                        <span id="countHint" class="px-1.5 py-0.2 bg-amber-950 rounded text-[10px]">3</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4 Multiple Choice Options Grid -->
+            <div id="optionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <!-- Populated dynamically with KaTeX -->
+            </div>
+
+            <!-- Interactive Scratchpad Drawer (Collapsible for doing rough derivatives/integrals) -->
+            <div id="scratchpadContainer" class="hidden flex-col bg-slate-950 border border-cyan-500/40 rounded-2xl overflow-hidden shadow-lg">
+                <div class="bg-slate-900 px-3.5 py-2 flex items-center justify-between border-b border-slate-800 text-xs font-mono-tech">
+                    <span class="text-cyan-400 font-bold">✏️ ROUGH WORK SCRATCHPAD (Draw steps with mouse/touch)</span>
+                    <div class="flex items-center space-x-2">
+                        <button id="clearScratchpadBtn" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-red-950 text-slate-300 hover:text-red-300 border border-slate-700 transition">Clear Pad</button>
+                    </div>
+                </div>
+                <canvas id="scratchCanvas" class="w-full h-44 bg-slate-950 cursor-crosshair touch-none"></canvas>
+            </div>
+
+            <!-- Step-by-Step Solution & Next Question Drawer -->
+            <div id="feedbackDrawer" class="hidden flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-slate-900/95 border border-slate-700 shadow-xl">
+                <div class="text-left space-y-1 flex-1">
+                    <div id="feedbackTitle" class="font-cyber font-bold text-sm sm:text-base text-emerald-400">
+                        ✓ EXACT CONVERGENCE! (+240 PTS)
+                    </div>
+                    <div class="text-xs font-mono-tech text-slate-400">Proof / Step-by-Step Method:</div>
+                    <div id="solutionProofBox" class="text-xs sm:text-sm text-slate-200 bg-slate-950/90 p-2.5 rounded-xl border border-slate-800 overflow-x-auto"></div>
+                </div>
+                <button id="nextQuestionBtn" class="btn-cyber font-cyber text-sm font-bold text-white px-6 py-3.5 rounded-xl shrink-0 w-full sm:w-auto cursor-pointer">
+                    NEXT PROBLEM →
+                </button>
+            </div>
+        </div>
+
+        <!-- ================= GAME OVER VIEW ================= -->
+        <div id="gameOverView" class="hidden p-6 sm:p-8 flex flex-col items-center text-center">
+            <div class="w-16 h-16 rounded-2xl bg-red-500/20 border-2 border-red-500 flex items-center justify-center text-3xl mb-3 shadow-lg">
+                💥
+            </div>
+            <h2 class="font-cyber text-3xl sm:text-4xl font-black text-red-500 tracking-wide mb-1">
+                SYSTEM DIVERGENCE
+            </h2>
+            <p id="gameOverSubtitle" class="text-xs font-mono-tech uppercase tracking-widest text-slate-400 mb-6">
+                Core Stability Depleted on Hard Mode
+            </p>
+
+            <!-- Final Stats Summary -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-xl mb-6">
+                <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl">
+                    <div class="text-[10px] font-mono-tech text-slate-400 uppercase">Final Score</div>
+                    <div id="finalScoreText" class="font-mono-tech font-extrabold text-2xl text-white mt-1">0</div>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl">
+                    <div class="text-[10px] font-mono-tech text-amber-400 uppercase">Best Record</div>
+                    <div id="finalBestText" class="font-mono-tech font-extrabold text-2xl text-amber-300 mt-1">0</div>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl">
+                    <div class="text-[10px] font-mono-tech text-cyan-400 uppercase">Solved</div>
+                    <div id="finalSolvedText" class="font-mono-tech font-extrabold text-2xl text-cyan-300 mt-1">0</div>
+                </div>
+                <div class="bg-slate-900/90 border border-slate-800 p-3.5 rounded-2xl">
+                    <div class="text-[10px] font-mono-tech text-emerald-400 uppercase">Accuracy</div>
+                    <div id="finalAccuracyText" class="font-mono-tech font-extrabold text-2xl text-emerald-300 mt-1">0%</div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 w-full max-w-md">
+                <button id="retryGameBtn" class="btn-hardcore font-cyber text-base font-bold text-white py-4 px-8 rounded-2xl w-full cursor-pointer">
+                    🔄 REBOOT HARD MODE
+                </button>
+                <button id="backToMenuBtn" class="px-6 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-300 font-mono-tech text-xs font-bold border border-slate-700 cursor-pointer shrink-0">
+                    MAIN MENU
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        /**
+         * Web Audio Synthesizer for Sci-Fi Math Feedback
+         */
+        class MathAudio {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+            }
+            playCorrect() {
+                if (this.muted || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now + i * 0.055);
+                    gain.gain.setValueAtTime(0.14, now + i * 0.055);
+                    gain.gain.exponentialRampToValueAtTime(0.005, now + i * 0.055 + 0.22);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now + i * 0.055);
+                    osc.stop(now + i * 0.055 + 0.22);
+                });
+            }
+            playWrong() {
+                if (this.muted || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(165, now);
+                osc.frequency.linearRampToValueAtTime(75, now + 0.35);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            }
+            playLifeline() {
+                if (this.muted || !this.ctx) return;
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(340, now);
+                osc.frequency.exponentialRampToValueAtTime(880, now + 0.18);
+                gain.gain.setValueAtTime(0.15, now);
+                gain.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.18);
+            }
+        }
+
+        const sfx = new MathAudio();
+
+        /**
+         * Curated & Dynamic Heavy Calculus Problem Bank (Hard Mode)
+         * Includes: Integration by Parts, Trig Substitution, L'Hopital Limits, Implicit/Logarithmic/Chain Derivatives, Improper & Definite Integrals
+         */
+        const HARD_CALCULUS_BANK = [
+            // ================= INTEGRALS =================
+            {
+                category: 'INTEGRALS',
+                tier: 'TIER IV • GAUSSIAN',
+                prompt: 'Evaluate the improper Gaussian integral:',
+                latex: '\\int_{-\\infty}^{\\infty} e^{-x^2}\\,dx',
+                correct: '\\sqrt{\\pi}',
+                wrongs: ['\\pi', '2\\sqrt{\\pi}', '\\frac{\\sqrt{\\pi}}{2}'],
+                hint: 'Polar coordinates trick: square the integral I² = ∬ e^{-(x²+y²)} dx dy = ∫₀^{2π} ∫₀^∞ r e^{-r²} dr dθ.',
+                proof: 'By polar transformation: \\(I^2 = \\int_0^{2\\pi}\\int_0^\\infty r e^{-r^2}dr\\,d\\theta = 2\\pi \\left[-\\frac{1}{2}e^{-r^2}\\right]_0^\\infty = \\pi \\implies I = \\sqrt{\\pi}\\).'
+            },
+            {
+                category: 'INTEGRALS',
+                tier: 'TIER III • BY PARTS',
+                prompt: 'Evaluate the definite integral using Integration by Parts:',
+                latex: '\\int_{1}^{e} x \\ln(x)\\,dx',
+                correct: '\\frac{e^2 + 1}{4}',
+                wrongs: ['\\frac{e^2 - 1}{4}', '\\frac{e^2}{2}', '\\frac{e^2 + 1}{2}'],
+                hint: 'Let u = ln(x) and dv = x dx. Then du = (1/x)dx and v = x²/2.',
+                proof: '\\(\\left[\\frac{x^2}{2}\\ln x\\right]_1^e - \\int_1^e \\frac{x}{2}\\,dx = \\frac{e^2}{2} - \\left[\\frac{x^2}{4}\\right]_1^e = \\frac{e^2}{2} - \\frac{e^2-1}{4} = \\frac{e^2+1}{4}\\).'
+            },
+            {
+                category: 'INTEGRALS',
+                tier: 'TIER IV • CYCLIC BY PARTS',
+                prompt: 'Find the indefinite integral:',
+                latex: '\\int e^x \\sin(x)\\,dx',
+                correct: '\\frac{e^x(\\sin x - \\cos x)}{2} + C',
+                wrongs: ['\\frac{e^x(\\sin x + \\cos x)}{2} + C', 'e^x(\\sin x - \\cos x) + C', '\\frac{e^x(\\cos x - \\sin x)}{2} + C'],
+                hint: 'Apply Integration by Parts twice and solve for the repeating integral I.',
+                proof: 'Differentiating \\(\\frac{e^x(\\sin x - \\cos x)}{2}\\) gives \\(\\frac{e^x(\\sin x - \\cos x + \\cos x + \\sin x)}{2} = e^x\\sin x\\).'
+            },
+            {
+                category: 'INTEGRALS',
+                tier: 'TIER III • TRIG SUBSTITUTION',
+                prompt: 'Evaluate the exact definite integral:',
+                latex: '\\int_{0}^{1} \\frac{x^3}{1 + x^2}\\,dx',
+                correct: '\\frac{1 - \\ln 2}{2}',
+                wrongs: ['\\frac{\\ln 2}{2}', '1 - \\ln 2', '\\frac{1 + \\ln 2}{2}'],
+                hint: 'Rewrite x³/(1+x²) using polynomial division: x - x/(1+x²).',
+                proof: '\\(\\int_0^1 \\left(x - \\frac{x}{1+x^2}\\right)dx = \\left[\\frac{x^2}{2} - \\frac{1}{2}\\ln(1+x^2)\\right]_0^1 = \\frac{1 - \\ln 2}{2}\\).'
+            },
+            {
+                category: 'INTEGRALS',
+                tier: 'TIER IV • KING\'S PROPERTY',
+                prompt: 'Evaluate using symmetry of definite integrals:',
+                latex: '\\int_{0}^{\\pi/2} \\frac{\\sin^{2025}(x)}{\\sin^{2025}(x) + \\cos^{2025}(x)}\\,dx',
+                correct: '\\frac{\\pi}{4}',
+                wrongs: ['\\frac{\\pi}{2}', '1', '\\frac{\\pi}{2025}'],
+                hint: 'Use ∫₀ᵃ f(x)dx = ∫₀ᵃ f(a-x)dx. Since sin(π/2 - x) = cos(x), adding both integrals gives ∫₀^{π/2} 1 dx.',
+                proof: 'By King\'s Property \\(I + I = \\int_0^{\\pi/2} 1\\,dx = \\frac{\\pi}{2} \\implies I = \\frac{\\pi}{4}\\).'
+            },
+            {
+                category: 'INTEGRALS',
+                tier: 'TIER III • INVERSE TRIG',
+                prompt: 'Evaluate the definite integral:',
+                latex: '\\int_{0}^{1} \\arctan(x)\\,dx',
+                correct: '\\frac{\\pi}{4} - \\frac{\\ln 2}{2}',
+                wrongs: ['\\frac{\\pi}{4} + \\frac{\\ln 2}{2}', '\\frac{\\pi}{2} - \\ln 2', '\\frac{\\pi}{4}'],
+                hint: 'Integrate by parts with u = arctan(x), dv = dx.',
+                proof: '\\(\\left[x\\arctan x\\right]_0^1 - \\int_0^1 \\frac{x}{1+x^2}dx = \\frac{\\pi}{4} - \\left[\\frac{1}{2}\\ln(1+x^2)\\right]_0^1 = \\frac{\\pi}{4} - \\frac{\\ln 2}{2}\\).'
+            },
+            {
+                category: 'INTEGRALS',
+                tier: 'TIER IV • PARTIAL FRACTIONS',
+                prompt: 'Evaluate the improper integral:',
+                latex: '\\int_{1}^{\\infty} \\frac{1}{x(x+1)}\\,dx',
+                correct: '\\ln(2)',
+                wrongs: ['1', '\\frac{1}{2}', '\\ln(e/2)'],
+                hint: 'Decompose into partial fractions: 1/(x(x+1)) = 1/x - 1/(x+1).',
+                proof: '\\(\\left[\\ln\\left(\\frac{x}{x+1}\\right)\\right]_1^\\infty = 0 - \\ln\\left(\\frac{1}{2}\\right) = \\ln(2)\\).'
+            },
+            {
+                category: 'INTEGRALS',
+                tier: 'TIER IV •WALLIS INTEGRAL',
+                prompt: 'Compute the exact value of:',
+                latex: '\\int_{0}^{\\pi/2} \\sin^4(x)\\,dx',
+                correct: '\\frac{3\\pi}{16}',
+                wrongs: ['\\frac{3\\pi}{8}', '\\frac{\\pi}{4}', '\\frac{5\\pi}{16}'],
+                hint: 'By Wallis reduction formula: ∫₀^{π/2} sin⁴(x)dx = (3/4)·(1/2)·(π/2).',
+                proof: 'Using Wallis formula: \\(\\frac{3}{4} \\cdot \\frac{1}{2} \\cdot \\frac{\\pi}{2} = \\frac{3\\pi}{16}\\).'
+            },
+
+            // ================= DERIVATIVES =================
+            {
+                category: 'DERIVATIVES',
+                tier: 'TIER IV • LOGARITHMIC DIFF',
+                prompt: 'Find the first derivative with respect to x:',
+                latex: '\\frac{d}{dx}\\left(x^x\\right) \\quad (x > 0)',
+                correct: 'x^x(1 + \\ln x)',
+                wrongs: ['x \\cdot x^{x-1}', 'x^x \\ln x', 'x^x\\left(1 + \\frac{1}{x}\\right)'],
+                hint: 'Write x^x = e^{x ln(x)} and apply the Chain & Product Rules.',
+                proof: '\\(\\frac{d}{dx}e^{x\\ln x} = e^{x\\ln x}\\frac{d}{dx}(x\\ln x) = x^x(1 + \\ln x)\\).'
+            },
+            {
+                category: 'DERIVATIVES',
+                tier: 'TIER IV • LEIBNIZ RULE',
+                prompt: 'Differentiate the integral using Leibniz Integral Rule:',
+                latex: '\\frac{d}{dx} \\int_{x}^{x^2} e^{-t^2}\\,dt',
+                correct: '2x e^{-x^4} - e^{-x^2}',
+                wrongs: ['e^{-x^4} - e^{-x^2}', '2x e^{-x^2} - e^{-x}', '2x^2 e^{-x^4} - e^{-x^2}'],
+                hint: 'd/dx ∫_{a(x)}^{b(x)} f(t)dt = f(b(x))·b\'(x) - f(a(x))·a\'(x).',
+                proof: 'By Fundamental Theorem & Chain Rule: \\(f(x^2)\\cdot (2x) - f(x)\\cdot (1) = 2x e^{-x^4} - e^{-x^2}\\).'
+            },
+            {
+                category: 'DERIVATIVES',
+                tier: 'TIER III • INVERSE HYPERBOLIC',
+                prompt: 'Compute the exact simplified derivative:',
+                latex: '\\frac{d}{dx} \\ln\\left(x + \\sqrt{x^2 + 1}\\right)',
+                correct: '\\frac{1}{\\sqrt{x^2 + 1}}',
+                wrongs: ['\\frac{1}{x + \\sqrt{x^2 + 1}}', '\\frac{x}{\\sqrt{x^2 + 1}}', '\\frac{1}{x^2 + 1}'],
+                hint: 'Note that ln(x + √(x²+1)) is arsinh(x). Apply the chain rule and simplify the numerator.',
+                proof: '\\(\\frac{1 + \\frac{x}{\\sqrt{x^2+1}}}{x + \\sqrt{x^2+1}} = \\frac{\\sqrt{x^2+1}+x}{\\sqrt{x^2+1}(x+\\sqrt{x^2+1})} = \\frac{1}{\\sqrt{x^2+1}}\\).'
+            },
+            {
+                category: 'DERIVATIVES',
+                tier: 'TIER IV • IMPLICIT TANGENT',
+                prompt: 'For the Folium of Descartes x³ + y³ = 6xy, find dy/dx at (3, 3):',
+                latex: 'x^3 + y^3 = 6xy \\implies \\left.\\frac{dy}{dx}\\right|_{(3,3)} = \\,?',
+                correct: '-1',
+                wrongs: ['1', '0', '-\\frac{1}{2}'],
+                hint: 'By symmetry of x and y at (3,3), or implicit differentiation: 3x² + 3y²y\' = 6y + 6xy\'.',
+                proof: '\\(y\' = \\frac{2y - x^2}{y^2 - 2x}\\). Substituting \\((3,3)\\) gives \\(\\frac{6-9}{9-6} = -1\\).'
+            },
+            {
+                category: 'DERIVATIVES',
+                tier: 'TIER IV • N-TH DERIVATIVE',
+                prompt: 'Evaluate the 100th derivative at x = 0:',
+                latex: '\\left.\\frac{d^{100}}{dx^{100}}\\left(\\frac{1}{1 - x}\\right)\\right|_{x=0}',
+                correct: '100!',
+                wrongs: ['1', '0', '99!'],
+                hint: 'Each differentiation of (1-x)^{-1} brings down the exponent and multiplies by -1 twice.',
+                proof: '\\(\\frac{d^n}{dx^n}(1-x)^{-1} = \\frac{n!}{(1-x)^{n+1}}\\). At \\(x=0, n=100\\), it equals \\(100!\\).'
+            },
+            {
+                category: 'DERIVATIVES',
+                tier: 'TIER III • CHAIN & TRIG',
+                prompt: 'Evaluate the derivative for all x > 0:',
+                latex: '\\frac{d}{dx}\\left(\\arctan(x) + \\arctan\\left(\\frac{1}{x}\\right)\\right)',
+                correct: '0',
+                wrongs: ['\\frac{2}{1 + x^2}', '\\frac{\\pi}{2}', '\\frac{1 - x^2}{1 + x^2}'],
+                hint: 'Recall the identity arctan(x) + arctan(1/x) = π/2 for x > 0.',
+                proof: '\\(\\frac{1}{1+x^2} + \\frac{-1/x^2}{1+(1/x)^2} = \\frac{1}{1+x^2} - \\frac{1}{x^2+1} = 0\\).'
+            },
+            {
+                category: 'DERIVATIVES',
+                tier: 'TIER IV • PRODUCT CHAIN',
+                prompt: 'Find the critical point x where f\'(x) = 0 (for x ≠ 0):',
+                latex: 'f(x) = x^2 e^{-x} \\implies f\'(x) = 0 \\text{ at } x = \\,?',
+                correct: '2',
+                wrongs: ['1', '\\frac{1}{2}', 'e'],
+                hint: 'f\'(x) = 2x e^{-x} - x² e^{-x} = x(2 - x)e^{-x}.',
+                proof: '\\(f\'(x) = x(2-x)e^{-x} = 0\\). For \\(x \\neq 0\\), \\(x = 2\\).'
+            },
+
+            // ================= LIMITS =================
+            {
+                category: 'LIMITS',
+                tier: 'TIER IV • TAYLOR / L\'HÔPITAL',
+                prompt: 'Evaluate the indeterminate 0/0 limit:',
+                latex: '\\lim_{x \\to 0} \\frac{x - \\sin(x)}{x^3}',
+                correct: '\\frac{1}{6}',
+                wrongs: ['\\frac{1}{3}', '0', '\\frac{1}{2}'],
+                hint: 'Use Maclaurin series sin(x) = x - x³/3! + O(x⁵) or apply L\'Hôpital\'s Rule 3 times.',
+                proof: 'Since \\(\\sin x = x - \\frac{x^3}{6} + O(x^5)\\), \\(\\frac{x - \\sin x}{x^3} \\to \\frac{1}{6}\\).'
+            },
+            {
+                category: 'LIMITS',
+                tier: 'TIER IV • EXPONENTIAL INDETERMINATE',
+                prompt: 'Evaluate the 1^∞ indeterminate form limit:',
+                latex: '\\lim_{x \\to 0} \\left(\\cos x\\right)^{1/x^2}',
+                correct: 'e^{-1/2}',
+                wrongs: ['e^{-1}', '1', 'e^{1/2}'],
+                hint: 'Take the natural log: lim (ln(cos x))/x² ≈ lim (-x²/2)/x² = -1/2.',
+                proof: '\\(\\ln L = \\lim_{x\\to 0}\\frac{\\ln(\\cos x)}{x^2} = \\lim_{x\\to 0}\\frac{-\\tan x}{2x} = -\\frac{1}{2} \\implies L = e^{-1/2}\\).'
+            },
+            {
+                category: 'LIMITS',
+                tier: 'TIER III • HIGHER ORDER L\'HÔPITAL',
+                prompt: 'Evaluate the limit as x approaches 0:',
+                latex: '\\lim_{x \\to 0} \\frac{e^x - 1 - x - \\frac{x^2}{2}}{x^3}',
+                correct: '\\frac{1}{6}',
+                wrongs: ['\\frac{1}{2}', '\\frac{1}{3}', '0'],
+                hint: 'Compare with the Taylor expansion e^x = 1 + x + x²/2! + x³/3! + ...',
+                proof: 'The numerator leaves the cubic Taylor term \\(\\frac{x^3}{3!} = \\frac{x^3}{6}\\), so the limit is \\(\\frac{1}{6}\\).'
+            },
+            {
+                category: 'LIMITS',
+                tier: 'TIER IV • RIEMANN SUM LIMIT',
+                prompt: 'Evaluate the limit of the series by converting to a definite integral:',
+                latex: '\\lim_{n \\to \\infty} \\sum_{k=1}^{n} \\frac{n}{n^2 + k^2}',
+                correct: '\\frac{\\pi}{4}',
+                wrongs: ['\\frac{\\pi}{2}', '\\ln(2)', '1'],
+                hint: 'Factor n² from the denominator: (1/n) ∑ 1/(1 + (k/n)²) → ∫₀¹ 1/(1+x²) dx.',
+                proof: '\\(\\lim_{n\\to\\infty}\\frac{1}{n}\\sum_{k=1}^n \\frac{1}{1+(k/n)^2} = \\int_0^1 \\frac{dx}{1+x^2} = \\arctan(1) = \\frac{\\pi}{4}\\).'
+            },
+            {
+                category: 'LIMITS',
+                tier: 'TIER III • RADICAL CONJUGATE',
+                prompt: 'Evaluate the ∞ - ∞ limit as x → ∞:',
+                latex: '\\lim_{x \\to \\infty} \\left(\\sqrt{x^2 + 6x} - x\\right)',
+                correct: '3',
+                wrongs: ['6', '0', '\\infty'],
+                hint: 'Multiply by the conjugate (√(x²+6x) + x) / (√(x²+6x) + x).',
+                proof: '\\(\\frac{(x^2+6x)-x^2}{\\sqrt{x^2+6x}+x} = \\frac{6x}{x(\\sqrt{1+6/x}+1)} \\to \\frac{6}{2} = 3\\).'
+            },
+            {
+                category: 'LIMITS',
+                tier: 'TIER IV • TRIG TAYLOR',
+                prompt: 'Evaluate the 4th-order trigonometric limit:',
+                latex: '\\lim_{x \\to 0} \\frac{1 - \\cos(x) - \\frac{x^2}{2}}{x^4}',
+                correct: '-\\frac{1}{24}',
+                wrongs: ['\\frac{1}{24}', '-\\frac{1}{12}', '0'],
+                hint: 'Recall Maclaurin series: cos(x) = 1 - x²/2! + x⁴/4! - ... where 4! = 24.',
+                proof: '\\(1 - \\left(1 - \\frac{x^2}{2} + \\frac{x^4}{24}\\right) - \\frac{x^2}{2} = -\\frac{x^4}{24} \\implies L = -\\frac{1}{24}\\).'
+            },
+            {
+                category: 'LIMITS',
+                tier: 'TIER III • POWER LIMIT',
+                prompt: 'Evaluate the classic exponential limit:',
+                latex: '\\lim_{x \\to \\infty} \\left(\\frac{x + 3}{x - 1}\\right)^x',
+                correct: 'e^4',
+                wrongs: ['e^3', 'e^2', '1'],
+                hint: 'Rewrite (x+3)/(x-1) as 1 + 4/(x-1) and use lim (1 + k/x)^x = e^k.',
+                proof: '\\(\\left(1 + \\frac{4}{x-1}\\right)^x \\to e^4\\) as \\(x \\to \\infty\\).'
+            }
+        ];
+
+        /**
+         * Dynamic Procedural Problem Generator for Infinite Replayability
+         */
+        function generateProceduralProblem(topicFilter) {
+            const categories = topicFilter === 'ALL' ? ['INTEGRALS', 'DERIVATIVES', 'LIMITS'] : [topicFilter];
+            const chosenCat = categories[Math.floor(Math.random() * categories.length)];
+
+            if (chosenCat === 'INTEGRALS') {
+                const a = Math.floor(Math.random() * 4) + 2; // 2..5
+                const p = Math.floor(Math.random() * 3) + 2; // 2..4
+                return {
+                    category: 'INTEGRALS',
+                    tier: 'TIER III • SUBSTITUTION',
+                    prompt: 'Evaluate the definite integral:',
+                    latex: `\\int_{0}^{1} ${a * p}x^{${p - 1}} e^{x^{${p}}}\\,dx`,
+                    correct: `${a}(e - 1)`,
+                    wrongs: [`${a}e`, `${a * p}(e - 1)`, `${a}(e + 1)`],
+                    hint: `Substitute u = x^${p}, so du = ${p}x^${p - 1} dx.`,
+                    proof: `Let \\(u = x^{${p}}\\). Then \\(\\int_0^1 ${a}e^u\\,du = ${a}(e - 1)\\).`
+                };
+            } else if (chosenCat === 'DERIVATIVES') {
+                const k = Math.floor(Math.random() * 5) + 2; // 2..6
+                return {
+                    category: 'DERIVATIVES',
+                    tier: 'TIER III • CHAIN RULE',
+                    prompt: 'Compute the first derivative with respect to x:',
+                    latex: `\\frac{d}{dx}\\left( \\ln(\\sec(${k}x) + \\tan(${k}x)) \\right)`,
+                    correct: `${k}\\sec(${k}x)`,
+                    wrongs: [`${k}\\tan(${k}x)`, `\\sec(${k}x)\\tan(${k}x)`, `${k}\\sec^2(${k}x)`],
+                    hint: 'Recall d/du [ln(sec u + tan u)] = sec(u) and multiply by du/dx.',
+                    proof: `By Chain Rule: \\(\\frac{\\sec(${k}x)\\tan(${k}x) + \\sec^2(${k}x)}{\\sec(${k}x)+\\tan(${k}x)} \\cdot ${k} = ${k}\\sec(${k}x)\\).`
+                };
+            } else {
+                const a = Math.floor(Math.random() * 4) + 2; // 2..5
+                const b = a + Math.floor(Math.random() * 3) + 1;
+                const diff = (b * b - a * a) / 2;
+                const ansLatex = Number.isInteger(diff) ? `${diff}` : `\\frac{${b * b - a * a}}{2}`;
+                return {
+                    category: 'LIMITS',
+                    tier: 'TIER IV • TRIGONOMETRIC LIMIT',
+                    prompt: 'Evaluate the indeterminate 0/0 limit:',
+                    latex: `\\lim_{x \\to 0} \\frac{\\cos(${a}x) - \\cos(${b}x)}{x^2}`,
+                    correct: ansLatex,
+                    wrongs: [`${b - a}`, `\\frac{${a * a - b * b}}{2}`, `${b * b - a * a}`],
+                    hint: 'Use cos(kx) ≈ 1 - (k²x²)/2 for small x.',
+                    proof: `Using Taylor expansion: \\(\\frac{(1 - \\frac{${a}^2 x^2}{2}) - (1 - \\frac{${b}^2 x^2}{2})}{x^2} = \\frac{${b * b} - ${a * a}}{2} = ${ansLatex}\\).`
+                };
+            }
+        }
+
+        // Game State
+        let selectedTopic = 'ALL';
+        let isZenMode = false;
+        let score = 0;
+        let highScore = parseInt(localStorage.getItem('calculusPro_highScore') || '0', 10);
+        let streak = 0;
+        let lives = 3;
+        let solvedCount = 0;
+        let totalAttempted = 0;
+        let usedIndices = new Set();
+
+        let lifelines = { fifty: 2, freeze: 2, hint: 3 };
+        let currentProblem = null;
+        let maxTime = 25.0;
+        let timeLeft = 25.0;
+        let timerInterval = null;
+        let isAnswered = false;
+
+        // DOM Elements
+        const menuView = document.getElementById('menuView');
+        const gameView = document.getElementById('gameView');
+        const gameOverView = document.getElementById('gameOverView');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const bestDisplay = document.getElementById('bestDisplay');
+        const streakDisplay = document.getElementById('streakDisplay');
+        const livesDisplay = document.getElementById('livesDisplay');
+        const rankBadge = document.getElementById('rankBadge');
+
+        const categoryTag = document.getElementById('categoryTag');
+        const difficultyTag = document.getElementById('difficultyTag');
+        const timerText = document.getElementById('timerText');
+        const timerBar = document.getElementById('timerBar');
+        const questionPrompt = document.getElementById('questionPrompt');
+        const mathQuestionBox = document.getElementById('mathQuestionBox');
+        const hintBox = document.getElementById('hintBox');
+        const optionsGrid = document.getElementById('optionsGrid');
+        const feedbackDrawer = document.getElementById('feedbackDrawer');
+        const feedbackTitle = document.getElementById('feedbackTitle');
+        const solutionProofBox = document.getElementById('solutionProofBox');
+
+        bestDisplay.textContent = highScore;
+
+        // Render LaTeX safely using KaTeX
+        function renderLatex(element, latexString, displayMode = false) {
+            if (window.katex) {
+                katex.render(latexString, element, {
+                    throwOnError: false,
+                    displayMode: displayMode
+                });
+            } else {
+                element.textContent = latexString;
+            }
+        }
+
+        // Render mixed text + inline \(...\) LaTeX for proofs
+        function renderProofWithLatex(element, rawHtml) {
+            element.innerHTML = rawHtml.replace(/\\\((.*?)\\\)/g, (_, tex) => {
+                if (window.katex) {
+                    return katex.renderToString(tex, { throwOnError: false });
+                }
+                return tex;
+            });
+        }
+
+        // Update Rank Title based on Score
+        function updateRankTitle() {
+            let rank = 'Novice Analyst';
+            if (score >= 2500) rank = 'Fields Medalist 👑';
+            else if (score >= 1600) rank = 'Euler Grandmaster ⚡';
+            else if (score >= 900) rank = 'Leibniz Scholar 📐';
+            else if (score >= 400) rank = 'Differential Specialist';
+            rankBadge.textContent = `Rank: ${rank}`;
+        }
+
+        // Topic Filter Selection
+        document.querySelectorAll('.topic-select-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedTopic = btn.getAttribute('data-topic');
+                document.querySelectorAll('.topic-select-btn').forEach(b => {
+                    b.className = 'topic-select-btn py-2.5 px-3 rounded-xl font-mono-tech text-xs font-bold bg-slate-900/90 text-slate-300 border border-slate-700 hover:border-cyan-500';
+                });
+                btn.className = 'topic-select-btn py-2.5 px-3 rounded-xl font-mono-tech text-xs font-bold bg-cyan-600 text-white border border-cyan-400 shadow-lg';
+            });
+        });
+
+        // Start Game Session
+        function startGame(zen = false) {
+            sfx.init();
+            isZenMode = zen;
+            score = 0;
+            streak = 0;
+            lives = 3;
+            solvedCount = 0;
+            totalAttempted = 0;
+            usedIndices.clear();
+            lifelines = { fifty: 2, freeze: 2, hint: 3 };
+
+            updateHUD();
+            updateLifelineButtons();
+
+            menuView.classList.add('hidden');
+            gameOverView.classList.add('hidden');
+            gameView.classList.remove('hidden');
+
+            loadNextProblem();
+        }
+
+        function updateHUD() {
+            scoreDisplay.textContent = score;
+            streakDisplay.textContent = streak;
+            livesDisplay.textContent = isZenMode ? '♾️ ZEN' : '⚡'.repeat(Math.max(0, lives)) + '🖤'.repeat(Math.max(0, 3 - lives));
+            if (score > highScore) {
+                highScore = score;
+                bestDisplay.textContent = highScore;
+                localStorage.setItem('calculusPro_highScore', highScore.toString());
+            }
+            updateRankTitle();
+        }
+
+        function updateLifelineButtons() {
+            document.getElementById('count5050').textContent = lifelines.fifty;
+            document.getElementById('countFreeze').textContent = lifelines.freeze;
+            document.getElementById('countHint').textContent = lifelines.hint;
+
+            document.getElementById('lifeline5050').disabled = lifelines.fifty <= 0 || isAnswered;
+            document.getElementById('lifelineFreeze').disabled = lifelines.freeze <= 0 || isAnswered || isZenMode;
+            document.getElementById('lifelineHint').disabled = lifelines.hint <= 0 || isAnswered;
+        }
+
+        // Pick next problem from curated bank or procedural generator
+        function pickProblem() {
+            const filtered = HARD_CALCULUS_BANK
+                .map((item, idx) => ({ item, idx }))
+                .filter(({ item, idx }) => !usedIndices.has(idx) && (selectedTopic === 'ALL' || item.category === selectedTopic));
+
+            if (filtered.length > 0 && Math.random() < 0.8) {
+                const pick = filtered[Math.floor(Math.random() * filtered.length)];
+                usedIndices.add(pick.idx);
+                return pick.item;
+            }
+            return generateProceduralProblem(selectedTopic);
+        }
+
+        // Load Question into UI
+        function loadNextProblem() {
+            clearInterval(timerInterval);
+            isAnswered = false;
+            feedbackDrawer.classList.add('hidden');
+            feedbackDrawer.classList.remove('flex');
+            hintBox.classList.add('hidden');
+
+            currentProblem = pickProblem();
+
+            categoryTag.textContent = currentProblem.category;
+            difficultyTag.textContent = currentProblem.tier;
+            questionPrompt.textContent = currentProblem.prompt;
+
+            renderLatex(mathQuestionBox, currentProblem.latex, true);
+
+            // Shuffle Options
+            const allOptions = [
+                { latex: currentProblem.correct, isCorrect: true },
+                ...currentProblem.wrongs.map(w => ({ latex: w, isCorrect: false }))
+            ];
+            for (let i = allOptions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+            }
+
+            optionsGrid.innerHTML = '';
+            const keys = ['A', 'B', 'C', 'D'];
+            allOptions.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn rounded-2xl p-4 flex items-center space-x-3 text-left cursor-pointer w-full';
+                btn.dataset.correct = opt.isCorrect ? 'true' : 'false';
+
+                const badge = document.createElement('span');
+                badge.className = 'w-7 h-7 rounded-lg bg-slate-900 border border-slate-700 font-mono-tech text-xs font-bold text-cyan-400 flex items-center justify-center shrink-0';
+                badge.textContent = keys[idx];
+
+                const mathSpan = document.createElement('div');
+                mathSpan.className = 'math-option text-white flex-1 overflow-x-auto py-0.5';
+                renderLatex(mathSpan, opt.latex, false);
+
+                btn.appendChild(badge);
+                btn.appendChild(mathSpan);
+                btn.addEventListener('click', () => handleAnswer(btn, opt.isCorrect));
+                optionsGrid.appendChild(btn);
+            });
+
+            updateLifelineButtons();
+
+            // Start Timer
+            if (isZenMode) {
+                timerText.textContent = '♾️ ZEN';
+                timerBar.style.width = '100%';
+            } else {
+                maxTime = Math.max(16, 25 - Math.floor(solvedCount / 4));
+                timeLeft = maxTime;
+                updateTimerUI();
+                timerInterval = setInterval(() => {
+                    timeLeft -= 0.1;
+                    if (timeLeft <= 0) {
+                        timeLeft = 0;
+                        updateTimerUI();
+                        clearInterval(timerInterval);
+                        handleTimeout();
+                    } else {
+                        updateTimerUI();
+                    }
+                }, 100);
+            }
+        }
+
+        function updateTimerUI() {
+            timerText.textContent = `${timeLeft.toFixed(1)}s`;
+            const pct = Math.max(0, (timeLeft / maxTime) * 100);
+            timerBar.style.width = `${pct}%`;
+            if (timeLeft < 6) {
+                timerText.className = 'text-base font-bold text-red-400 animate-pulse';
+            } else {
+                timerText.className = 'text-base font-bold text-white';
+            }
+        }
+
+        function handleAnswer(selectedBtn, isCorrect) {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearInterval(timerInterval);
+            totalAttempted++;
+            updateLifelineButtons();
+
+            const allBtns = optionsGrid.querySelectorAll('button');
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.correct === 'true') {
+                    btn.classList.add('option-correct');
+                }
+            });
+
+            if (isCorrect) {
+                sfx.playCorrect();
+                solvedCount++;
+                streak++;
+                const timeBonus = isZenMode ? 50 : Math.round(timeLeft * 6);
+                const streakMultiplier = 1 + Math.min(2.5, streak * 0.25);
+                const earned = Math.round((150 + timeBonus) * streakMultiplier);
+                score += earned;
+
+                feedbackTitle.className = 'font-cyber font-bold text-sm sm:text-base text-emerald-400';
+                feedbackTitle.textContent = `✓ EXACT CONVERGENCE! (+${earned} PTS • ${streak}x STREAK)`;
+            } else {
+                sfx.playWrong();
+                selectedBtn.classList.add('option-wrong');
+                document.getElementById('appContainer').classList.add('shake-anim');
+                setTimeout(() => document.getElementById('appContainer').classList.remove('shake-anim'), 450);
+
+                streak = 0;
+                if (!isZenMode) lives--;
+
+                feedbackTitle.className = 'font-cyber font-bold text-sm sm:text-base text-red-400';
+                feedbackTitle.textContent = '✗ MATHEMATICAL DIVERGENCE! (-1 CORE HP)';
+            }
+
+            updateHUD();
+            renderProofWithLatex(solutionProofBox, currentProblem.proof);
+            feedbackDrawer.classList.remove('hidden');
+            feedbackDrawer.classList.add('flex');
+
+            if (!isZenMode && lives <= 0) {
+                document.getElementById('nextQuestionBtn').textContent = 'VIEW FINAL REPORT →';
+            } else {
+                document.getElementById('nextQuestionBtn').textContent = 'NEXT PROBLEM →';
+            }
+        }
+
+        function handleTimeout() {
+            if (isAnswered) return;
+            isAnswered = true;
+            totalAttempted++;
+            sfx.playWrong();
+            streak = 0;
+            if (!isZenMode) lives--;
+            updateHUD();
+            updateLifelineButtons();
+
+            const allBtns = optionsGrid.querySelectorAll('button');
+            allBtns.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.correct === 'true') btn.classList.add('option-correct');
+            });
+
+            feedbackTitle.className = 'font-cyber font-bold text-sm sm:text-base text-amber-400';
+            feedbackTitle.textContent = '⌛ TIME LIMIT EXCEEDED! (-1 CORE HP)';
+            renderProofWithLatex(solutionProofBox, currentProblem.proof);
+            feedbackDrawer.classList.remove('hidden');
+            feedbackDrawer.classList.add('flex');
+
+            if (!isZenMode && lives <= 0) {
+                document.getElementById('nextQuestionBtn').textContent = 'VIEW FINAL REPORT →';
+            } else {
+                document.getElementById('nextQuestionBtn').textContent = 'NEXT PROBLEM →';
+            }
+        }
+
+        // Next Question or Game Over transition
+        document.getElementById('nextQuestionBtn').addEventListener('click', () => {
+            if (!isZenMode && lives <= 0) {
+                showGameOver();
+            } else {
+                loadNextProblem();
+            }
+        });
+
+        function showGameOver() {
+            gameView.classList.add('hidden');
+            gameOverView.classList.remove('hidden');
+
+            document.getElementById('finalScoreText').textContent = score;
+            document.getElementById('finalBestText').textContent = highScore;
+            document.getElementById('finalSolvedText').textContent = `${solvedCount}/${totalAttempted}`;
+            const acc = totalAttempted > 0 ? Math.round((solvedCount / totalAttempted) * 100) : 0;
+            document.getElementById('finalAccuracyText').textContent = `${acc}%`;
+        }
+
+        // Lifelines Implementation
+        document.getElementById('lifeline5050').addEventListener('click', () => {
+            if (lifelines.fifty <= 0 || isAnswered) return;
+            lifelines.fifty--;
+            sfx.playLifeline();
+            const wrongBtns = Array.from(optionsGrid.querySelectorAll('button')).filter(
+                b => b.dataset.correct === 'false' && !b.disabled
+            );
+            wrongBtns.slice(0, 2).forEach(b => {
+                b.disabled = true;
+                b.style.opacity = '0.25';
+            });
+            updateLifelineButtons();
+        });
+
+        document.getElementById('lifelineFreeze').addEventListener('click', () => {
+            if (lifelines.freeze <= 0 || isAnswered || isZenMode) return;
+            lifelines.freeze--;
+            sfx.playLifeline();
+            timeLeft = Math.min(maxTime, timeLeft + 15);
+            updateTimerUI();
+            updateLifelineButtons();
+        });
+
+        document.getElementById('lifelineHint').addEventListener('click', () => {
+            if (lifelines.hint <= 0 || isAnswered) return;
+            lifelines.hint--;
+            sfx.playLifeline();
+            hintBox.textContent = `💡 Hint: ${currentProblem.hint}`;
+            hintBox.classList.remove('hidden');
+            updateLifelineButtons();
+        });
+
+        // Buttons & Keyboard Shortcuts
+        document.getElementById('startHardBtn').addEventListener('click', () => startGame(false));
+        document.getElementById('startZenBtn').addEventListener('click', () => startGame(true));
+        document.getElementById('retryGameBtn').addEventListener('click', () => startGame(false));
+        document.getElementById('backToMenuBtn').addEventListener('click', () => {
+            gameOverView.classList.add('hidden');
+            menuView.classList.remove('hidden');
+        });
+
+        document.getElementById('muteBtn').addEventListener('click', () => {
+            sfx.muted = !sfx.muted;
+            document.getElementById('soundIcon').textContent = sfx.muted ? '🔇' : '🔊';
+        });
+
+        // Keyboard shortcuts (1-4 or A-D for options, Space/Enter for Next)
+        window.addEventListener('keydown', (e) => {
+            if (gameView.classList.contains('hidden')) return;
+            const btns = optionsGrid.querySelectorAll('button');
+            if (!isAnswered && btns.length === 4) {
+                if (e.key === '1' || e.key.toLowerCase() === 'a') btns[0].click();
+                if (e.key === '2' || e.key.toLowerCase() === 'b') btns[1].click();
+                if (e.key === '3' || e.key.toLowerCase() === 'c') btns[2].click();
+                if (e.key === '4' || e.key.toLowerCase() === 'd') btns[3].click();
+            } else if (isAnswered && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
+                document.getElementById('nextQuestionBtn').click();
+            }
+        });
+
+        /**
+         * Interactive Rough-Work Scratchpad Canvas
+         */
+        const scratchpadContainer = document.getElementById('scratchpadContainer');
+        const scratchCanvas = document.getElementById('scratchCanvas');
+        const sCtx = scratchCanvas.getContext('2d');
+        let isDrawing = false;
+
+        function resizeScratchpad() {
+            const rect = scratchCanvas.getBoundingClientRect();
+            if (rect.width > 0) {
+                scratchCanvas.width = rect.width;
+                scratchCanvas.height = rect.height;
+                sCtx.strokeStyle = '#38bdf8';
+                sCtx.lineWidth = 2.2;
+                sCtx.lineCap = 'round';
+            }
+        }
+
+        document.getElementById('scratchpadToggleBtn').addEventListener('click', () => {
+            const isHidden = scratchpadContainer.classList.contains('hidden');
+            if (isHidden) {
+                scratchpadContainer.classList.remove('hidden');
+                scratchpadContainer.classList.add('flex');
+                setTimeout(resizeScratchpad, 20);
+            } else {
+                scratchpadContainer.classList.add('hidden');
+                scratchpadContainer.classList.remove('flex');
+            }
+        });
+
+        document.getElementById('clearScratchpadBtn').addEventListener('click', () => {
+            sCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+        });
+
+        scratchCanvas.addEventListener('pointerdown', (e) => {
+            isDrawing = true;
+            const rect = scratchCanvas.getBoundingClientRect();
+            sCtx.beginPath();
+            sCtx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        });
+        scratchCanvas.addEventListener('pointermove', (e) => {
+            if (!isDrawing) return;
+            const rect = scratchCanvas.getBoundingClientRect();
+            sCtx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            sCtx.stroke();
+        });
+        window.addEventListener('pointerup', () => {
+            isDrawing = false;
+        });
+
+        /**
+         * Background Animated Calculus Function & Riemann Sum Visualizer
+         */
+        const bgCanvas = document.getElementById('bgCanvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgPhase = 0;
+
+        function resizeBg() {
+            bgCanvas.width = window.innerWidth;
+            bgCanvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeBg);
+
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            const w = bgCanvas.width;
+            const h = bgCanvas.height;
+            const midY = h * 0.55;
+
+            // Coordinate Grid
+            bgCtx.strokeStyle = 'rgba(30, 41, 59, 0.55)';
+            bgCtx.lineWidth = 1;
+            const gridSize = 60;
+            for (let x = 0; x < w; x += gridSize) {
+                bgCtx.beginPath();
+                bgCtx.moveTo(x, 0);
+                bgCtx.lineTo(x, h);
+                bgCtx.stroke();
+            }
+            for (let y = 0; y < h; y += gridSize) {
+                bgCtx.beginPath();
+                bgCtx.moveTo(0, y);
+                bgCtx.lineTo(w, y);
+                bgCtx.stroke();
+            }
+
+            // Draw Riemann Sum Rectangles under f(x)
+            const rectWidth = 28;
+            bgCtx.fillStyle = 'rgba(2, 132, 199, 0.14)';
+            bgCtx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+            for (let x = 0; x < w; x += rectWidth) {
+                const waveY = Math.sin(x * 0.008 + bgPhase) * 90 + Math.cos(x * 0.02 - bgPhase * 1.4) * 35;
+                bgCtx.fillRect(x, midY, rectWidth - 2, waveY);
+                bgCtx.strokeRect(x, midY, rectWidth - 2, waveY);
+            }
+
+            // Draw Primary Function Curve f(x)
+            bgCtx.strokeStyle = '#38bdf8';
+            bgCtx.lineWidth = 2.5;
+            bgCtx.beginPath();
+            for (let x = 0; x < w; x += 4) {
+                const y = midY + Math.sin(x * 0.008 + bgPhase) * 90 + Math.cos(x * 0.02 - bgPhase * 1.4) * 35;
+                if (x === 0) bgCtx.moveTo(x, y);
+                else bgCtx.lineTo(x, y);
+            }
+            bgCtx.stroke();
+
+            // Draw Derivative Curve f'(x)
+            bgCtx.strokeStyle = '#f43f5e';
+            bgCtx.lineWidth = 1.5;
+            bgCtx.beginPath();
+            for (let x = 0; x < w; x += 4) {
+                const dy = midY + Math.cos(x * 0.008 + bgPhase) * 70 - Math.sin(x * 0.02 - bgPhase * 1.4) * 55;
+                if (x === 0) bgCtx.moveTo(x, dy);
+                else bgCtx.lineTo(x, dy);
+            }
+            bgCtx.stroke();
+
+            bgPhase += 0.015;
+            requestAnimationFrame(animateBg);
+        }
+
+        window.onload = function () {
+            resizeBg();
+            animateBg();
+        };
+    </script>
+</body>
+</html>
