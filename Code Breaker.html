@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Code Breaker - Algorithm Hacker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            color: #22c55e;
+            font-family: 'Share Tech Mono', monospace;
+            overflow: hidden;
+            touch-action: none;
+        }
+        .code-font {
+            font-family: 'Fira Code', monospace;
+        }
+        
+        /* CRT Monitor Effects */
+        .crt-container {
+            position: relative;
+            height: 100dvh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
+        }
+        .crt-container::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+            z-index: 50;
+            pointer-events: none;
+        }
+        .crt-container::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            box-shadow: inset 0 0 100px rgba(0,0,0,0.9);
+            z-index: 51;
+            pointer-events: none;
+        }
+
+        /* Glowing Text */
+        .glow-text {
+            text-shadow: 0 0 5px rgba(34, 197, 94, 0.5), 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+        .glow-text-red {
+            text-shadow: 0 0 5px rgba(239, 68, 68, 0.5), 0 0 10px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Terminal Window */
+        .terminal-window {
+            width: 100%;
+            max-width: 768px;
+            height: 90vh;
+            background: rgba(5, 5, 5, 0.85);
+            border: 1px solid #166534;
+            box-shadow: 0 0 20px rgba(22, 101, 52, 0.4), inset 0 0 30px rgba(0,0,0,0.8);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #064e3b;
+            color: #a7f3d0;
+            padding: 8px 16px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #047857;
+        }
+
+        /* Glitch Animation for Title */
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
+        }
+        .glitch-anim:hover {
+            animation: glitch 0.2s cubic-bezier(.25, .46, .45, .94) both infinite;
+            color: #ef4444;
+        }
+
+        /* Input Field Styling */
+        input[type="text"] {
+            background: transparent;
+            border: none;
+            color: #4ade80;
+            font-family: 'Fira Code', monospace;
+            font-size: 1.1rem;
+            outline: none;
+            width: 100%;
+            caret-color: #22c55e;
+            text-shadow: 0 0 5px rgba(74, 222, 128, 0.5);
+        }
+        input[type="text"]:focus {
+            outline: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #022c22; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #16a34a; 
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #22c55e; 
+        }
+
+        .typing-cursor::after {
+            content: '█';
+            animation: blink 1s step-start infinite;
+            color: #22c55e;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+        
+        .scanline {
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(0deg, rgba(0,0,0,0) 0%, rgba(34,197,94,0.1) 50%, rgba(0,0,0,0) 100%);
+            opacity: 0.5;
+            position: absolute;
+            bottom: 100%;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 40;
+        }
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100px; }
+        }
+
+        /* Screen Shake */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+        .shake {
+            animation: shake 0.4s;
+        }
+
+        /* Syntax Highlighting Base */
+        .syntax-keyword { color: #c678dd; } /* Purple */
+        .syntax-string { color: #98c379; } /* Green */
+        .syntax-function { color: #61afef; } /* Blue */
+        .syntax-number { color: #d19a66; } /* Orange */
+        .syntax-operator { color: #56b6c2; } /* Cyan */
+        .syntax-comment { color: #5c6370; font-style: italic; } /* Grey */
+    </style>
+</head>
+<body>
+
+<div class="crt-container" id="main-container">
+    <div class="scanline"></div>
+
+    <div class="terminal-window flex flex-col mx-4 sm:mx-0">
+        
+        <!-- Header -->
+        <div class="terminal-header shrink-0 shadow-lg">
+            <div class="flex items-center gap-2">
+                <span class="animate-pulse">🔴</span>
+                <span class="font-bold tracking-widest glitch-anim cursor-default">SYS.CORE.BREAKER</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden sm:block text-xs uppercase text-emerald-400">Target: Server Node <span id="node-level">1</span>/15</div>
+                <div class="flex items-center gap-1">
+                    <span class="text-xs uppercase text-red-300">Attempts:</span>
+                    <span id="lives-display" class="font-bold text-red-400">███</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="start-screen" class="flex-1 flex flex-col items-center justify-center p-8 text-center bg-black/60 z-20 absolute inset-0 mt-[38px]">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-4 glow-text uppercase tracking-widest text-emerald-400">CODE BREAKER</h1>
+            <p class="text-emerald-600/80 mb-8 max-w-md code-font text-sm leading-relaxed">
+                > INFILTRATION PROTOCOL INITIATED.<br>
+                > BYPASS THE FIREWALL BY PREDICTING THE ALGORITHM OUTPUTS IN <span class="text-yellow-400">PYTHON</span> AND <span class="text-blue-400">JAVASCRIPT</span>.<br>
+                > YOU HAVE 3 ATTEMPTS PER SECURE NODE.
+            </p>
+            <button id="start-btn" class="border-2 border-emerald-500 text-emerald-400 px-8 py-3 uppercase tracking-widest hover:bg-emerald-900 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 font-bold">
+                [ INITIATE HACK ]
+            </button>
+            <p class="mt-8 text-xs text-emerald-700/50">PRESS ENTER OR TAP BUTTON TO START</p>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="game-over-screen" class="hidden flex-1 flex flex-col items-center justify-center p-8 text-center bg-red-950/90 z-20 absolute inset-0 mt-[38px]">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-2 glow-text-red uppercase tracking-widest text-red-500">ACCESS DENIED</h1>
+            <p class="text-red-400/80 mb-6 code-font text-sm">> SECURITY BREACH DETECTED. CONNECTION TERMINATED.</p>
+            <div class="bg-black/50 border border-red-800 p-4 mb-8 rounded w-full max-w-sm">
+                <div class="flex justify-between border-b border-red-900 pb-2 mb-2">
+                    <span class="text-red-500/70 uppercase text-xs">Nodes Compromised:</span>
+                    <span id="go-nodes" class="text-red-400 font-bold">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-red-500/70 uppercase text-xs">Security Threat Level:</span>
+                    <span id="go-threat" class="text-red-400 font-bold">LOW</span>
+                </div>
+            </div>
+            <button id="restart-btn-go" class="border-2 border-red-500 text-red-400 px-8 py-3 uppercase tracking-widest hover:bg-red-900 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-red-400 font-bold">
+                [ RECONNECT ]
+            </button>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victory-screen" class="hidden flex-1 flex flex-col items-center justify-center p-8 text-center bg-emerald-950/90 z-20 absolute inset-0 mt-[38px]">
+            <h1 class="text-4xl sm:text-5xl font-bold mb-2 glow-text uppercase tracking-widest text-emerald-400">SYSTEM COMPROMISED</h1>
+            <p class="text-emerald-300 mb-6 code-font text-sm">> ALL NODES HACKED. ROOT ACCESS GRANTED.</p>
+            <div class="w-24 h-24 mb-8">
+                <svg class="w-full h-full text-emerald-400 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+            <button id="restart-btn-win" class="border-2 border-emerald-500 text-emerald-400 px-8 py-3 uppercase tracking-widest hover:bg-emerald-800 hover:text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-emerald-400 font-bold">
+                [ EXIT SYSTEM ]
+            </button>
+        </div>
+
+        <!-- Main Game Area -->
+        <div id="game-screen" class="hidden flex-1 flex flex-col p-4 sm:p-6 overflow-hidden relative">
+            
+            <!-- Terminal Output Log -->
+            <div id="terminal-log" class="flex-1 overflow-y-auto mb-4 code-font text-sm sm:text-base space-y-2 pr-2">
+                <div class="text-emerald-600/60">> connection established...</div>
+                <div class="text-emerald-600/60">> downloading node algorithms...</div>
+            </div>
+
+            <!-- Active Challenge Area -->
+            <div id="challenge-box" class="mt-auto shrink-0 transition-opacity duration-300">
+                <div class="flex items-center gap-2 mb-2">
+                    <span id="lang-badge" class="px-2 py-0.5 text-xs font-bold rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30">PYTHON</span>
+                    <span class="text-xs text-emerald-600 uppercase tracking-widest">Decrypt output to advance</span>
+                </div>
+                
+                <!-- Code Snippet Display -->
+                <div class="bg-black/80 border border-emerald-800/60 p-4 rounded mb-4 shadow-inner relative overflow-hidden">
+                    <pre><code id="code-snippet" class="code-font text-[15px] sm:text-[17px] leading-relaxed glow-text whitespace-pre-wrap"></code></pre>
+                </div>
+
+                <!-- Input Area -->
+                <div class="flex items-center gap-3 bg-black/60 border border-emerald-700/50 p-2 sm:p-3 rounded focus-within:border-emerald-400 transition-colors">
+                    <span class="text-emerald-500 font-bold">> </span>
+                    <input type="text" id="answer-input" autocomplete="off" spellcheck="false" placeholder="Enter output..." class="flex-1 min-w-0 bg-transparent">
+                    <button id="submit-btn" class="bg-emerald-900/50 hover:bg-emerald-700 text-emerald-300 border border-emerald-600 px-4 py-1.5 rounded text-sm uppercase font-bold transition-colors">
+                        EXEC
+                    </button>
+                </div>
+                <div class="mt-2 text-right">
+                     <span class="text-[10px] text-emerald-700 uppercase">Format: Exact output (no quotes for strings unless specified)</span>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+<script>
+    /**
+     * Web Audio API Synthesizer for Cyberpunk/Hacker Sound Effects
+     */
+    class AudioFX {
+        constructor() {
+            this.ctx = null;
+        }
+        init() {
+            if (!this.ctx) {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (AudioCtx) this.ctx = new AudioCtx();
+            }
+            if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+        }
+        _playTone(freq, type, duration, vol) {
+            if (!this.ctx) return;
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, now);
+            
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + duration);
+            
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + duration);
+        }
+        typeSound() {
+            this._playTone(800 + Math.random() * 400, 'square', 0.05, 0.02);
+        }
+        enterSound() {
+            this._playTone(400, 'square', 0.15, 0.05);
+            setTimeout(() => this._playTone(600, 'square', 0.2, 0.05), 50);
+        }
+        errorSound() {
+            this._playTone(150, 'sawtooth', 0.4, 0.1);
+            setTimeout(() => this._playTone(100, 'sawtooth', 0.4, 0.1), 100);
+        }
+        successSound() {
+            this._playTone(800, 'sine', 0.1, 0.05);
+            setTimeout(() => this._playTone(1200, 'sine', 0.1, 0.05), 100);
+            setTimeout(() => this._playTone(1600, 'sine', 0.3, 0.05), 200);
+        }
+        gameOverSound() {
+            this._playTone(200, 'sawtooth', 0.3, 0.1);
+            setTimeout(() => this._playTone(150, 'sawtooth', 0.3, 0.1), 200);
+            setTimeout(() => this._playTone(100, 'sawtooth', 0.8, 0.1), 400);
+        }
+        winSound() {
+            const notes = [440, 554, 659, 880, 1108, 1318];
+            notes.forEach((freq, i) => {
+                setTimeout(() => this._playTone(freq, 'square', 0.15, 0.05), i * 100);
+            });
+        }
+    }
+
+    const sfx = new AudioFX();
+
+    // Challenge Database (Python & JS Logic)
+    const challenges = [
+        { lang: 'JS', code: `let a = 5;\nlet b = "5";\nconsole.log(a == b);`, ans: 'true' },
+        { lang: 'JS', code: `let a = 5;\nlet b = "5";\nconsole.log(a === b);`, ans: 'false' },
+        { lang: 'PY', code: `print(type([]).__name__)`, ans: 'list' },
+        { lang: 'PY', code: `print(bool([]))`, ans: 'False' },
+        { lang: 'JS', code: `console.log(typeof null);`, ans: 'object' },
+        { lang: 'JS', code: `console.log(Math.max(1, 3, 2));`, ans: '3' },
+        { lang: 'PY', code: `x = "cyber"\nprint(x[::-1])`, ans: 'rebyc' },
+        { lang: 'PY', code: `print(3 ** 2)`, ans: '9' },
+        { lang: 'JS', code: `console.log(2 + "2");`, ans: '22' },
+        { lang: 'JS', code: `console.log("2" - 1);`, ans: '1' },
+        { lang: 'PY', code: `print("hack"[1:3])`, ans: 'ac' },
+        { lang: 'JS', code: `let arr = [1, 2, 3];\nconsole.log(arr.reduce((a, b) => a + b, 0));`, ans: '6' },
+        { lang: 'PY', code: `print(list(range(3)))`, ans: '[0,1,2]' },
+        { lang: 'JS', code: `console.log(Boolean("false"));`, ans: 'true' },
+        { lang: 'PY', code: `print(1 == "1")`, ans: 'False' },
+        { lang: 'JS', code: `let s = "node";\nconsole.log(s.charAt(2));`, ans: 'd' },
+        { lang: 'PY', code: `def foo(n):\n    return n * 2\nprint(foo(4))`, ans: '8' },
+        { lang: 'JS', code: `console.log([1, 2, 3].map(x => x * 2)[1]);`, ans: '4' },
+        { lang: 'PY', code: `a = [1, 2, 3]\na.append(4)\nprint(len(a))`, ans: '4' },
+        { lang: 'JS', code: `console.log(0 == false);`, ans: 'true' },
+        { lang: 'PY', code: `print(10 // 3)`, ans: '3' },
+        { lang: 'JS', code: `console.log(typeof NaN);`, ans: 'number' },
+        { lang: 'PY', code: `print(set([1, 2, 2, 3]))`, ans: '{1,2,3}' }
+    ];
+
+    // Simple Syntax Highlighter
+    function highlightCode(code, lang) {
+        let highlighted = code
+            .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+        if (lang === 'JS') {
+            highlighted = highlighted
+                .replace(/\b(let|const|var|function|return|console|Math)\b/g, '<span class="syntax-keyword">$1</span>')
+                .replace(/\b(log|max|reduce|map|charAt)\b/g, '<span class="syntax-function">$1</span>')
+                .replace(/(['"].*?['"])/g, '<span class="syntax-string">$1</span>')
+                .replace(/\b(\d+)\b/g, '<span class="syntax-number">$1</span>')
+                .replace(/(\/\/.*)/g, '<span class="syntax-comment">$1</span>')
+                .replace(/\b(true|false|null|NaN)\b/g, '<span class="syntax-number">$1</span>');
+        } else if (lang === 'PY') {
+            highlighted = highlighted
+                .replace(/\b(def|return|print|type|bool|list|range|len|set)\b/g, '<span class="syntax-keyword">$1</span>')
+                .replace(/(['"].*?['"])/g, '<span class="syntax-string">$1</span>')
+                .replace(/\b(\d+)\b/g, '<span class="syntax-number">$1</span>')
+                .replace(/(#.*)/g, '<span class="syntax-comment">$1</span>')
+                .replace(/\b(True|False|None)\b/g, '<span class="syntax-number">$1</span>');
+        }
+        return highlighted;
+    }
+
+    // Game State
+    const TOTAL_LEVELS = 15;
+    let currentLevel = 0;
+    let lives = 3;
+    let activeChallenge = null;
+    let isTyping = false;
+    let usedIndices = new Set();
+
+    // DOM Elements
+    const screens = {
+        start: document.getElementById('start-screen'),
+        game: document.getElementById('game-screen'),
+        gameOver: document.getElementById('game-over-screen'),
+        victory: document.getElementById('victory-screen')
+    };
+    
+    const ui = {
+        nodeLevel: document.getElementById('node-level'),
+        livesDisplay: document.getElementById('lives-display'),
+        log: document.getElementById('terminal-log'),
+        snippet: document.getElementById('code-snippet'),
+        input: document.getElementById('answer-input'),
+        submitBtn: document.getElementById('submit-btn'),
+        langBadge: document.getElementById('lang-badge'),
+        container: document.getElementById('main-container'),
+        goNodes: document.getElementById('go-nodes'),
+        goThreat: document.getElementById('go-threat')
+    };
+
+    function showScreen(screenId) {
+        Object.values(screens).forEach(s => s.classList.add('hidden'));
+        screens[screenId].classList.remove('hidden');
+    }
+
+    function updateLivesDisplay() {
+        ui.livesDisplay.textContent = '█'.repeat(lives) + '-'.repeat(3 - lives);
+        if (lives === 1) ui.livesDisplay.className = 'font-bold text-red-500 animate-pulse';
+        else ui.livesDisplay.className = 'font-bold text-emerald-400';
+    }
+
+    function appendLog(text, type = 'info') {
+        const div = document.createElement('div');
+        div.className = 'flex gap-2 font-mono';
+        
+        let colorClass = 'text-emerald-400';
+        let prefix = '>';
+        if (type === 'error') { colorClass = 'text-red-400'; prefix = '[!]'; }
+        if (type === 'success') { colorClass = 'text-green-300'; prefix = '[+]'; }
+        if (type === 'system') { colorClass = 'text-blue-300'; prefix = 'SYS:'; }
+
+        div.innerHTML = `<span class="${colorClass} opacity-70">${prefix}</span> <span class="${colorClass}">${text}</span>`;
+        ui.log.appendChild(div);
+        ui.log.scrollTop = ui.log.scrollHeight;
+    }
+
+    async function typeCodeSnippet(text, html) {
+        return new Promise(resolve => {
+            isTyping = true;
+            ui.snippet.innerHTML = '';
+            ui.snippet.classList.add('typing-cursor');
+            
+            // For typing effect with HTML, we just fade it in slightly or reveal line by line to keep it simple and preserve spans.
+            // A true char-by-char HTML typer is complex, so let's simulate line-by-line typing.
+            const lines = html.split('\n');
+            let currentLine = 0;
+            
+            const typeLine = () => {
+                if (currentLine < lines.length) {
+                    sfx.typeSound();
+                    const lineDiv = document.createElement('div');
+                    lineDiv.innerHTML = lines[currentLine] || ' ';
+                    ui.snippet.appendChild(lineDiv);
+                    currentLine++;
+                    ui.log.scrollTop = ui.log.scrollHeight;
+                    setTimeout(typeLine, 80 + Math.random() * 70); // random typing speed
+                } else {
+                    ui.snippet.classList.remove('typing-cursor');
+                    isTyping = false;
+                    ui.input.focus();
+                    resolve();
+                }
+            };
+            typeLine();
+        });
+    }
+
+    function loadNextNode() {
+        if (currentLevel >= TOTAL_LEVELS) {
+            triggerVictory();
+            return;
+        }
+
+        currentLevel++;
+        ui.nodeLevel.textContent = currentLevel;
+        ui.input.value = '';
+        ui.input.disabled = true;
+
+        // Select random unused challenge
+        let available = challenges.map((_, i) => i).filter(i => !usedIndices.has(i));
+        if (available.length === 0) { usedIndices.clear(); available = challenges.map((_, i) => i); } // fallback
+        
+        const randIndex = available[Math.floor(Math.random() * available.length)];
+        usedIndices.add(randIndex);
+        activeChallenge = challenges[randIndex];
+
+        // Update Badge
+        ui.langBadge.textContent = activeChallenge.lang;
+        if (activeChallenge.lang === 'JS') {
+            ui.langBadge.className = 'px-2 py-0.5 text-xs font-bold rounded bg-yellow-500/20 text-yellow-400 border border-yellow-500/30';
+        } else {
+            ui.langBadge.className = 'px-2 py-0.5 text-xs font-bold rounded bg-blue-500/20 text-blue-400 border border-blue-500/30';
+        }
+
+        appendLog(`Connecting to secure node [${currentLevel}/${TOTAL_LEVELS}]...`, 'system');
+        
+        setTimeout(async () => {
+            appendLog(`Intercepted algorithm sequence. Decrypting...`);
+            const highlightedHTML = highlightCode(activeChallenge.code, activeChallenge.lang);
+            await typeCodeSnippet(activeChallenge.code, highlightedHTML);
+            ui.input.disabled = false;
+            ui.input.focus();
+        }, 600);
+    }
+
+    function triggerGameOver() {
+        sfx.gameOverSound();
+        ui.container.classList.add('shake');
+        setTimeout(() => ui.container.classList.remove('shake'), 400);
+        
+        ui.goNodes.textContent = currentLevel - 1;
+        ui.goThreat.textContent = (currentLevel > 10) ? 'EXTREME' : (currentLevel > 5 ? 'HIGH' : 'ELEVATED');
+        showScreen('gameOver');
+    }
+
+    function triggerVictory() {
+        sfx.winSound();
+        showScreen('victory');
+    }
+
+    // Clean strings for comparison (remove spaces, lowercase)
+    function sanitizeForCompare(str) {
+        return String(str).replace(/\s+/g, '').toLowerCase();
+    }
+
+    function handleSubmission() {
+        if (isTyping || ui.input.disabled || !activeChallenge) return;
+        
+        const userAnswer = ui.input.value.trim();
+        if (!userAnswer) return;
+
+        sfx.enterSound();
+        appendLog(`Input sequence: "${userAnswer}"`);
+        
+        const cleanUser = sanitizeForCompare(userAnswer);
+        const cleanAns = sanitizeForCompare(activeChallenge.ans);
+
+        if (cleanUser === cleanAns) {
+            // Success
+            sfx.successSound();
+            appendLog(`Access Granted. Node [${currentLevel}] compromised.`, 'success');
+            ui.input.value = '';
+            ui.input.disabled = true;
+            setTimeout(loadNextNode, 1000);
+        } else {
+            // Failure
+            sfx.errorSound();
+            lives--;
+            updateLivesDisplay();
+            ui.container.classList.add('shake');
+            setTimeout(() => ui.container.classList.remove('shake'), 400);
+            
+            appendLog(`Access Denied. Incorrect sequence.`, 'error');
+            ui.input.value = '';
+            ui.input.focus();
+
+            if (lives <= 0) {
+                setTimeout(triggerGameOver, 500);
+            }
+        }
+    }
+
+    function initGame() {
+        sfx.init();
+        currentLevel = 0;
+        lives = 3;
+        usedIndices.clear();
+        ui.log.innerHTML = '';
+        updateLivesDisplay();
+        showScreen('game');
+        appendLog('INITIALIZING HACK SEQUENCE...', 'system');
+        setTimeout(loadNextNode, 800);
+    }
+
+    // Event Listeners
+    document.getElementById('start-btn').addEventListener('click', initGame);
+    document.getElementById('restart-btn-go').addEventListener('click', initGame);
+    document.getElementById('restart-btn-win').addEventListener('click', initGame);
+    ui.submitBtn.addEventListener('click', handleSubmission);
+    
+    ui.input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') handleSubmission();
+    });
+
+    // Global Key Listener for start screens
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            if (!screens.start.classList.contains('hidden') || 
+                !screens.gameOver.classList.contains('hidden') || 
+                !screens.victory.classList.contains('hidden')) {
+                initGame();
+            }
+        }
+        
+        // Typing sound effect for input
+        if (!screens.game.classList.contains('hidden') && e.key.length === 1 && document.activeElement === ui.input) {
+            sfx.typeSound();
+        }
+    });
+
+</script>
+</body>
+</html>
