@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Physics Lab - Gravity & Friction Sandbox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #090d16;
+            color: #f8fafc;
+            font-family: 'Space Grotesk', sans-serif;
+            overflow: hidden;
+            touch-action: none;
+        }
+        .title-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: #1e293b;
+            border-radius: 999px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #38bdf8;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.8);
+        }
+        .tool-btn {
+            transition: all 0.15s ease;
+        }
+        .tool-btn.active {
+            background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%);
+            border-color: #7dd3fc;
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.45);
+            transform: translateY(-2px);
+        }
+        .preset-chip {
+            transition: all 0.15s ease;
+        }
+        .preset-chip:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="h-dvh w-screen flex flex-col bg-slate-950 overflow-hidden select-none">
+
+    <!-- Top Header & Mode Switcher -->
+    <header class="z-20 flex flex-wrap items-center justify-between gap-2 px-3 py-2 bg-slate-900/95 border-b border-slate-800 shadow-lg shrink-0">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center shadow-md shadow-cyan-500/20 text-xl">
+                ⚛️
+            </div>
+            <div>
+                <h1 class="title-font text-lg sm:text-xl tracking-wide text-white leading-none flex items-center gap-2">
+                    PHYSICS <span class="text-cyan-400">LAB</span>
+                    <span id="modeBadge" class="text-[10px] font-sans uppercase px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-bold">Sandbox</span>
+                </h1>
+                <p class="text-[11px] text-slate-400 hidden sm:block">Experiment with Gravity, Surface Friction & Collisions</p>
+            </div>
+        </div>
+
+        <!-- Mode & Level Controls -->
+        <div class="flex items-center space-x-1.5 sm:space-x-2">
+            <button id="sandboxModeBtn" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-cyan-600 text-white border border-cyan-400 shadow transition">
+                🛠️ Sandbox
+            </button>
+            <button id="challengeModeBtn" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition">
+                🏆 Challenges (3)
+            </button>
+            <button id="soundBtn" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700" title="Toggle Sound">
+                🔊
+            </button>
+            <button id="clearBtn" class="px-2.5 py-1.5 rounded-xl text-xs font-bold bg-rose-950/80 hover:bg-rose-900 text-rose-300 border border-rose-700/50 transition">
+                🗑️ Clear
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Interactive Workspace -->
+    <div class="relative flex-1 w-full overflow-hidden flex flex-col md:flex-row">
+
+        <!-- Canvas Container -->
+        <div id="canvasContainer" class="relative flex-1 h-full w-full overflow-hidden bg-slate-950">
+            <canvas id="simCanvas" class="block w-full h-full cursor-crosshair"></canvas>
+
+            <!-- Live Telemetry HUD (Top Left) -->
+            <div class="absolute top-3 left-3 pointer-events-none flex flex-col gap-1.5 bg-slate-900/80 backdrop-blur-md border border-slate-800 px-3 py-2 rounded-xl text-xs shadow-lg">
+                <div class="flex items-center justify-between gap-4">
+                    <span class="text-slate-400">Objects:</span>
+                    <span id="objCount" class="font-bold text-white">0</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                    <span class="text-slate-400">Avg Speed:</span>
+                    <span id="avgSpeed" class="font-bold text-cyan-400">0.0 m/s</span>
+                </div>
+                <div class="flex items-center justify-between gap-4">
+                    <span class="text-slate-400">Kinetic Energy:</span>
+                    <span id="keDisplay" class="font-bold text-amber-400">0 J</span>
+                </div>
+            </div>
+
+            <!-- Challenge Banner (Top Center - Shown in Challenge Mode) -->
+            <div id="challengeBanner" class="hidden absolute top-3 left-1/2 -translate-x-1/2 z-10 w-[92%] max-w-md bg-slate-900/95 backdrop-blur-md border-2 border-amber-500/60 px-4 py-2.5 rounded-2xl shadow-2xl">
+                <div class="flex items-center justify-between mb-1">
+                    <span id="challengeTitle" class="title-font text-amber-400 text-sm tracking-wide">LEVEL 1: ICE SLIDE</span>
+                    <div class="flex items-center gap-2">
+                        <button id="spawnPuzzleBallBtn" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow cursor-pointer">
+                            ▶ Drop Energy Core
+                        </button>
+                        <button id="nextLevelBtn" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs border border-slate-700">
+                            Skip ⏭
+                        </button>
+                    </div>
+                </div>
+                <p id="challengeDesc" class="text-xs text-slate-200 leading-snug">
+                    Lower the friction or draw a ramp so the Energy Core slides into the green Goal Portal!
+                </p>
+            </div>
+
+            <!-- Quick Helper Toast (Bottom Center over Canvas) -->
+            <div id="helperToast" class="absolute bottom-3 left-1/2 -translate-x-1/2 pointer-events-none bg-slate-900/85 border border-slate-700/80 px-3.5 py-1.5 rounded-full text-[11px] text-slate-300 shadow-lg whitespace-nowrap">
+                💡 <b>Tip:</b> Drag on canvas to spawn/throw, or select <b>Draw Ramp</b>!
+            </div>
+
+            <!-- Level Complete Modal -->
+            <div id="winModal" class="hidden absolute inset-0 z-30 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+                <div class="bg-slate-900 border-2 border-emerald-500 rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400 flex items-center justify-center mx-auto mb-3 text-3xl">
+                        🎉
+                    </div>
+                    <h2 class="title-font text-2xl text-white mb-1">EXPERIMENT SUCCESS!</h2>
+                    <p id="winMessage" class="text-xs text-slate-300 mb-5">You mastered gravity and friction to guide the core into the portal!</p>
+                    <button id="nextChallengeModalBtn" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold text-sm shadow-lg hover:opacity-95 transition">
+                        NEXT CHALLENGE ➔
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Physics Control Panel (Bottom on Mobile, Right Sidebar on Desktop) -->
+        <aside class="z-20 w-full md:w-80 bg-slate-900/95 border-t md:border-t-0 md:border-l border-slate-800 p-3 sm:p-4 flex flex-col justify-between gap-3 shrink-0 max-h-[46dvh] md:max-h-none overflow-y-auto">
+            
+            <!-- Tool Selector -->
+            <div>
+                <div class="flex items-center justify-between mb-1.5">
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">1. Interactive Tool</span>
+                    <span id="activeToolHint" class="text-[11px] text-cyan-400 font-semibold">Tap or slingshot balls</span>
+                </div>
+                <div class="grid grid-cols-5 gap-1.5">
+                    <button data-tool="ball" class="tool-btn active flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-slate-800/90 border border-slate-700 text-xs">
+                        <span class="text-base">⚽</span>
+                        <span class="text-[10px] font-bold mt-0.5">Ball</span>
+                    </button>
+                    <button data-tool="heavy" class="tool-btn flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-slate-800/90 border border-slate-700 text-xs">
+                        <span class="text-base">🪨</span>
+                        <span class="text-[10px] font-bold mt-0.5">Heavy</span>
+                    </button>
+                    <button data-tool="ice" class="tool-btn flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-slate-800/90 border border-slate-700 text-xs">
+                        <span class="text-base">🧊</span>
+                        <span class="text-[10px] font-bold mt-0.5">Ice Puck</span>
+                    </button>
+                    <button data-tool="ramp" class="tool-btn flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-slate-800/90 border border-slate-700 text-xs">
+                        <span class="text-base">📐</span>
+                        <span class="text-[10px] font-bold mt-0.5">Ramp</span>
+                    </button>
+                    <button data-tool="grab" class="tool-btn flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-slate-800/90 border border-slate-700 text-xs">
+                        <span class="text-base">✋</span>
+                        <span class="text-[10px] font-bold mt-0.5">Grab/Throw</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Environment Presets -->
+            <div>
+                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">2. Quick Planet & Surface Presets</span>
+                <div class="grid grid-cols-4 gap-1.5">
+                    <button data-preset="earth" class="preset-chip py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-bold text-emerald-300 flex items-center justify-center gap-1">
+                        🌍 Earth
+                    </button>
+                    <button data-preset="moon" class="preset-chip py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-bold text-slate-200 flex items-center justify-center gap-1">
+                        🌙 Moon
+                    </button>
+                    <button data-preset="space" class="preset-chip py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-bold text-purple-300 flex items-center justify-center gap-1">
+                        🚀 Zero-G
+                    </button>
+                    <button data-preset="iceworld" class="preset-chip py-1.5 px-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-[11px] font-bold text-cyan-300 flex items-center justify-center gap-1">
+                        ❄️ Ice Lab
+                    </button>
+                </div>
+            </div>
+
+            <!-- Physics Sliders (Gravity, Friction, Restitution, Air Drag) -->
+            <div class="space-y-2.5 bg-slate-950/70 p-3 rounded-2xl border border-slate-800/90">
+                <!-- Gravity Y -->
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="font-semibold text-slate-300">⬇️ Gravity (<span class="text-cyan-400">g</span>)</span>
+                        <span id="gravityVal" class="font-bold text-cyan-300">9.8 m/s²</span>
+                    </div>
+                    <input id="gravitySlider" type="range" min="-10" max="25" step="0.2" value="9.8" class="w-full">
+                </div>
+
+                <!-- Surface Friction -->
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="font-semibold text-slate-300">🧱 Surface Friction (<span class="text-amber-400">μ</span>)</span>
+                        <span id="frictionVal" class="font-bold text-amber-300">0.25 (Normal)</span>
+                    </div>
+                    <input id="frictionSlider" type="range" min="0" max="1" step="0.02" value="0.25" class="w-full">
+                </div>
+
+                <!-- Restitution / Bounciness -->
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="font-semibold text-slate-300">🏀 Elasticity / Bounce (<span class="text-emerald-400">e</span>)</span>
+                        <span id="bounceVal" class="font-bold text-emerald-300">0.75</span>
+                    </div>
+                    <input id="bounceSlider" type="range" min="0.05" max="0.98" step="0.02" value="0.75" class="w-full">
+                </div>
+
+                <!-- Air Resistance -->
+                <div>
+                    <div class="flex justify-between text-xs mb-1">
+                        <span class="font-semibold text-slate-300">💨 Air Drag</span>
+                        <span id="dragVal" class="font-bold text-purple-300">0.005</span>
+                    </div>
+                    <input id="dragSlider" type="range" min="0" max="0.05" step="0.002" value="0.005" class="w-full">
+                </div>
+            </div>
+
+            <!-- Bottom Fun Actions -->
+            <div class="grid grid-cols-2 gap-2">
+                <button id="explosionBtn" class="py-2 px-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-95 text-slate-950 font-bold text-xs shadow-md active:scale-95 transition">
+                    💥 Shockwave Impulse
+                </button>
+                <button id="flipGravityBtn" class="py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-300 font-bold text-xs active:scale-95 transition">
+                    🔄 Invert Gravity
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        /**
+         * Web Audio Synthesizer for Physics Collisions & Interactions
+         */
+        class LabAudio {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+                this.lastPing = 0;
+            }
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            }
+            playBounce(speed, radius = 18) {
+                if (this.muted || !this.ctx) return;
+                const now = performance.now();
+                if (now - this.lastPing < 35 || speed < 1.8) return;
+                this.lastPing = now;
+
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                const baseFreq = Math.max(90, Math.min(520, 420 - radius * 8 + speed * 8));
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(baseFreq, t);
+                osc.frequency.exponentialRampToValueAtTime(baseFreq * 0.45, t + 0.08);
+
+                const vol = Math.min(0.22, speed * 0.015);
+                gain.gain.setValueAtTime(vol, t);
+                gain.gain.linearRampToValueAtTime(0.001, t + 0.08);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(t);
+                osc.stop(t + 0.08);
+            }
+            playWin() {
+                if (this.muted || !this.ctx) return;
+                const notes = [523.25, 659.25, 783.99, 1046.5];
+                const t = this.ctx.currentTime;
+                notes.forEach((f, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(f, t + idx * 0.08);
+                    gain.gain.setValueAtTime(0.18, t + idx * 0.08);
+                    gain.gain.linearRampToValueAtTime(0.001, t + idx * 0.08 + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(t + idx * 0.08);
+                    osc.stop(t + idx * 0.08 + 0.25);
+                });
+            }
+            playBlast() {
+                if (this.muted || !this.ctx) return;
+                const t = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(160, t);
+                osc.frequency.exponentialRampToValueAtTime(38, t + 0.28);
+                gain.gain.setValueAtTime(0.25, t);
+                gain.gain.linearRampToValueAtTime(0.001, t + 0.28);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(t);
+                osc.stop(t + 0.28);
+            }
+        }
+
+        const audio = new LabAudio();
+
+        // Canvas & DOM References
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvasContainer');
+
+        // Physics Parameters
+        const physics = {
+            gravity: 9.8,      // m/s^2 equivalent scaled
+            friction: 0.25,    // 0.0 (Ice) to 1.0 (Sandpaper)
+            restitution: 0.75, // Bounciness (0.05 to 0.98)
+            airDrag: 0.005     // Fluid resistance
+        };
+
+        // Simulation State
+        let width = 800;
+        let height = 600;
+        let mode = 'SANDBOX'; // 'SANDBOX' or 'CHALLENGE'
+        let currentTool = 'ball'; // 'ball', 'heavy', 'ice', 'ramp', 'grab'
+        let bodies = [];
+        let ramps = [];
+        let particles = [];
+        let goalPortal = null;
+        let currentLevel = 0;
+
+        // Pointer Interaction State
+        const pointer = {
+            isDown: false,
+            startX: 0,
+            startY: 0,
+            currX: 0,
+            currY: 0,
+            grabbedBody: null,
+            lastX: 0,
+            lastY: 0,
+            vx: 0,
+            vy: 0
+        };
+
+        // Challenge Levels Definition
+        const levels = [
+            {
+                title: "LEVEL 1: THE FRICTION TEST",
+                desc: "The ramp is too rough! Lower the Surface Friction (μ) slider or use Shockwave so the Gold Core slides into the Green Portal.",
+                setup: (w, h) => {
+                    physics.gravity = 9.8;
+                    physics.friction = 0.88; // High friction holds the ball initially
+                    physics.restitution = 0.5;
+                    syncSliders();
+                    ramps.push({ x1: w * 0.12, y1: h * 0.28, x2: w * 0.65, y2: h * 0.62 });
+                    goalPortal = { x: w * 0.78, y: h * 0.72, r: 34 };
+                    spawnPuzzleCore(w * 0.2, h * 0.2);
+                }
+            },
+            {
+                title: "LEVEL 2: ZERO-G ANTI-GRAVITY",
+                desc: "The portal is on the ceiling! Invert or lower Gravity (g) and draw a ramp to guide the Gold Core upward.",
+                setup: (w, h) => {
+                    physics.gravity = 9.8;
+                    physics.friction = 0.15;
+                    physics.restitution = 0.8;
+                    syncSliders();
+                    // Obstacle barrier in middle
+                    ramps.push({ x1: w * 0.35, y1: h * 0.5, x2: w * 0.65, y2: h * 0.5 });
+                    goalPortal = { x: w * 0.78, y: h * 0.18, r: 34 };
+                    spawnPuzzleCore(w * 0.22, h * 0.78);
+                }
+            },
+            {
+                title: "LEVEL 3: SUPER BOUNCE CANYON",
+                desc: "Crank up Elasticity/Bounce (e) or draw a bridge ramp across the canyon so the Gold Core rebounds into the portal!",
+                setup: (w, h) => {
+                    physics.gravity = 12.0;
+                    physics.friction = 0.1;
+                    physics.restitution = 0.35;
+                    syncSliders();
+                    ramps.push({ x1: w * 0.1, y1: h * 0.35, x2: w * 0.38, y2: h * 0.75 });
+                    ramps.push({ x1: w * 0.38, y1: h * 0.75, x2: w * 0.62, y2: h * 0.75 });
+                    goalPortal = { x: w * 0.82, y: h * 0.35, r: 34 };
+                    spawnPuzzleCore(w * 0.16, h * 0.22);
+                }
+            }
+        ];
+
+        function spawnPuzzleCore(x, y) {
+            // Remove existing puzzle cores
+            bodies = bodies.filter(b => !b.isPuzzleCore);
+            bodies.push({
+                x: x,
+                y: y,
+                vx: 1.2,
+                vy: 0,
+                r: 20,
+                mass: 2.5,
+                angle: 0,
+                omega: 0,
+                color: '#facc15',
+                label: '⭐',
+                type: 'core',
+                isPuzzleCore: true,
+                customFriction: null
+            });
+        }
+
+        // Resize Canvas & Reposition Elements
+        function resizeCanvas() {
+            width = container.clientWidth;
+            height = container.clientHeight;
+            canvas.width = width;
+            canvas.height = height;
+
+            if (bodies.length === 0 && ramps.length === 0 && mode === 'SANDBOX') {
+                initSandboxDefault();
+            }
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        // Initialize Default Sandbox Playground
+        function initSandboxDefault() {
+            bodies = [];
+            ramps = [];
+            goalPortal = null;
+
+            // Create two fun starter ramps
+            ramps.push({
+                x1: width * 0.12,
+                y1: height * 0.32,
+                x2: width * 0.52,
+                y2: height * 0.52
+            });
+            ramps.push({
+                x1: width * 0.88,
+                y1: height * 0.45,
+                x2: width * 0.48,
+                y2: height * 0.72
+            });
+
+            // Spawn starter objects of varying mass & friction
+            createBody(width * 0.22, height * 0.18, 0, 0, 'ball');
+            createBody(width * 0.32, height * 0.14, 0, 0, 'ice');
+            createBody(width * 0.75, height * 0.25, -2, 0, 'heavy');
+        }
+
+        // Create Physics Body
+        function createBody(x, y, vx = 0, vy = 0, type = 'ball') {
+            let r = 19;
+            let mass = 1.5;
+            let color = '#38bdf8';
+            let label = '⚽';
+            let customFriction = null;
+
+            if (type === 'heavy') {
+                r = 26;
+                mass = 6.0;
+                color = '#f97316';
+                label = '🪨';
+            } else if (type === 'ice') {
+                r = 18;
+                mass = 1.2;
+                color = '#67e8f9';
+                label = '🧊';
+                customFriction = 0.01; // Virtually frictionless ice puck
+            } else {
+                const palette = ['#38bdf8', '#a855f7', '#ec4899', '#22c55e'];
+                color = palette[bodies.length % palette.length];
+            }
+
+            bodies.push({
+                x,
+                y,
+                vx,
+                vy,
+                r,
+                mass,
+                angle: 0,
+                omega: 0,
+                color,
+                label,
+                type,
+                isPuzzleCore: false,
+                customFriction
+            });
+        }
+
+        // Create Particle Burst
+        function spawnParticles(x, y, color, count = 12) {
+            for (let i = 0; i < count; i++) {
+                const a = Math.random() * Math.PI * 2;
+                const sp = Math.random() * 4.5 + 1;
+                particles.push({
+                    x,
+                    y,
+                    vx: Math.cos(a) * sp,
+                    vy: Math.sin(a) * sp,
+                    r: Math.random() * 3 + 1.5,
+                    color,
+                    alpha: 1
+                });
+            }
+        }
+
+        // Closest Point on Line Segment Helper
+        function closestPointOnSegment(px, py, x1, y1, x2, y2) {
+            const dx = x2 - x1;
+            const dy = y2 - y1;
+            const lenSq = dx * dx + dy * dy;
+            if (lenSq === 0) return { x: x1, y: y1, t: 0 };
+            let t = ((px - x1) * dx + (py - y1) * dy) / lenSq;
+            t = Math.max(0, Math.min(1, t));
+            return {
+                x: x1 + t * dx,
+                y: y1 + t * dy,
+                t
+            };
+        }
+
+        // Step Physics Simulation (Sub-stepped for rock-solid stability)
+        function updatePhysics() {
+            const subSteps = 4;
+            const dt = 1 / subSteps;
+            const gAccel = (physics.gravity * 0.042) * dt;
+            const dragFactor = Math.pow(1 - physics.airDrag, dt);
+
+            for (let step = 0; step < subSteps; step++) {
+                // 1. Integrate Forces & Velocity
+                for (let i = 0; i < bodies.length; i++) {
+                    const b = bodies[i];
+                    if (pointer.grabbedBody === b) continue;
+
+                    b.vy += gAccel;
+                    b.vx *= dragFactor;
+                    b.vy *= dragFactor;
+
+                    b.x += b.vx * dt;
+                    b.y += b.vy * dt;
+                    b.angle += b.omega * dt;
+
+                    const effFriction = b.customFriction !== null ? b.customFriction : physics.friction;
+
+                    // 2. Floor, Ceiling & Wall Collisions with Surface Friction
+                    // Floor
+                    if (b.y + b.r > height - 10) {
+                        b.y = height - 10 - b.r;
+                        if (Math.abs(b.vy) > 1.8) audio.playBounce(Math.abs(b.vy), b.r);
+                        b.vy = -b.vy * physics.restitution;
+
+                        // Apply tangential friction along floor
+                        b.vx *= Math.max(0, 1 - effFriction * 0.14 * dt);
+                        b.omega = b.vx / b.r;
+
+                        // Friction sparks when sliding fast on rough surface
+                        if (Math.abs(b.vx) > 2.5 && effFriction > 0.35 && Math.random() < 0.25) {
+                            particles.push({
+                                x: b.x,
+                                y: b.y + b.r,
+                                vx: -b.vx * 0.3 + (Math.random() - 0.5),
+                                vy: -Math.random() * 2,
+                                r: 2,
+                                color: '#fbbf24',
+                                alpha: 0.9
+                            });
+                        }
+                    }
+                    // Ceiling
+                    if (b.y - b.r < 10) {
+                        b.y = 10 + b.r;
+                        if (Math.abs(b.vy) > 1.8) audio.playBounce(Math.abs(b.vy), b.r);
+                        b.vy = -b.vy * physics.restitution;
+                        b.vx *= Math.max(0, 1 - effFriction * 0.14 * dt);
+                    }
+                    // Left Wall
+                    if (b.x - b.r < 10) {
+                        b.x = 10 + b.r;
+                        if (Math.abs(b.vx) > 1.8) audio.playBounce(Math.abs(b.vx), b.r);
+                        b.vx = -b.vx * physics.restitution;
+                    }
+                    // Right Wall
+                    if (b.x + b.r > width - 10) {
+                        b.x = width - 10 - b.r;
+                        if (Math.abs(b.vx) > 1.8) audio.playBounce(Math.abs(b.vx), b.r);
+                        b.vx = -b.vx * physics.restitution;
+                    }
+
+                    // 3. Collisions with Sloped Ramps (Gravity + Friction on Inclined Planes!)
+                    const rampThickness = 6;
+                    for (let rIdx = 0; rIdx < ramps.length; rIdx++) {
+                        const ramp = ramps[rIdx];
+                        const closest = closestPointOnSegment(b.x, b.y, ramp.x1, ramp.y1, ramp.x2, ramp.y2);
+                        const dx = b.x - closest.x;
+                        const dy = b.y - closest.y;
+                        const dist = Math.hypot(dx, dy);
+                        const minDist = b.r + rampThickness;
+
+                        if (dist < minDist && dist > 0.0001) {
+                            const nx = dx / dist;
+                            const ny = dy / dist;
+                            const tx = -ny;
+                            const ty = nx;
+
+                            // Push ball out of ramp penetration
+                            const overlap = minDist - dist;
+                            b.x += nx * overlap;
+                            b.y += ny * overlap;
+
+                            // Project velocity onto normal & tangent
+                            const vn = b.vx * nx + b.vy * ny;
+                            const vt = b.vx * tx + b.vy * ty;
+
+                            if (vn < 0) {
+                                if (Math.abs(vn) > 2.0) audio.playBounce(Math.abs(vn), b.r);
+                                const newVn = -vn * physics.restitution;
+
+                                // Coulomb-like surface friction reducing tangential velocity
+                                const frictionLoss = Math.max(0, 1 - effFriction * 0.22);
+                                const newVt = vt * frictionLoss;
+
+                                // Static friction threshold on gentle slopes when friction is very high
+                                const finalVt = (Math.abs(newVt) < effFriction * 0.35 && effFriction > 0.65) ? 0 : newVt;
+
+                                b.vx = nx * newVn + tx * finalVt;
+                                b.vy = ny * newVn + ty * finalVt;
+                                b.omega = finalVt / b.r;
+
+                                // Sparks on high friction ramp slide
+                                if (Math.abs(finalVt) > 2.2 && effFriction > 0.3 && Math.random() < 0.2) {
+                                    particles.push({
+                                        x: closest.x,
+                                        y: closest.y,
+                                        vx: -tx * finalVt * 0.25,
+                                        vy: -ty * finalVt * 0.25 - 1,
+                                        r: 2,
+                                        color: '#f59e0b',
+                                        alpha: 0.85
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 4. Body-to-Body Elastic & Frictional Collisions
+                for (let i = 0; i < bodies.length; i++) {
+                    for (let j = i + 1; j < bodies.length; j++) {
+                        const b1 = bodies[i];
+                        const b2 = bodies[j];
+                        const dx = b2.x - b1.x;
+                        const dy = b2.y - b1.y;
+                        const dist = Math.hypot(dx, dy);
+                        const minDist = b1.r + b2.r;
+
+                        if (dist < minDist && dist > 0.0001) {
+                            const nx = dx / dist;
+                            const ny = dy / dist;
+                            const overlap = minDist - dist;
+
+                            const totalMass = b1.mass + b2.mass;
+                            if (pointer.grabbedBody !== b1) {
+                                b1.x -= nx * overlap * (b2.mass / totalMass);
+                                b1.y -= ny * overlap * (b2.mass / totalMass);
+                            }
+                            if (pointer.grabbedBody !== b2) {
+                                b2.x += nx * overlap * (b1.mass / totalMass);
+                                b2.y += ny * overlap * (b1.mass / totalMass);
+                            }
+
+                            // Relative velocity
+                            const rvx = b2.vx - b1.vx;
+                            const rvy = b2.vy - b1.vy;
+                            const velAlongNormal = rvx * nx + rvy * ny;
+
+                            if (velAlongNormal < 0) {
+                                const e = physics.restitution;
+                                const jImpulse = -(1 + e) * velAlongNormal / (1 / b1.mass + 1 / b2.mass);
+                                const impulseX = jImpulse * nx;
+                                const impulseY = jImpulse * ny;
+
+                                if (pointer.grabbedBody !== b1) {
+                                    b1.vx -= impulseX / b1.mass;
+                                    b1.vy -= impulseY / b1.mass;
+                                }
+                                if (pointer.grabbedBody !== b2) {
+                                    b2.vx += impulseX / b2.mass;
+                                    b2.vy += impulseY / b2.mass;
+                                }
+
+                                if (Math.abs(velAlongNormal) > 2.2) {
+                                    audio.playBounce(Math.abs(velAlongNormal), Math.min(b1.r, b2.r));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 5. Check Challenge Goal Portal
+            if (mode === 'CHALLENGE' && goalPortal) {
+                for (let i = 0; i < bodies.length; i++) {
+                    const b = bodies[i];
+                    if (b.isPuzzleCore) {
+                        const d = Math.hypot(b.x - goalPortal.x, b.y - goalPortal.y);
+                        if (d < goalPortal.r + b.r * 0.5) {
+                            audio.playWin();
+                            spawnParticles(goalPortal.x, goalPortal.y, '#10b981', 35);
+                            bodies.splice(i, 1);
+                            document.getElementById('winModal').classList.remove('hidden');
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // 6. Update Particles
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.03;
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+
+            // 7. Update Live Telemetry HUD
+            let totalSpeed = 0;
+            let totalKE = 0;
+            bodies.forEach(b => {
+                const sp = Math.hypot(b.vx, b.vy);
+                totalSpeed += sp;
+                totalKE += 0.5 * b.mass * sp * sp;
+            });
+            document.getElementById('objCount').textContent = bodies.length;
+            const avgSp = bodies.length ? (totalSpeed / bodies.length).toFixed(1) : '0.0';
+            document.getElementById('avgSpeed').textContent = `${avgSp} m/s`;
+            document.getElementById('keDisplay').textContent = `${Math.round(totalKE)} J`;
+        }
+
+        // Render Lab Canvas
+        function drawLab() {
+            ctx.clearRect(0, 0, width, height);
+
+            // 1. Blueprint Grid Background
+            ctx.fillStyle = '#090d16';
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.strokeStyle = 'rgba(30, 41, 59, 0.55)';
+            ctx.lineWidth = 1;
+            const gridSize = 40;
+            for (let x = 0; x < width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, height);
+                ctx.stroke();
+            }
+            for (let y = 0; y < height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+                ctx.stroke();
+            }
+
+            // 2. Draw Boundary Floor with Visual Texture Matching Current Friction!
+            const floorY = height - 10;
+            if (physics.friction < 0.12) {
+                // Icy Cyan Sheen
+                ctx.fillStyle = '#06b6d4';
+            } else if (physics.friction > 0.6) {
+                // High-Friction Rough Amber/Orange
+                ctx.fillStyle = '#d97706';
+            } else {
+                // Standard Slate Surface
+                ctx.fillStyle = '#334155';
+            }
+            ctx.fillRect(0, floorY, width, 10);
+
+            // 3. Draw Goal Portal (If in Challenge Mode)
+            if (mode === 'CHALLENGE' && goalPortal) {
+                const pulse = Math.sin(Date.now() * 0.006) * 4;
+                const grad = ctx.createRadialGradient(
+                    goalPortal.x, goalPortal.y, 4,
+                    goalPortal.x, goalPortal.y, goalPortal.r + pulse + 8
+                );
+                grad.addColorStop(0, '#a7f3d0');
+                grad.addColorStop(0.5, '#10b981');
+                grad.addColorStop(1, 'rgba(16, 185, 129, 0)');
+
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(goalPortal.x, goalPortal.y, goalPortal.r + pulse + 8, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.strokeStyle = '#ecfdf5';
+                ctx.lineWidth = 2.5;
+                ctx.setLineDash([6, 4]);
+                ctx.beginPath();
+                ctx.arc(goalPortal.x, goalPortal.y, goalPortal.r * 0.75, Date.now() * 0.002, Date.now() * 0.002 + Math.PI * 2);
+                ctx.stroke();
+                ctx.setLineDash([]);
+
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 11px "Space Grotesk", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('GOAL', goalPortal.x, goalPortal.y + 4);
+            }
+
+            // 4. Draw Ramps (Color & Texture Reflects Surface Friction μ)
+            ramps.forEach(r => {
+                ctx.save();
+                ctx.lineCap = 'round';
+                ctx.lineWidth = 12;
+
+                if (physics.friction < 0.12) {
+                    ctx.strokeStyle = '#22d3ee'; // Slippery Ice Ramp
+                } else if (physics.friction > 0.6) {
+                    ctx.strokeStyle = '#f59e0b'; // High-Grip Rough Ramp
+                } else {
+                    ctx.strokeStyle = '#64748b'; // Standard Steel Ramp
+                }
+
+                ctx.beginPath();
+                ctx.moveTo(r.x1, r.y1);
+                ctx.lineTo(r.x2, r.y2);
+                ctx.stroke();
+
+                // Inner core line on ramp
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = '#0f172a';
+                ctx.beginPath();
+                ctx.moveTo(r.x1, r.y1);
+                ctx.lineTo(r.x2, r.y2);
+                ctx.stroke();
+
+                // End bolts
+                ctx.fillStyle = '#e2e8f0';
+                ctx.beginPath();
+                ctx.arc(r.x1, r.y1, 3.5, 0, Math.PI * 2);
+                ctx.arc(r.x2, r.y2, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // 5. Draw Active Pointer Drag Preview (Slingshot or Ramp Preview)
+            if (pointer.isDown && !pointer.grabbedBody) {
+                ctx.save();
+                if (currentTool === 'ramp') {
+                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.8)';
+                    ctx.lineWidth = 10;
+                    ctx.lineCap = 'round';
+                    ctx.setLineDash([8, 6]);
+                    ctx.beginPath();
+                    ctx.moveTo(pointer.startX, pointer.startY);
+                    ctx.lineTo(pointer.currX, pointer.currY);
+                    ctx.stroke();
+                } else if (currentTool !== 'grab') {
+                    // Slingshot launch vector arrow
+                    ctx.strokeStyle = '#38bdf8';
+                    ctx.lineWidth = 2.5;
+                    ctx.setLineDash([5, 5]);
+                    ctx.beginPath();
+                    ctx.moveTo(pointer.startX, pointer.startY);
+                    ctx.lineTo(pointer.currX, pointer.currY);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    ctx.fillStyle = 'rgba(56, 189, 248, 0.35)';
+                    ctx.beginPath();
+                    ctx.arc(pointer.startX, pointer.startY, 18, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+
+            // 6. Draw Physics Bodies
+            bodies.forEach(b => {
+                ctx.save();
+                ctx.translate(b.x, b.y);
+
+                // Velocity Vector Indicator (Subtle green arrow when moving fast)
+                const speed = Math.hypot(b.vx, b.vy);
+                if (speed > 1.5) {
+                    ctx.strokeStyle = 'rgba(56, 189, 248, 0.45)';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(b.vx * 3.5, b.vy * 3.5);
+                    ctx.stroke();
+                }
+
+                ctx.rotate(b.angle);
+
+                // Glow for Puzzle Core
+                if (b.isPuzzleCore) {
+                    ctx.shadowColor = '#facc15';
+                    ctx.shadowBlur = 16;
+                }
+
+                // Body Circle
+                ctx.fillStyle = b.color;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, b.r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Rotation stripe so user clearly sees rolling friction vs sliding!
+                ctx.strokeStyle = 'rgba(15, 23, 42, 0.5)';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(-b.r + 3, 0);
+                ctx.lineTo(b.r - 3, 0);
+                ctx.stroke();
+
+                // Center Emoji Icon
+                ctx.font = `${Math.round(b.r * 0.95)}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(b.label, 0, 1);
+
+                ctx.restore();
+            });
+
+            // 7. Draw Particles
+            particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = Math.max(0, p.alpha);
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        // Main Loop
+        function animate() {
+            updatePhysics();
+            drawLab();
+            requestAnimationFrame(animate);
+        }
+
+        // Canvas Pointer Helpers
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('pointerdown', (e) => {
+            e.preventDefault();
+            audio.init();
+            const pos = getCanvasCoords(e);
+            pointer.isDown = true;
+            pointer.startX = pos.x;
+            pointer.startY = pos.y;
+            pointer.currX = pos.x;
+            pointer.currY = pos.y;
+            pointer.lastX = pos.x;
+            pointer.lastY = pos.y;
+
+            // Check if clicking an existing body when in Grab mode (or right on a body)
+            if (currentTool === 'grab') {
+                for (let i = bodies.length - 1; i >= 0; i--) {
+                    const b = bodies[i];
+                    if (Math.hypot(pos.x - b.x, pos.y - b.y) <= b.r + 10) {
+                        pointer.grabbedBody = b;
+                        b.vx = 0;
+                        b.vy = 0;
+                        break;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!pointer.isDown) return;
+            const pos = getCanvasCoords(e);
+            pointer.vx = (pos.x - pointer.lastX) * 0.45;
+            pointer.vy = (pos.y - pointer.lastY) * 0.45;
+            pointer.lastX = pos.x;
+            pointer.lastY = pos.y;
+            pointer.currX = pos.x;
+            pointer.currY = pos.y;
+
+            if (pointer.grabbedBody) {
+                pointer.grabbedBody.x = pos.x;
+                pointer.grabbedBody.y = pos.y;
+                pointer.grabbedBody.vx = 0;
+                pointer.grabbedBody.vy = 0;
+            }
+        });
+
+        window.addEventListener('pointerup', () => {
+            if (!pointer.isDown) return;
+            pointer.isDown = false;
+
+            if (pointer.grabbedBody) {
+                pointer.grabbedBody.vx = Math.max(-18, Math.min(18, pointer.vx));
+                pointer.grabbedBody.vy = Math.max(-18, Math.min(18, pointer.vy));
+                pointer.grabbedBody = null;
+                return;
+            }
+
+            const dx = pointer.currX - pointer.startX;
+            const dy = pointer.currY - pointer.startY;
+            const dragDist = Math.hypot(dx, dy);
+
+            if (currentTool === 'ramp') {
+                if (dragDist > 24) {
+                    ramps.push({
+                        x1: pointer.startX,
+                        y1: pointer.startY,
+                        x2: pointer.currX,
+                        y2: pointer.currY
+                    });
+                }
+            } else if (currentTool !== 'grab') {
+                // Slingshot velocity based on drag vector
+                const launchVx = (pointer.startX - pointer.currX) * 0.085;
+                const launchVy = (pointer.startY - pointer.currY) * 0.085;
+                createBody(pointer.startX, pointer.startY, launchVx, launchVy, currentTool);
+            }
+        });
+
+        // UI Controls & Sliders Synchronization
+        const gravitySlider = document.getElementById('gravitySlider');
+        const frictionSlider = document.getElementById('frictionSlider');
+        const bounceSlider = document.getElementById('bounceSlider');
+        const dragSlider = document.getElementById('dragSlider');
+
+        function getFrictionLabel(val) {
+            if (val < 0.08) return `${val.toFixed(2)} (Ice ❄️)`;
+            if (val < 0.35) return `${val.toFixed(2)} (Smooth)`;
+            if (val < 0.65) return `${val.toFixed(2)} (Rough)`;
+            return `${val.toFixed(2)} (Sticky 🧱)`;
+        }
+
+        function syncSliders() {
+            gravitySlider.value = physics.gravity;
+            frictionSlider.value = physics.friction;
+            bounceSlider.value = physics.restitution;
+            dragSlider.value = physics.airDrag;
+
+            document.getElementById('gravityVal').textContent = `${physics.gravity.toFixed(1)} m/s²`;
+            document.getElementById('frictionVal').textContent = getFrictionLabel(physics.friction);
+            document.getElementById('bounceVal').textContent = physics.restitution.toFixed(2);
+            document.getElementById('dragVal').textContent = physics.airDrag.toFixed(3);
+        }
+
+        gravitySlider.addEventListener('input', (e) => {
+            physics.gravity = parseFloat(e.target.value);
+            syncSliders();
+        });
+        frictionSlider.addEventListener('input', (e) => {
+            physics.friction = parseFloat(e.target.value);
+            syncSliders();
+        });
+        bounceSlider.addEventListener('input', (e) => {
+            physics.restitution = parseFloat(e.target.value);
+            syncSliders();
+        });
+        dragSlider.addEventListener('input', (e) => {
+            physics.airDrag = parseFloat(e.target.value);
+            syncSliders();
+        });
+
+        // Tool Buttons
+        const toolHints = {
+            ball: 'Tap or drag-slingshot bouncy balls',
+            heavy: 'Spawn heavy high-momentum boulders',
+            ice: 'Spawn ultra-low friction ice pucks',
+            ramp: 'Click & drag to build custom inclined ramps',
+            grab: 'Drag & fling existing objects'
+        };
+
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = btn.getAttribute('data-tool');
+                document.getElementById('activeToolHint').textContent = toolHints[currentTool];
+            });
+        });
+
+        // Planet & Surface Presets
+        document.querySelectorAll('.preset-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const preset = chip.getAttribute('data-preset');
+                if (preset === 'earth') {
+                    physics.gravity = 9.8;
+                    physics.friction = 0.25;
+                    physics.restitution = 0.75;
+                    physics.airDrag = 0.005;
+                } else if (preset === 'moon') {
+                    physics.gravity = 1.6;
+                    physics.friction = 0.40;
+                    physics.restitution = 0.65;
+                    physics.airDrag = 0.0;
+                } else if (preset === 'space') {
+                    physics.gravity = 0.0;
+                    physics.friction = 0.05;
+                    physics.restitution = 0.92;
+                    physics.airDrag = 0.0;
+                } else if (preset === 'iceworld') {
+                    physics.gravity = 9.8;
+                    physics.friction = 0.0;
+                    physics.restitution = 0.85;
+                    physics.airDrag = 0.002;
+                }
+                syncSliders();
+            });
+        });
+
+        // Fun Action Buttons
+        document.getElementById('explosionBtn').addEventListener('click', () => {
+            audio.init();
+            audio.playBlast();
+            const cx = width / 2;
+            const cy = height * 0.75;
+            spawnParticles(cx, cy, '#f97316', 28);
+
+            bodies.forEach(b => {
+                const dx = b.x - cx;
+                const dy = b.y - cy;
+                const dist = Math.max(40, Math.hypot(dx, dy));
+                const force = (420 / dist);
+                b.vx += (dx / dist) * force + (Math.random() - 0.5) * 4;
+                b.vy += (dy / dist) * force - 6;
+            });
+        });
+
+        document.getElementById('flipGravityBtn').addEventListener('click', () => {
+            physics.gravity = physics.gravity === 0 ? -9.8 : -physics.gravity;
+            syncSliders();
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            if (mode === 'CHALLENGE') {
+                loadChallenge(currentLevel);
+            } else {
+                bodies = [];
+                ramps = [];
+            }
+        });
+
+        document.getElementById('soundBtn').addEventListener('click', (e) => {
+            audio.muted = !audio.muted;
+            e.currentTarget.textContent = audio.muted ? '🔇' : '🔊';
+        });
+
+        // Mode Switching (Sandbox vs Challenges)
+        const sandboxModeBtn = document.getElementById('sandboxModeBtn');
+        const challengeModeBtn = document.getElementById('challengeModeBtn');
+        const challengeBanner = document.getElementById('challengeBanner');
+        const modeBadge = document.getElementById('modeBadge');
+
+        function setMode(newMode) {
+            mode = newMode;
+            document.getElementById('winModal').classList.add('hidden');
+            if (mode === 'SANDBOX') {
+                modeBadge.textContent = 'Sandbox';
+                challengeBanner.classList.add('hidden');
+                sandboxModeBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-cyan-600 text-white border border-cyan-400 shadow transition';
+                challengeModeBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition';
+                initSandboxDefault();
+            } else {
+                modeBadge.textContent = 'Challenge';
+                challengeBanner.classList.remove('hidden');
+                challengeModeBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-slate-950 border border-amber-300 shadow transition';
+                sandboxModeBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:text-white border border-slate-700 transition';
+                loadChallenge(0);
+            }
+        }
+
+        function loadChallenge(idx) {
+            currentLevel = idx % levels.length;
+            bodies = [];
+            ramps = [];
+            document.getElementById('winModal').classList.add('hidden');
+            const lvl = levels[currentLevel];
+            document.getElementById('challengeTitle').textContent = lvl.title;
+            document.getElementById('challengeDesc').textContent = lvl.desc;
+            lvl.setup(width, height);
+        }
+
+        sandboxModeBtn.addEventListener('click', () => setMode('SANDBOX'));
+        challengeModeBtn.addEventListener('click', () => setMode('CHALLENGE'));
+
+        document.getElementById('spawnPuzzleBallBtn').addEventListener('click', () => {
+            loadChallenge(currentLevel);
+        });
+
+        document.getElementById('nextLevelBtn').addEventListener('click', () => {
+            loadChallenge(currentLevel + 1);
+        });
+
+        document.getElementById('nextChallengeModalBtn').addEventListener('click', () => {
+            loadChallenge(currentLevel + 1);
+        });
+
+        // Initialize on Window Load
+        window.onload = function () {
+            resizeCanvas();
+            syncSliders();
+            animate();
+        };
+    </script>
+</body>
+</html>
